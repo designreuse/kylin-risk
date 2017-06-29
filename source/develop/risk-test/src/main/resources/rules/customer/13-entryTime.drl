@@ -1,0 +1,44 @@
+package os.nut.drools.WorkInfo;
+//salience:279-260
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "entryTime2"
+    no-loop true
+    salience 279
+    when
+        $workInfo : CustomerFactor(entryTime>=5);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setEntryTime("entryTime01");
+end
+
+rule "entryTime3"
+    no-loop true
+    salience 278
+    when
+        $workInfo : CustomerFactor( entryTime>=3&&entryTime<5);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setEntryTime("entryTime02");
+end
+
+rule "entryTime4"
+    no-loop true
+    salience 277
+    when
+        $workInfo : CustomerFactor(entryTime>=1&&entryTime<3);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setEntryTime("entryTime03");
+end
+
+rule "entryTime5"
+    no-loop true
+    salience 276
+    when
+        $workInfo : CustomerFactor(entryTime<1);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setEntryTime("entryTime04");
+end

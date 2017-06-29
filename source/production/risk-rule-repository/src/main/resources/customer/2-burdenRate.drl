@@ -1,0 +1,45 @@
+package os.nut.drools.RepayInfo;
+//salience:499-480 负债比
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "burdenRate2"
+    no-loop true
+    salience 498
+    when
+        $repayInfo : CustomerFactor(burdenRate!=null,burdenRate.isGreaterOrEqualThan(3));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setBurdenRate("burdenRate01");
+end
+
+rule "burdenRate3"
+    no-loop true
+    salience 497
+    when
+        $repayInfo : CustomerFactor(burdenRate!=null, burdenRate.isGreaterOrEqualThan(1)&&burdenRate.isLesserThan(3));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setBurdenRate("burdenRate02");
+end
+
+rule "burdenRate4"
+    no-loop true
+    salience 496
+    when
+        $repayInfo : CustomerFactor(burdenRate!=null,burdenRate.isGreaterOrEqualThan(0.5)&&burdenRate.isLesserThan(1));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setBurdenRate("burdenRate03");
+end
+
+rule "burdenRate5"
+    no-loop true
+    salience 499
+    when
+        $repayInfo : CustomerFactor(burdenRate!=null,burdenRate.isLesserThan(0.4));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMsg("负债比低于0.5以下");
+        retract($repayInfo)
+end

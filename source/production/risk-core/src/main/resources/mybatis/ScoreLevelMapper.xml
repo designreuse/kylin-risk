@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ScoreLevel" >
+  <resultMap id="scoreLevelMap" type="ScoreLevel" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="scoremin" property="scoremin" jdbcType="DOUBLE" javaType="Amount" />
+    <result column="scoremax" property="scoremax" jdbcType="DOUBLE" javaType="Amount" />
+    <result column="risklevel" property="risklevel" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, scoremin, scoremax, risklevel
+  </sql>
+  <select id="get" resultMap="scoreLevelMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_score_level
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+
+  <select id="getlevelbyscore" resultMap="scoreLevelMap" parameterType="double" >
+    select
+    <include refid="columnList" />
+    from risk_score_level
+    where scoremin &lt;= #{score,jdbcType=DOUBLE,javaType=Double} and scoremax &gt; #{score,jdbcType=DOUBLE,javaType=Double}
+  </select>
+  <delete id="delete" parameterType="short" >
+    delete from risk_score_level
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="ScoreLevel" >
+    insert into risk_score_level (scoremin, scoremax, risklevel
+      )
+    values (#{scoremin,jdbcType=DOUBLE,javaType=Amount},
+    #{scoremax,jdbcType=DOUBLE,javaType=Amount},
+    #{risklevel,jdbcType=CHAR})
+  </insert>
+  <update id="update" parameterType="ScoreLevel" >
+    update risk_score_level
+    set scoremin = #{scoremin,jdbcType=DOUBLE,javaType=Amount},
+      scoremax = #{scoremax,jdbcType=DOUBLE,javaType=Amount},
+      risklevel = #{risklevel,jdbcType=CHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+</mapper>

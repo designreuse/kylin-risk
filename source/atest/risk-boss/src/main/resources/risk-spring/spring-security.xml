@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+    http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security-4.0.xsd">
+
+
+    <!--
+		CSRF protection. Here we only include the CsrfFilter instead of all of Spring Security.
+		See http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#csrf for more information on
+		Spring Security's CSRF protection
+	-->
+    <beans:bean id="csrfFilter" class="org.springframework.security.web.csrf.CsrfFilter">
+        <beans:constructor-arg>
+            <beans:bean class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository"/>
+        </beans:constructor-arg>
+    </beans:bean>
+
+    <!--
+    如果用的是spring mvc 的form标签，则配置此项时自动将crsf的token
+    放入到一个hidden的input中，而不需要开发人员显式的写入form -->
+    <beans:bean id="requestDataValueProcessor" class="org.springframework.security.web.servlet.support.csrf.CsrfRequestDataValueProcessor"/>
+
+
+    <beans:bean id="frameOptionsWriter"
+          class="org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter">
+        <beans:constructor-arg name="frameOptionsMode" value="SAMEORIGIN"></beans:constructor-arg>
+    </beans:bean>
+
+
+
+</beans:beans>
+
+	

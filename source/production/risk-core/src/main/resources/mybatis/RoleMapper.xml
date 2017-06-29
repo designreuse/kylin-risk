@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Role" >
+  <cache type="com.rkylin.risk.mybatis.cache.RedisCache"/>
+  <resultMap id="roleMap" type="Role" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="rolename" property="rolename" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+
+  </resultMap>
+  <sql id="columnList" >
+    id, rolename, remark, status
+  </sql>
+
+  <select id="queryAll" resultMap="roleMap">
+    select
+    <include refid="columnList" />
+    from risk_role
+  </select>
+
+  <select id="queryOne" resultMap="roleMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_role
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+
+  <select id="query" resultMap="roleMap" parameterType="Role">
+    <if test="rolename != null">
+      <bind name="rolename" value="rolename + '%'" />
+    </if>
+    SELECT
+    <include refid="columnList" />
+    FROM risk_role
+    <where>
+      <if test="rolename != null and ''!=rolename">
+        rolename LIKE #{rolename}
+      </if>
+      <if test="status != null and ''!=status">
+        AND status = #{status}
+      </if>
+    </where>
+    order by id
+  </select>
+
+  <delete id="delete" parameterType="short" >
+    delete from risk_role
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+
+  <insert id="insert" parameterType="Role" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_role (rolename, remark, status
+      )
+    values (#{rolename,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}
+      )
+  </insert>
+
+  <update id="update" parameterType="Role" >
+    update risk_role
+    set rolename = #{rolename,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+
+
+  <select id="getOperatorRole" resultMap="roleMap" parameterType="short" useCache="false">
+    select
+    a.id, a.rolename, a.remark, a.status
+    from risk_role a  join risk_operator_role b on a.id=b.roleid  join risk_operator c on b.operatorid=c.id
+    where c.id = #{id,jdbcType=SMALLINT}
+  </select>
+</mapper>

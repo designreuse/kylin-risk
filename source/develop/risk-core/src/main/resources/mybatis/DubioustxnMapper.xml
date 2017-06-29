@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Dubioustxn">
+  <resultMap id="dubioustxnMap" type="Dubioustxn">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="txncount" jdbcType="VARCHAR" property="txncount" />
+    <result column="txnaccount" javaType="Amount" jdbcType="DECIMAL" property="txnaccount" />
+    <result column="risklevel" jdbcType="CHAR" property="risklevel" />
+    <result column="warndate" javaType="LocalDate" jdbcType="DATE" property="warndate" />
+    <result column="ruleid" jdbcType="VARCHAR" property="ruleid" />
+    <result column="customnum" jdbcType="VARCHAR" property="customnum" />
+    <result column="customname" jdbcType="VARCHAR" property="customname" />
+    <result column="dealopinion" jdbcType="VARCHAR" property="dealopinion" />
+    <result column="warnstatus" jdbcType="CHAR" property="warnstatus" />
+    <result column="txnum" jdbcType="VARCHAR" property="txnum" />
+    <result column="certificateid" jdbcType="VARCHAR" property="certificateid" />
+    <result column="telephonenum" jdbcType="VARCHAR" property="telephonenum" />
+    <result column="bankcardnum" jdbcType="VARCHAR" property="bankcardnum" />
+    <result column="productid" jdbcType="VARCHAR" property="productid" />
+  </resultMap>
+  <sql id="columnList">
+    id, txncount, txnaccount, risklevel, warndate, ruleid, customnum, customname, dealopinion,
+    warnstatus, txnum, certificateid, telephonenum, bankcardnum,productid
+  </sql>
+  <select id="queryAll"  resultMap="dubioustxnMap">
+    select
+    <include refid="columnList" />
+    from risk_dubioustxn t
+    where risklevel = '00'
+    AND warndate = #{warndate,jdbcType=DATE,javaType=LocalDate}
+    AND warnstatus != '01'
+    ORDER BY customnum
+  </select>
+
+  <select id="queryAllMap" resultMap="dubioustxnMap" parameterType="map">
+    select
+    <include refid="columnList" />
+    from risk_dubioustxn t
+    where  t.warndate = #{warndate,jdbcType=DATE,javaType=LocalDate}
+    AND t.warnstatus != '01'
+
+    <if test="products != null and products.length !=0">
+      AND t.productid in
+      <foreach collection="products" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+    <if test="productall != null and ''!=productall">
+      AND t.productid = #{productall}
+    </if>
+    <if test="productnull != null and ''!=productnull">
+      AND t.productid is null
+    </if>
+
+    ORDER BY customnum
+  </select>
+
+  <select id="queryByCaseId" resultMap="dubioustxnMap" parameterType="integer" >
+    select a.*
+    from risk_dubioustxn a
+    LEFT JOIN risk_case_dubioustxn b
+    ON a.id=b.txnid
+    where b.caseid = #{caseid,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryByCondition"  resultType="Map">
+    <if test="customnum != null and ''!=customnum">
+      <bind name="customnum" value="customnum + '%'" />
+    </if>
+    <if test="customname != null and ''!=customname">
+      <bind name="customname" value="customname + '%'" />
+    </if>
+    select
+      d.id ,d.warndate, d.customnum ,d.customname, d.txnaccount,
+      d.warnstatus,d.risklevel,d.dealopinion,d.ruleid,d.txnum
+    from risk_dubioustxn d
+    <where>
+      <if test="customnum != null and ''!=customnum">
+        customnum LIKE #{customnum}
+      </if>
+      <if test="customname != null and ''!=customname">
+        AND customname LIKE #{customname}
+      </if>
+      <if test="warnstatus != null and ''!=warnstatus">
+        AND warnstatus = #{warnstatus}
+      </if>
+      <if test="products != null and products.length !=0">
+        AND d.productid in
+        <foreach collection="products" index="index" item="product" open="(" separator="," close=")">
+          #{product}
+        </foreach>
+      </if>
+      <if test="productall != null and ''!=productall">
+        AND d.productid = #{productall}
+      </if>
+      <if test="productnull != null and ''!=productnull">
+        AND d.productid is null
+      </if>
+      <if test="warndates != null and ''!=warndates">
+        AND <![CDATA[warndate >= #{warndates,jdbcType=DATE}]]>
+      </if>
+      <if test="warndatee != null and ''!=warndatee">
+        AND <![CDATA[warndate <= #{warndatee,jdbcType=DATE}]]>
+      </if>
+    </where>
+  </select>
+  <select id="get" parameterType="integer" resultMap="dubioustxnMap">
+    select
+    <include refid="columnList" />
+    from risk_dubioustxn
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="queryByRiskLevel" parameterType="String" resultMap="dubioustxnMap">
+    select
+    <include refid="columnList" />
+    from risk_dubioustxn
+    where risklevel = #{riskLevel,jdbcType=CHAR}
+  </select>
+  <select id="queryByTxnum" parameterType="String" resultMap="dubioustxnMap">
+    SELECT
+    <include refid="columnList" />
+    FROM risk_dubioustxn
+    WHERE txnum = #{orderId,jdbcType=VARCHAR}
+  </select>
+  <delete id="delete" parameterType="integer">
+    delete from risk_dubioustxn
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="Dubioustxn" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_dubioustxn (txncount, txnaccount, risklevel,
+    warndate, ruleid, customnum,
+    customname, dealopinion, warnstatus,
+    txnum, certificateid, telephonenum,
+    bankcardnum,productid)
+    values (#{txncount,jdbcType=VARCHAR}, #{txnaccount,jdbcType=DECIMAL}, #{risklevel,jdbcType=CHAR},
+    #{warndate,jdbcType=DATE}, #{ruleid,jdbcType=VARCHAR}, #{customnum,jdbcType=VARCHAR},
+    #{customname,jdbcType=VARCHAR}, #{dealopinion,jdbcType=VARCHAR}, #{warnstatus,jdbcType=CHAR},
+    #{txnum,jdbcType=VARCHAR}, #{certificateid,jdbcType=VARCHAR}, #{telephonenum,jdbcType=VARCHAR},
+    #{bankcardnum,jdbcType=VARCHAR},#{productid,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="Dubioustxn">
+    update risk_dubioustxn
+    set txncount = #{txncount,jdbcType=VARCHAR},
+      txnaccount = #{txnaccount,jdbcType=DECIMAL},
+      risklevel = #{risklevel,jdbcType=CHAR},
+      warndate = #{warndate,jdbcType=DATE},
+      ruleid = #{ruleid,jdbcType=VARCHAR},
+      customnum = #{customnum,jdbcType=VARCHAR},
+      customname = #{customname,jdbcType=VARCHAR},
+      dealopinion = #{dealopinion,jdbcType=VARCHAR},
+      warnstatus = #{warnstatus,jdbcType=CHAR},
+      txnum = #{txnum,jdbcType=VARCHAR},
+      certificateid = #{certificateid,jdbcType=VARCHAR},
+      telephonenum = #{telephonenum,jdbcType=VARCHAR},
+      bankcardnum = #{bankcardnum,jdbcType=VARCHAR},
+      productid = #{productid,jdbcType=VARCHAR})
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateWarnstatus" parameterType="map" >
+    update risk_dubioustxn
+    set
+      warnstatus = #{warnstatus,jdbcType=CHAR},
+      dealopinion = #{dealopinion,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

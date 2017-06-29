@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="RoleMenu" >
+  <cache type="com.rkylin.risk.mybatis.cache.RedisCache"/>
+  <resultMap id="roleMenuMap" type="RoleMenu" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="roleid" property="roleid" jdbcType="SMALLINT" />
+    <result column="menuid" property="menuid" jdbcType="SMALLINT" />
+  </resultMap>
+  <sql id="columnList" >
+    id, roleid, menuid
+  </sql>
+
+  <select id="queryAll" resultMap="roleMenuMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_role_menu
+    where roleid = #{roleid,jdbcType=SMALLINT}
+  </select>
+  <select id="queryByMenuid" resultMap="roleMenuMap" parameterType="short" >
+    select
+    <include refid="columnList" />
+    from risk_role_menu
+    where menuid = #{menuid,jdbcType=SMALLINT}
+  </select>
+
+  <delete id="delete" parameterType="short" >
+    delete from risk_role_menu
+    where roleid = #{roleid,jdbcType=SMALLINT}
+  </delete>
+
+  <delete id="deleteRolemenuByMenuid" parameterType="short" >
+    delete from risk_role_menu
+    where menuid = #{menuid,jdbcType=SMALLINT}
+  </delete>
+
+  <insert id="insert" parameterType="RoleMenu" >
+    insert into risk_role_menu (roleid, menuid)
+    values (#{roleid,jdbcType=SMALLINT}, #{menuid,jdbcType=SMALLINT})
+  </insert>
+
+  <update id="update" parameterType="RoleMenu" >
+    update risk_role_menu
+    set roleid = #{roleid,jdbcType=SMALLINT},
+      menuid = #{menuid,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+</mapper>

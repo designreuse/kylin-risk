@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="OperateFlow" >
+  <resultMap id="operateFlowMap" type="OperateFlow" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="checkorderid" property="checkorderid" jdbcType="VARCHAR" />
+    <result column="customerid" property="customerid" jdbcType="VARCHAR" />
+    <result column="resultstatus" property="resultstatus" jdbcType="CHAR" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="riskmsg" property="riskmsg" jdbcType="VARCHAR" />
+    <result column="ruleid" property="ruleid" jdbcType="VARCHAR" />
+    <result column="classname" property="classname" jdbcType="VARCHAR" />
+    <result column="classprice" property="classprice" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, checkorderid,customerid, resultstatus, reason, riskmsg, ruleid,classprice, classname, createtime, updatetime
+  </sql>
+  <select id="get" resultMap="operateFlowMap" parameterType="long" >
+    select 
+    <include refid="columnList" />
+    from risk_operateflow
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="delete" parameterType="long" >
+    delete from risk_operateflow
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="OperateFlow" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_operateflow (checkorderid, customerid, resultstatus, reason,
+      riskmsg, ruleid, classname, classprice)
+    values (#{checkorderid,jdbcType=VARCHAR},#{customerid,jdbcType=VARCHAR}, #{resultstatus,jdbcType=CHAR}, #{reason,jdbcType=VARCHAR},
+      #{riskmsg,jdbcType=VARCHAR}, #{ruleid,jdbcType=VARCHAR}, #{classname,jdbcType=VARCHAR}, #{classprice,jdbcType=DECIMAL})
+  </insert>
+  <update id="update" parameterType="OperateFlow" >
+    update risk_operateflow
+    set
+      checkorderid = #{checkorderid,jdbcType=VARCHAR},
+      customerid = #{customerid,jdbcType=VARCHAR},
+      resultstatus = #{resultstatus,jdbcType=CHAR},
+      reason = #{reason,jdbcType=VARCHAR},
+      riskmsg = #{riskmsg,jdbcType=VARCHAR},
+      ruleid = #{ruleid,jdbcType=VARCHAR},
+      classname = #{classname,jdbcType=VARCHAR},
+      classprice = #{classprice,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="queryByCheckorderid" resultMap="operateFlowMap" parameterType="String">
+    SELECT
+    <include refid="columnList"/>
+    FROM risk_operateflow
+    WHERE checkorderid = #{checkorderid, jdbcType=VARCHAR}
+  </select>
+</mapper>

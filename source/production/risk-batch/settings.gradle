@@ -1,0 +1,5 @@
+
+rootProject.name = 'risk-batch'
+
+include 'risk-batch-core'
+include 'risk-batch-web'

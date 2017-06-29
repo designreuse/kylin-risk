@@ -1,0 +1,58 @@
+#macro(makeupfield $field $factor $index $ruleBean)
+  #set($convals=$factor.conditionvals.get($index))
+  #set($conditions=$factor.conditions.get($index))
+  #if($conditions==">=")${field}.isGreaterOrEqualThan($convals)
+  #elseif($conditions==">")${field}.isGreaterThan($convals)
+  #elseif($conditions=="<=")${field}.isLesserOrEqualThan($convals)
+  #elseif($conditions=="<")${field}.isLesserThan($convals)
+  #elseif($conditions=="==")
+    #if($ruleBean.isNumeric($convals))${field}.isEqualTo($convals)
+    #else${field}=="$convals"
+    #end
+  #elseif($conditions=="!=")
+    #if($ruleBean.isNumeric($convals))!${field}.isEqualTo($convals)
+    #else${field}!="$convals"
+    #end
+  #end
+#end
+
+package risk.drools.customerrule;
+
+import com.rkylin.risk.core.dto.LogicRuleBean;
+import com.rkylin.risk.core.dto.ResultBean;
+
+#foreach($factor in $factors)
+rule "customer$velocityCount"
+no-loop true
+salience $factor.priority
+when
+ruleBean : LogicRuleBean(
+  #set($index=0)
+  #set($foo = -1)
+  #foreach($field in $factor.fields)
+  ##输出‘与或’操作符
+    #if($index>0)$factor.logicsym.get($foo)#end
+    #set($bracflg=false)
+  ##判断以右括号结尾，并截取右括号前字符串赋值到$field，设置括号参数为true
+    #if($ruleBean.isEndWithRightbrac($field))#set($field=$ruleBean.subBracBefore($field))#set($bracflg=true)#end
+  ##判断以左括号开始，并截取左括号后字符串赋值到$field，输出左括号
+    #if($ruleBean.isStartWithLeftbrac($field))#set($field=$ruleBean.subBracAfter($field))(#end
+  ##判断$field有值，拼接$field不为空判断，输出拼接后逻辑判断，输出右括号
+    #if($ruleBean.isNotNullVal($field))($field!=null&&#makeupfield($field $factor $index $ruleBean))#end
+  ##输出原有右括号
+    #if($bracflg))#end
+    #set($index = $index+1)
+    #set($foo = $foo+1)
+  #end
+);
+resultBean : ResultBean();
+then
+  #if($factor.result=="forbid")
+  resultBean.setOffMsg("$factor.rulename"+"条件不符合，导致禁入！");
+  resultBean.setIsOff("1");
+  retract(ruleBean);
+  #else
+  resultBean.setScore(resultBean.getScore()#if($logicRule.isNegaNum($factor.result))$factor.result#else+$factor.result#end);
+  #end
+end
+#end

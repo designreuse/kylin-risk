@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="FactorLibrary" >
+  <resultMap id="factorLibraryMap" type="FactorLibrary" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, name, code, type,status, createtime, updatetime
+  </sql>
+  <select id="get" resultMap="factorLibraryMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_factor_library
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="delete" parameterType="short" >
+    delete from risk_factor_library
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="FactorLibrary"  keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_factor_library (name, code, type, status)
+    values (#{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="FactorLibrary" >
+    update risk_factor_library
+    <set>
+      <if test="name!=null and name != ''">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code!=null and code != ''">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="type!=null and type != ''">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="status!=null and status != ''">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="queryByType" resultMap="factorLibraryMap" parameterType="string" >
+    select
+    <include refid="columnList" />
+    from risk_factor_library
+    where type = #{type,jdbcType=VARCHAR}
+      and status = '00'
+  </select>
+  <select id="queryFactorLibrary" resultMap="factorLibraryMap" parameterType="FactorLibrary" >
+    <if test="factorname!=null and ''!=factorname">
+      <bind name="factorname" value="'%'+factorname + '%'" />
+    </if>
+    select
+    <include refid="columnList" />
+    from risk_factor_library
+    <where>
+    <if test="factorname!=null and factorname != ''">
+      name like #{factorname,jdbcType=VARCHAR}
+    </if>
+    <if test="factortype!=null and factortype != ''">
+     and type = #{factortype,jdbcType=VARCHAR}
+    </if>
+  </where>
+  </select>
+</mapper>

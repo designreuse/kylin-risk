@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
+
+  <context:component-scan base-package="com.rkylin.risk.test.restController"/>
+
+  <mvc:view-controller path="/" view-name="redirect:/orderApi/invokeOrderApi"/>
+
+  <bean id="contentNegotiationManager"
+      class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+    <!--忽略以html请求的Accept作为请求判断MediaType依据-->
+    <property name="ignoreAcceptHeader" value="true"/>
+    <property name="favorPathExtension" value="true"/>
+    <property name="favorParameter" value="true"/>
+    <property name="defaultContentType" value="application/json"/>
+    <property name="mediaTypes">
+      <props>
+        <prop key="json">application/json</prop>
+      </props>
+    </property>
+
+  </bean>
+
+  <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+    <!--停用系统默认的converter，使用自定义converter-->
+    <mvc:message-converters register-defaults="false">
+      <!-- 将Jackson2HttpMessageConverter的默认格式化输出设为true -->
+      <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <constructor-arg name="objectMapper" type="com.fasterxml.jackson.databind.ObjectMapper">
+          <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+            <property name="createXmlMapper" value="false"/>
+            <property name="indentOutput" value="true"/>
+            <property name="simpleDateFormat" value="yyyy-MM-dd HH:mm:ss"/>
+            <property name="serializationInclusion" value="NON_EMPTY"/>
+          </bean>
+        </constructor-arg>
+      </bean>
+    </mvc:message-converters>
+  </mvc:annotation-driven>
+
+
+</beans>
+	
+	

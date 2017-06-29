@@ -1,0 +1,57 @@
+package os.nut.drools.recharge;
+
+import com.rkylin.risk.service.bean.RechargeFactor;
+
+import com.rkylin.risk.service.bean.RechargeCode;
+
+rule "cardnumex1"
+    no-loop true
+    salience 99
+    when
+         recharge : RechargeFactor(cardnumex >=5)
+         code:RechargeCode()
+    then
+        code.setCardnumex("recCardnumex01");
+
+
+end
+
+rule "cardnumex2"
+    no-loop true
+    salience 98
+    when
+         recharge : RechargeFactor(cardnumex == 4 )
+         code:RechargeCode()
+    then
+        code.setCardnumex("recCardnumex02");
+end
+
+rule "cardnumex3"
+    no-loop true
+    salience 97
+    when
+         recharge : RechargeFactor(cardnumex == 3)
+         code:RechargeCode()
+    then
+        code.setCardnumex("recCardnumex03");
+end
+
+rule "cardnumex4"
+    no-loop true
+    salience 96
+    when
+         recharge : RechargeFactor(cardnumex >= 1&&cardnumex <= 2)
+         code:RechargeCode()
+    then
+        code.setCardnumex("recCardnumex04");
+end
+
+rule "cardnumex5"
+    no-loop true
+    salience 95
+    when
+         recharge : RechargeFactor(cardnumex == 0)
+         code:RechargeCode()
+    then
+        code.setCardnumex("recCardnumex05");
+end

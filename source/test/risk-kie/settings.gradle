@@ -1,0 +1,3 @@
+rootProject.name = 'risk-kie'
+include 'risk-kie-server'
+include 'risk-kie-server-rule'

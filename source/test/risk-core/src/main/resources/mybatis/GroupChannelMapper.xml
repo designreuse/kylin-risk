@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="GroupChannel" >
+  <resultMap id="groupChannelMap" type="GroupChannel" >
+    <result column="id" property="id" jdbcType="SMALLINT" />
+    <result column="groupid" property="groupid" jdbcType="SMALLINT" />
+    <result column="channelcode" property="channelcode" jdbcType="VARCHAR" />
+    <result column="channelname" property="channelname" jdbcType="VARCHAR" />
+    <result column="productcode" property="productcode" jdbcType="VARCHAR" />
+    <result column="productname" property="productname" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, groupid, channelcode, channelname,productcode,productname
+  </sql>
+  <insert id="insert" parameterType="GroupChannel" >
+    insert into risk_group_channel (groupid, channelcode, channelname,
+      productcode, productname)
+    values (#{groupid,jdbcType=SMALLINT}, #{channelcode,jdbcType=VARCHAR}, #{channelname,jdbcType=VARCHAR},
+      #{productcode,jdbcType=VARCHAR}, #{productname,jdbcType=VARCHAR})
+  </insert>
+
+  <select id="queryByGroupid" parameterType="short" resultMap="groupChannelMap">
+    SELECT <include refid="columnList" />
+    FROM  risk_group_channel
+    where groupid = #{groupid,jdbcType=SMALLINT}
+  </select>
+  <select id="queryByProductCode" parameterType="string" resultMap="groupChannelMap">
+    SELECT <include refid="columnList" />
+    FROM  risk_group_channel
+    where productcode = #{productcode,jdbcType=VARCHAR}
+  </select>
+  <delete id="delByGroupId" parameterType="short">
+    DELETE from risk_group_channel
+    where groupid = #{groupid,jdbcType=SMALLINT}
+  </delete>
+
+  <insert id="insertBatch" parameterType="list" >
+    insert into risk_group_channel (groupid, channelcode, channelname,
+    productcode, productname)
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+    (#{item.groupid,jdbcType=SMALLINT}, #{item.channelcode,jdbcType=VARCHAR}, #{item.channelname,jdbcType=VARCHAR},
+    #{item.productcode,jdbcType=VARCHAR}, #{item.productname,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+</mapper>

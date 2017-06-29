@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RiskGradeCust">
+  <resultMap id="riskGradeCustMap" type="RiskGradeCust">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="custid" jdbcType="BIGINT" property="custid" />
+    <result column="customerid" jdbcType="VARCHAR" property="customerid" />
+    <result column="customername" jdbcType="VARCHAR" property="customername" />
+    <result column="totalscore" jdbcType="VARCHAR" property="totalscore" />
+    <result column="grade" jdbcType="CHAR" property="grade" />
+    <result column="checkgrade" jdbcType="CHAR" property="checkgrade" />
+    <result column="lastgrade" jdbcType="CHAR" property="lastgrade" />
+    <result column="lasttime" javaType="DateTime" jdbcType="TIMESTAMP" property="lasttime" />
+    <result column="ototalscore" jdbcType="VARCHAR" property="ototalscore" />
+    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="risktype" jdbcType="CHAR" property="risktype" />
+    <result column="createtime" javaType="DateTime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="commitid" jdbcType="SMALLINT" property="commitid" />
+    <result column="commitname" jdbcType="VARCHAR" property="commitname" />
+    <result column="committime" javaType="DateTime" jdbcType="TIMESTAMP" property="committime" />
+    <result column="checkid" jdbcType="SMALLINT" property="checkid" />
+    <result column="checkname" jdbcType="VARCHAR" property="checkname" />
+    <result column="checktime" javaType="DateTime" jdbcType="TIMESTAMP" property="checktime" />
+    <result column="updatereason" jdbcType="VARCHAR" property="updatereason" />
+    <result column="ruleid" jdbcType="VARCHAR" property="ruleid" />
+  </resultMap>
+  <sql id="columnList">
+    id, custid, customerid, customername, totalscore, grade, checkgrade, lastgrade,lasttime, ototalscore,
+    status, risktype, createtime, commitid, commitname, committime, checkid, checkname, 
+    checktime, updatereason, ruleid
+  </sql>
+  <select id="get" parameterType="integer" resultMap="riskGradeCustMap">
+    select 
+    <include refid="columnList" />
+    from risk_riskgrade_cust
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer">
+    delete from risk_riskgrade_cust
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="RiskGradeCust">
+    insert into risk_riskgrade_cust (custid, customerid, customername,
+      totalscore, grade, checkgrade,
+      lastgrade, lasttime,ototalscore, status,
+      risktype, commitid,
+      commitname, committime, checkid,
+      checkname, checktime, updatereason, ruleid
+      )
+    values (#{custid,jdbcType=BIGINT}, #{customerid,jdbcType=VARCHAR}, #{customername,jdbcType=VARCHAR},
+      #{totalscore,jdbcType=VARCHAR}, #{grade,jdbcType=CHAR}, #{checkgrade,jdbcType=CHAR},
+      #{lastgrade,jdbcType=CHAR},#{lasttime,jdbcType=TIMESTAMP}, #{ototalscore,jdbcType=VARCHAR}, #{status,jdbcType=CHAR},
+      #{risktype,jdbcType=CHAR}, #{commitid,jdbcType=SMALLINT},
+      #{commitname,jdbcType=VARCHAR}, #{committime,jdbcType=TIMESTAMP}, #{checkid,jdbcType=SMALLINT},
+      #{checkname,jdbcType=VARCHAR}, #{checktime,jdbcType=TIMESTAMP}, #{updatereason,jdbcType=VARCHAR},
+      #{ruleid,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="update" parameterType="RiskGradeCust">
+    update risk_riskgrade_cust
+    <set>
+      <if test="grade != null">
+        grade = #{grade,jdbcType=CHAR},
+      </if>
+      <if test="checkgrade != null">
+        checkgrade = #{checkgrade,jdbcType=CHAR},
+      </if>
+      <if test="lastgrade != null">
+        lastgrade = #{lastgrade,jdbcType=CHAR},
+      </if>
+      <if test="lasttime != null">
+        lasttime = #{lasttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ototalscore != null">
+        ototalscore = #{ototalscore,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="commitid != null">
+        commitid = #{commitid,jdbcType=SMALLINT},
+      </if>
+      <if test="commitname != null">
+        commitname = #{commitname,jdbcType=VARCHAR},
+      </if>
+      <if test="committime != null">
+        committime = #{committime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="checkid != null">
+        checkid = #{checkid,jdbcType=SMALLINT},
+      </if>
+      <if test="checkname != null">
+        checkname = #{checkname,jdbcType=VARCHAR},
+      </if>
+      <if test="checktime != null">
+        checktime = #{checktime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatereason != null">
+        updatereason = #{updatereason,jdbcType=VARCHAR}
+      </if>
+      <if test="ruleid != null">
+        ruleid = #{ruleid,jdbcType=VARCHAR}
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryPayGradeCust" parameterType="map" resultType="map">
+    select g.id,g.customerid,g.customername,g.grade,g.totalscore,g.checkgrade,g.lastgrade,g.lasttime,g.status,g.createtime
+    from risk_riskgrade_cust g
+    <where>
+      <if test="customerid != null and ''!=customerid">
+        g.customerid = #{customerid}
+      </if>
+      <if test="grade != null and ''!=grade">
+        AND g.grade = #{grade}
+      </if>
+      <if test="customername != null and ''!=customername">
+        AND g.customername = #{customername}
+      </if>
+      <if test="status != null and ''!=status">
+        AND g.status = #{status}
+      </if>
+      <if test="createtime != null and ''!=createtime">
+        AND date_format(g.createtime,'%Y-%m-%d') = #{createtime}
+      </if>
+      <if test="risktype != null and ''!=risktype">
+        AND g.risktype=#{risktype}
+      </if>
+
+    </where>
+    order by committime desc
+  </select>
+
+  <select id="queryByCustRisk"  resultMap="riskGradeCustMap" flushCache="false" parameterType="map">
+    select
+    <include refid="columnList" />
+    from risk_riskgrade_cust g
+    <where>
+        g.custid = #{custid,jdbcType=BIGINT}
+        and g.risktype=#{riskType,jdbcType=CHAR}
+    </where>
+  </select>
+</mapper>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.2.xsd
+	http://code.alibabatech.com/schema/dubbo
+	   http://code.alibabatech.com/schema/dubbo/dubbo.xsd" default-autowire="byName">
+
+  <bean class="com.rkylin.risk.core.common.CustomPropertyPlaceHoderConfigurer">
+    <property name="ignoreResourceNotFound" value="true"/>
+    <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    <property name="locations">
+      <array>
+        <value>classpath:/risk.properties</value>
+        <value>classpath:/risk-credit-product.properties</value>
+      </array>
+    </property>
+    <property name="fileEncoding" value="UTF-8"/>
+    <property name="secretKeys">
+      <set value-type="java.lang.String">
+        <value>template.mail.password</value>
+        <value>redis.password</value>
+        <value>maven.password</value>
+      </set>
+    </property>
+  </bean>
+
+  <import resource="classpath:risk-spring/spring-config.xml" />
+  <import resource="classpath:risk-spring/spring-redis.xml" />
+
+  <!--<context:property-placeholder location="classpath:risk-credit.properties" file-encoding="UTF-8"/>-->
+  <bean id="baiRongDasApi" class="com.rkylin.risk.credit.service.BaiRongDasApi"/>
+  <bean id="baiRongTerApi" class="com.rkylin.risk.credit.service.BaiRongTerApi"/>
+  <bean id="unionPayAdvisorsApi" class="com.rkylin.risk.credit.service.UnionPayAdvisorsApi"/>
+
+
+
+  <dubbo:application name="rule-credit" />
+  <dubbo:registry protocol="zookeeper" address="${credit.py.registry-address}" timeout="12000"/>
+
+
+  <!--default reference options-->
+  <dubbo:consumer id="dubboCon" default="true" version="1.0" retries="2" check="false" timeout="3000"></dubbo:consumer>
+
+  <!--dubbo consumer begin-->
+  <dubbo:reference id="creditService" interface="com.rkylin.gateway.service.CreditService" group="PY_Credit" protocol="dubbo" version="1.0.0"/>
+  <!--dubbo consumer end-->
+
+  <bean id="pyBankCheckApi" class="com.rkylin.risk.credit.service.PYBankCheckApi"/>
+  <bean id="pyCreditReportApi" class="com.rkylin.risk.credit.service.PYCreditReportApi"/>
+  <bean id="pyQueryHistoryApi" class="com.rkylin.risk.credit.service.PYQueryHistoryApi">
+  </bean>
+  <bean id="pyEducationAndRiskApi" class="com.rkylin.risk.credit.service.PYEducationAndRiskApi"/>
+
+  <bean id="creditResultPersistent" class="com.rkylin.risk.credit.biz.impl.ExternalCreditResultBizImpl"/>
+  <bean id="riskCreditService" class="com.rkylin.risk.credit.service.RiskCreditService">
+    <property name="creditProductApiList">
+      <list>
+        <!--<ref bean="baiRongTerApi"></ref>-->
+        <!--<ref bean="baiRongDasApi"></ref>-->
+        <ref bean="unionPayAdvisorsApi"></ref>
+        <!--<ref bean="pyBankCheckApi"/>-->
+        <!--<ref bean="pyCreditReportApi"/>-->
+        <!--<ref bean="pyQueryHistoryApi"/>-->
+        <!--<ref bean="pyEducationAndRiskApi"/>-->
+      </list>
+    </property>
+  </bean>
+</beans>

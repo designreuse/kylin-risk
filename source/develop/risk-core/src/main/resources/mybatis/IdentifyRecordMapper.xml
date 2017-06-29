@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="IdentifyRecord">
+  <resultMap id="identifyRecordMap" type="IdentifyRecord">
+    <id column="id" property="id" jdbcType="BIGINT"/>
+    <result column="customerid" property="customerid" jdbcType="VARCHAR"/>
+    <result column="checkorderid" property="checkorderid" jdbcType="VARCHAR"/>
+    <result column="interfacename" property="interfacename" jdbcType="VARCHAR"/>
+    <result column="md5checksum1" property="md5checksum1" jdbcType="VARCHAR"/>
+    <result column="md5checksum2" property="md5checksum2" jdbcType="VARCHAR"/>
+    <result column="status" property="status" jdbcType="VARCHAR"/>
+    <result column="code" property="code" jdbcType="VARCHAR"/>
+    <result column="name" property="name" jdbcType="VARCHAR"/>
+    <result column="sex" property="sex" jdbcType="VARCHAR"/>
+    <result column="year" property="year" jdbcType="VARCHAR"/>
+    <result column="number" property="number" jdbcType="VARCHAR"/>
+    <result column="address" property="address" jdbcType="VARCHAR"/>
+    <result column="authority" property="authority" jdbcType="VARCHAR"/>
+    <result column="timelimit" property="timelimit" jdbcType="VARCHAR"/>
+    <result column="cardnumber" property="cardnumber" jdbcType="VARCHAR"/>
+    <result column="bankname" property="bankname" jdbcType="VARCHAR"/>
+    <result column="cardtype" property="cardtype" jdbcType="VARCHAR"/>
+    <result column="similarity" property="similarity" jdbcType="VARCHAR"/>
+    <result column="phone" property="phone" jdbcType="VARCHAR"/>
+    <result column="namecheck" property="namecheck" jdbcType="VARCHAR"/>
+    <result column="phonecheck" property="phonecheck" jdbcType="VARCHAR"/>
+    <result column="phonearea" property="phonearea" jdbcType="VARCHAR"/>
+    <result column="phoneoperator" property="phoneoperator" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="queryList">
+    id, customerid,checkorderid, interfacename, md5checksum1, md5checksum2, status, code,  name,
+    sex,year, number, address, authority, timelimit, cardnumber, bankname, cardtype, similarity,
+    phone,namecheck,phonecheck,phonearea,phoneoperator
+  </sql>
+  <select id="get" resultMap="identifyRecordMap" parameterType="long">
+    select
+    <include refid="queryList"/>
+    from risk_identify_record
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="queryBycondition" resultMap="identifyRecordMap" parameterType="IdentifyRecord">
+    select
+    <include refid="queryList"/>
+    from risk_identify_record
+    <where>
+      <if test="customerid != null and ''!=customerid">
+        customerid = #{customerid}
+      </if>
+      <if test="checkorderid != null and ''!=checkorderid">
+        checkorderid = #{checkorderid}
+      </if>
+      <if test="interfacename != null and ''!=interfacename">
+        AND interfacename = #{interfacename}
+      </if>
+
+      <if test="md5checksum1 != null and ''!=md5checksum1">
+        AND md5checksum1 = #{md5checksum1}
+      </if>
+      <if test="md5checksum2 != null and ''!=md5checksum2">
+        AND md5checksum2 = #{md5checksum2}
+      </if>
+
+      <if test="number != null and ''!=number">
+        AND number = #{number}
+      </if>
+      <if test="name != null and ''!=name">
+        AND name = #{name}
+      </if>
+      <if test="phone != null and ''!=phone">
+        AND phone = #{phone}
+      </if>
+    </where>
+  </select>
+
+
+  <delete id="delete" parameterType="long">
+    delete from risk_identify_record
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="IdentifyRecord">
+    insert into risk_identify_record (customerid, checkorderid,interfacename, md5checksum1, md5checksum2,
+      status, code,
+      name, sex, year,
+      number, address, authority, 
+      timelimit, cardnumber, bankname, 
+      cardtype, similarity,phone,namecheck,phonecheck,phonearea,phoneoperator)
+    values (#{customerid,jdbcType=VARCHAR},#{checkorderid,jdbcType=VARCHAR}, #{interfacename,jdbcType=VARCHAR}, #{md5checksum1,jdbcType=VARCHAR}, #{md5checksum2,jdbcType=VARCHAR},
+       #{status,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR},
+      #{name,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR},  #{year,jdbcType=VARCHAR},
+      #{number,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{authority,jdbcType=VARCHAR}, 
+      #{timelimit,jdbcType=VARCHAR}, #{cardnumber,jdbcType=VARCHAR}, #{bankname,jdbcType=VARCHAR}, 
+      #{cardtype,jdbcType=VARCHAR}, #{similarity,jdbcType=VARCHAR},#{phone,jdbcType=VARCHAR},
+      #{namecheck,jdbcType=VARCHAR},#{phonecheck,jdbcType=VARCHAR},#{phonearea,jdbcType=VARCHAR},
+      #{phoneoperator,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="IdentifyRecord">
+    update risk_identify_record
+    set customerid = #{customerid,jdbcType=VARCHAR},
+      checkorderid = #{checkorderid,jdbcType=VARCHAR},
+      interfacename = #{interfacename,jdbcType=VARCHAR},
+      md5checksum1 = #{md5checksum1,jdbcType=VARCHAR},
+      md5checksum2 = #{md5checksum2,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      year = #{year,jdbcType=VARCHAR},
+      number = #{number,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      authority = #{authority,jdbcType=VARCHAR},
+      timelimit = #{timelimit,jdbcType=VARCHAR},
+      cardnumber = #{cardnumber,jdbcType=VARCHAR},
+      bankname = #{bankname,jdbcType=VARCHAR},
+      cardtype = #{cardtype,jdbcType=VARCHAR},
+      similarity = #{similarity,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      namecheck = #{namecheck,jdbcType=VARCHAR},
+      phonecheck = #{phonecheck,jdbcType=VARCHAR},
+      phonearea = #{phonearea,jdbcType=VARCHAR},
+      phoneoperator = #{phoneoperator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

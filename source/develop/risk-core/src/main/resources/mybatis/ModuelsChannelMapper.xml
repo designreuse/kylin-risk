@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ModuelsChannel" >
+  <resultMap id="moduelsChannelMap" type="ModuelsChannel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="moduletype" property="moduletype" jdbcType="VARCHAR" />
+    <result column="channelcode" property="channelcode" jdbcType="VARCHAR" />
+    <result column="mercid" property="mercid" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, moduletype, channelcode, mercid, status
+  </sql>
+  <select id="get" resultMap="moduelsChannelMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_modules_channel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_modules_channel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="ModuelsChannel" >
+    insert into risk_modules_channel (moduletype, channelcode, mercid, 
+      status)
+    values (#{moduletype,jdbcType=VARCHAR}, #{channelcode,jdbcType=VARCHAR}, #{mercid,jdbcType=VARCHAR}, 
+      #{status,jdbcType=CHAR})
+  </insert>
+  <update id="update" parameterType="ModuelsChannel" >
+    update risk_modules_channel
+    set moduletype = #{moduletype,jdbcType=VARCHAR},
+      channelcode = #{channelcode,jdbcType=VARCHAR},
+      mercid = #{mercid,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryByModuel" resultMap="moduelsChannelMap" parameterType="string" >
+    select
+    <include refid="columnList" />
+    from risk_modules_channel
+    where moduletype = #{moduelType,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByModule" parameterType="string" >
+    delete from risk_modules_channel
+    where moduletype = #{moduletype,jdbcType=VARCHAR}
+  </delete>
+</mapper>

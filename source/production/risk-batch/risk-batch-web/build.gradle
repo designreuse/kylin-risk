@@ -1,0 +1,39 @@
+apply plugin: 'war'
+
+description = '风控批处理管理与定时配置模块'
+dependencies {
+  compile project(":risk-batch-core")
+
+
+  compile "org.springframework:spring-web:${springVersion}"
+
+  compile("org.quartz-scheduler:quartz:${springQuartzVersion}") {
+    exclude(module: "c3p0")
+  }
+
+
+  //log begin
+  compile "org.slf4j:slf4j-api:${slf4jVersion}"
+  compile "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+  compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+  compile "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+  compile "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+  compile "org.apache.logging.log4j:log4j-web:${log4jVersion}"
+  compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+  //log end
+
+
+  compile "joda-time:joda-time:${jodaTimeVersion}"
+
+
+  testCompile "org.springframework.batch:spring-batch-test:${springBatchVersion}"
+  testCompile "junit:junit:${junitVersion}"
+  testCompile "org.mockito:mockito-all:${mockitoVersion}"
+  testCompile "org.springframework:spring-test:${springVersion}"
+  testCompile "com.jayway.jsonpath:json-path:${jsonpathVersion}"
+  testCompile "org.assertj:assertj-core:${assertjVersion}"
+  testCompile "org.assertj:assertj-guava:${assertGuavaVersion}"
+
+
+  providedCompile "org.projectlombok:lombok:${lombokVersion}"
+}

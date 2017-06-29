@@ -1,0 +1,45 @@
+package os.nut.drools.WorkInfo;
+//salience:259-240
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+
+rule "wage2"
+    no-loop true
+    salience 259
+    when
+        $workInfo : CustomerFactor(wage!=null,wage.isLesserThan(5000));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setWage("wage01");
+end
+
+rule "wage3"
+    no-loop true
+    salience 258
+    when
+        $workInfo : CustomerFactor(wage!=null, wage.isGreaterOrEqualThan(5000)&&wage.isLesserThan(15000));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setWage("wage02");
+end
+
+rule "wage4"
+    no-loop true
+    salience 257
+    when
+        $workInfo : CustomerFactor(wage!=null,wage.isGreaterOrEqualThan(15000)&&wage.isLesserThan(30000));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setWage("wage03");
+end
+
+rule "wage5"
+    no-loop true
+    salience 256
+    when
+        $workInfo : CustomerFactor(wage!=null,wage.isGreaterOrEqualThan(30000));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setWage("wage04");
+end

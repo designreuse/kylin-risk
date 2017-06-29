@@ -1,0 +1,56 @@
+package os.nut.drools.deposit;
+
+import com.rkylin.risk.service.bean.DepositCode;
+import com.rkylin.risk.service.bean.DepositFactor;
+
+rule "cardnumex1"
+    no-loop true
+    salience 139
+    when
+         deposit : DepositFactor(cardnumex>5)
+         code:DepositCode()
+    then
+        code.setCardnumex("depCardnumex01");
+
+
+end
+
+rule "cardnumex2"
+    no-loop true
+    salience 138
+    when
+         deposit : DepositFactor(cardnumex>=3&&cardnumex<=5 )
+         code:DepositCode()
+    then
+        code.setCardnumex("depCardnumex02");
+end
+
+rule "cardnumex3"
+    no-loop true
+    salience 137
+    when
+         deposit : DepositFactor(cardnumex==2)
+         code:DepositCode()
+    then
+        code.setCardnumex("depCardnumex03");
+end
+
+rule "cardnumex4"
+    no-loop true
+    salience 136
+    when
+         deposit : DepositFactor(cardnumex==1)
+         code:DepositCode()
+    then
+        code.setCardnumex("depCardnumex04");
+end
+
+rule "cardnumex5"
+    no-loop true
+    salience 135
+    when
+         deposit : DepositFactor(cardnumex==0)
+         code:DepositCode()
+    then
+        code.setCardnumex("depCardnumex05");
+end

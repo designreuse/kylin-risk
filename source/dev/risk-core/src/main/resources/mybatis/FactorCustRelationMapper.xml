@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="FactorCustRelation" >
+  <resultMap id="factorCustRelationMap" type="FactorCustRelation" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="custid" property="custid" jdbcType="BIGINT" />
+    <result column="factorid" property="factorid" jdbcType="INTEGER" />
+    <result column="factorscore" property="factorscore" jdbcType="VARCHAR" />
+    <result column="factorcode" property="factorcode" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, custid, factorid, factorscore,factorcode
+  </sql>
+  <select id="get" resultMap="factorCustRelationMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_factor_cust_relation
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_factor_cust_relation
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByCust" parameterType="long" >
+    delete from risk_factor_cust_relation
+    where custid = #{custid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="FactorCustRelation" >
+    insert into risk_factor_cust_relation (custid, factorid, factorscore,factorcode
+      )
+    values (#{custid,jdbcType=BIGINT}, #{factorid,jdbcType=INTEGER}, #{factorscore,jdbcType=VARCHAR}, #{factorcode,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="update" parameterType="FactorCustRelation" >
+    update risk_factor_cust_relation
+    set custid = #{custid,jdbcType=BIGINT},
+      factorid = #{factorid,jdbcType=INTEGER},
+      factorscore = #{factorscore,jdbcType=VARCHAR}
+      factorcode = #{factorcode,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insertBatch" parameterType="list">
+    insert into risk_factor_cust_relation (custid, factorid, factorscore,factorcode)
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+      (#{item.custid,jdbcType=BIGINT}, #{item.factorid,jdbcType=INTEGER}, #{item.factorscore,jdbcType=VARCHAR}, #{item.factorcode,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+</mapper>

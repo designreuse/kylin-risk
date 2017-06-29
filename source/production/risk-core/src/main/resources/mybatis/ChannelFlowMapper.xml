@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ChannelFlow" >
+  <resultMap id="channelFlowMap" type="ChannelFlow" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="channelcode" property="channelcode" jdbcType="VARCHAR" />
+    <result column="channelname" property="channelname" jdbcType="VARCHAR" />
+    <result column="productcode" property="productcode" jdbcType="VARCHAR" />
+    <result column="productname" property="productname" jdbcType="VARCHAR" />
+    <result column="crawler" property="crawler" jdbcType="VARCHAR" />
+    <result column="idcardvalidate" property="idcardvalidate" jdbcType="VARCHAR" />
+    <result column="bankcardvalidate" property="bankcardvalidate" jdbcType="VARCHAR" />
+    <result column="idcardhandvalidate" property="idcardhandvalidate" jdbcType="VARCHAR" />
+    <result column="mitou" property="mitou" jdbcType="VARCHAR" />
+    <result column="bairongeducational" property="bairongeducational" jdbcType="VARCHAR" />
+    <result column="bairongspecial" property="bairongspecial" jdbcType="VARCHAR" />
+    <result column="bairongquery" property="bairongquery" jdbcType="VARCHAR" />
+    <result column="unionpayadvisors" property="unionpayadvisors" jdbcType="VARCHAR" />
+    <result column="spare1" property="spare1" jdbcType="VARCHAR" />
+    <result column="spare2" property="spare2" jdbcType="VARCHAR" />
+    <result column="Spare3" property="spare3" jdbcType="VARCHAR" />
+    <result column="operator" property="operator" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, channelcode, channelname, productcode, productname, crawler, idcardvalidate, 
+    bankcardvalidate, idcardhandvalidate, mitou, bairongeducational, bairongspecial, 
+    bairongquery, unionpayadvisors, spare1, spare2, Spare3, operator, createtime, updatetime
+  </sql>
+  <select id="queryChannelFlowByCondition" parameterType="map" resultType="map">
+    <if test="channelcode !=null and ''!=channelcode">
+      <bind name="channelcode" value="'%' + channelcode + '%'"/>
+    </if>
+    select
+    <include refid="columnList"/>
+    from risk_channel_flow
+    <where>
+      <if test="channelcode != null and ''!=channelcode">
+        AND channelcode LIKE #{channelcode}
+      </if>
+    </where>
+    ORDER BY id
+  </select>
+  <select id="get" resultMap="channelFlowMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_channel_flow
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_channel_flow
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="ChannelFlow" >
+    insert into risk_channel_flow (channelcode, channelname, productcode, 
+      productname, crawler, idcardvalidate, 
+      bankcardvalidate, idcardhandvalidate, mitou, 
+      bairongeducational, bairongspecial, bairongquery, 
+      unionpayadvisors, operator)
+    values (#{channelcode,jdbcType=VARCHAR}, #{channelname,jdbcType=VARCHAR}, #{productcode,jdbcType=VARCHAR}, 
+      #{productname,jdbcType=VARCHAR}, #{crawler,jdbcType=VARCHAR}, #{idcardvalidate,jdbcType=VARCHAR}, 
+      #{bankcardvalidate,jdbcType=VARCHAR}, #{idcardhandvalidate,jdbcType=VARCHAR}, #{mitou,jdbcType=VARCHAR}, 
+      #{bairongeducational,jdbcType=VARCHAR}, #{bairongspecial,jdbcType=VARCHAR}, #{bairongquery,jdbcType=VARCHAR}, 
+      #{unionpayadvisors,jdbcType=VARCHAR}, #{operator,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="ChannelFlow" >
+    update risk_channel_flow
+    set
+    <if test="crawler != null">
+      crawler = #{crawler,jdbcType=VARCHAR},
+    </if>
+    <if test="idcardvalidate != null">
+      idcardvalidate = #{idcardvalidate,jdbcType=VARCHAR},
+    </if>
+    <if test="bankcardvalidate != null">
+      bankcardvalidate = #{bankcardvalidate,jdbcType=VARCHAR},
+    </if>
+    <if test="idcardhandvalidate != null">
+      idcardhandvalidate = #{idcardhandvalidate,jdbcType=VARCHAR},
+    </if>
+    <if test="mitou != null">
+      mitou = #{mitou,jdbcType=VARCHAR},
+    </if>
+    <if test="bairongeducational != null">
+      bairongeducational = #{bairongeducational,jdbcType=VARCHAR},
+    </if>
+    <if test="bairongspecial != null">
+      bairongspecial = #{bairongspecial,jdbcType=VARCHAR},
+    </if>
+    <if test="bairongquery != null">
+      bairongquery = #{bairongquery,jdbcType=VARCHAR},
+    </if>
+    <if test="unionpayadvisors != null">
+      unionpayadvisors = #{unionpayadvisors,jdbcType=VARCHAR}
+    </if>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="checkExistProduct" resultMap="channelFlowMap" parameterType="ChannelFlow">
+    select
+    <include refid="columnList"/>
+    from risk_channel_flow
+    where productcode = #{productcode,jdbcType=VARCHAR}
+  </select>
+</mapper>

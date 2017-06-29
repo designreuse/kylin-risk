@@ -1,0 +1,88 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.rkylin.risk</groupId>
+        <artifactId>risk</artifactId>
+        <version>1.1</version>
+    </parent>
+    <artifactId>risk-service-web</artifactId>
+    <packaging>war</packaging>
+    <name>risk::service-web(external  service web)</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <risk-spring-web.version>1.0.0</risk-spring-web.version>
+        <rootDir>${project.parent.basedir}/</rootDir>
+    </properties>
+
+    <dependencies>
+
+        <!--servlet&jsp api begin-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!--servlet&jsp api end-->
+        <!--spring begin-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <!--spring end-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.rkylin.risk</groupId>
+            <artifactId>risk-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rkylin.risk</groupId>
+            <artifactId>risk-spring-web</artifactId>
+            <version>${risk-spring-web.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>risk-service-web</finalName>
+        <filters>
+            <filter>${project.parent.relativePath}/../profiles/${build.profile}.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <warName>risk-service-web</warName>
+                    <!-- 激活spring profile -->
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>src/main/webapp</directory>
+                            <includes>
+                                <include>WEB-INF/web.xml</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                    <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                    <warSourceDirectory>src/main/webapp</warSourceDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

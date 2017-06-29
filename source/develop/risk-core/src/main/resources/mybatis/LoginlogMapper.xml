@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Loginlog" >
+  <resultMap id="loginlogMap" type="Loginlog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="operatorid" property="operatorid" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="loginip" property="loginip" jdbcType="VARCHAR" />
+    <result column="logintime" property="logintime" jdbcType="TIMESTAMP" javaType="DateTime"/>
+    <result column="logouttime" property="logouttime" jdbcType="TIMESTAMP" javaType="DateTime"/>
+  </resultMap>
+  <sql id="columnList" >
+    id, operatorid, username, loginip, logintime, logouttime
+  </sql>
+  <select id="get" resultMap="loginlogMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_loginlog
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_loginlog
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="Loginlog" keyProperty="id" keyColumn="id" useGeneratedKeys="true" >
+    insert into risk_loginlog (operatorid, username, loginip, 
+      logintime, logouttime)
+    values (#{operatorid,jdbcType=SMALLINT}, #{username,jdbcType=VARCHAR}, #{loginip,jdbcType=VARCHAR}, 
+      #{logintime,jdbcType=TIMESTAMP}, #{logouttime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="update" parameterType="Loginlog" >
+    update risk_loginlog
+    set operatorid = #{operatorid,jdbcType=SMALLINT},
+      username = #{username,jdbcType=VARCHAR},
+      loginip = #{loginip,jdbcType=VARCHAR},
+      logintime = #{logintime,jdbcType=TIMESTAMP},
+      logouttime = #{logouttime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryLoginLogByUsername" parameterType="string" resultMap="loginlogMap">
+    select
+    <include refid="columnList" />
+    from risk_loginlog
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
+</mapper>

@@ -1,0 +1,25 @@
+package os.nut.drools.PubRecord;
+//salience:479-460 总逾期次数占比
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "overdueRate2"
+    no-loop true
+    salience 478
+    when
+        $estateInfo : CustomerFactor(overdueRate!=null,overdueRate.isGreaterOrEqualThan(0.2) &&overdueRate.isLesserThan(0.3));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setOverdueRate("overdueRate01");
+end
+
+rule "overdueRate3"
+    no-loop true
+    salience 479
+    when
+        $estateInfo : CustomerFactor(overdueRate!=null, overdueRate.isGreaterOrEqualThan(0.3));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMsg("总逾期次数占比在30%以上");
+        retract($estateInfo);
+end

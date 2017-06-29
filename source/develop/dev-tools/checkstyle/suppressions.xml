@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<suppressions>
+  <suppress checks="MemberName"
+      files="riskapi[/\\]risk-operation-api[/\\]src[/\\]main[/\\]java[/\\]com[/\\]rkylin[/\\]risk[/\\]operation[/\\]bean[/\\]CustomerMsg.java"
+      lines="139"/>
+  <suppress checks="MethodLength"
+      files="risk-boss[/\\]src[/\\]main[/\\]java[/\\]com[/\\]rkylin[/\\]risk[/\\]boss[/\\]util[/\\]ExportExcel.java"
+      lines="55"/>
+  <suppress checks="MemberName"
+      files="risk-service[/\\]src[/\\]main[/\\]java[/\\]com[/\\]rkylin[/\\]risk[/\\]service[/\\]bean[/\\]CustomerCode.java"
+      lines="115"/>
+  <suppress checks="MemberName"
+      files="risk-service[/\\]src[/\\]main[/\\]java[/\\]com[/\\]rkylin[/\\]risk[/\\]service[/\\]bean[/\\]CustomerFactor.java"
+      lines="118"/>
+
+
+
+</suppressions>

@@ -1,0 +1,55 @@
+package os.nut.drools.deposit;
+
+import com.rkylin.risk.service.bean.DepositCode;
+import com.rkylin.risk.service.bean.DepositFactor;
+
+rule "depositpercent1"
+    no-loop true
+    salience 155
+    when
+         deposit : DepositFactor(depositpercent!=null&&depositpercent.isEqualTo(100))
+         code:DepositCode()
+    then
+        code.setDepositpercent("depDepositpercent01");
+
+end
+
+rule "depositpercent2"
+    no-loop true
+    salience 154
+    when
+         deposit : DepositFactor(depositpercent!=null&&depositpercent.isGreaterOrEqualThan(95)&&depositpercent.isLesserThan(100) )
+         code:DepositCode()
+    then
+        code.setDepositpercent("depDepositpercent02");
+end
+
+rule "depositpercent3"
+    no-loop true
+    salience 153
+    when
+         deposit : DepositFactor(depositpercent!=null&&depositpercent.isGreaterOrEqualThan(90)&&depositpercent.isLesserThan(95))
+         code:DepositCode()
+    then
+        code.setDepositpercent("depDepositpercent03");
+end
+
+rule "depositpercent4"
+    no-loop true
+    salience 152
+    when
+         deposit : DepositFactor(depositpercent!=null&&depositpercent.isGreaterOrEqualThan(85)&&depositpercent.isLesserThan(90))
+         code:DepositCode()
+    then
+        code.setDepositpercent("depDepositpercent04");
+end
+
+rule "depositpercent5"
+    no-loop true
+    salience 151
+    when
+         deposit : DepositFactor(depositpercent!=null&&depositpercent.isLesserThan(85))
+         code:DepositCode()
+    then
+        code.setDepositpercent("depDepositpercent05");
+end

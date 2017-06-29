@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Menu">
+  <cache type="com.rkylin.risk.mybatis.cache.RedisCache"/>
+  <resultMap id="BaseResultMap" type="Menu">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="menuname" jdbcType="VARCHAR" property="menuname" />
+    <result column="menulevel" jdbcType="VARCHAR" property="menulevel" />
+    <result column="menuurl" jdbcType="VARCHAR" property="menuurl" />
+    <result column="displayorder" jdbcType="SMALLINT" property="displayorder" />
+    <result column="parentid" jdbcType="SMALLINT" property="parentid" />
+    <result column="status" jdbcType="CHAR" property="status" />
+  </resultMap>
+  <sql id="menu_Column_List">
+    id, menuname, menulevel, menuurl,displayorder, parentid, status
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="short" resultMap="BaseResultMap">
+    select
+    <include refid="menu_Column_List" />
+    from risk_menu
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+
+  <select id="queryOne" parameterType="short" resultMap="BaseResultMap">
+    select
+    <include refid="menu_Column_List" />
+    from risk_menu
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <!--< Bystatus>-->
+  <select id="queryAllBystatus" parameterType="string" resultMap="BaseResultMap">
+    select
+    <include refid="menu_Column_List" />
+    from risk_menu
+    where status = #{status,jdbcType=VARCHAR}
+  </select>
+  <select id="queryAll"   resultMap="BaseResultMap">
+    select
+    <include refid="menu_Column_List" />
+    from risk_menu
+  </select>
+  <select id="queryByParentid" parameterType="short" resultMap="BaseResultMap">
+    select
+    <include refid="menu_Column_List" />
+    from risk_menu
+    where parentid = #{parentid,jdbcType=SMALLINT}
+  </select>
+
+  <delete id="delete" parameterType="short">
+    delete from risk_menu
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="Menu">
+    <selectKey keyProperty="id" order="AFTER" resultType="short">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into risk_menu (menuname, menulevel, menuurl,displayorder,
+    parentid, status)
+    values (#{menuname,jdbcType=VARCHAR}, #{menulevel,jdbcType=VARCHAR}, #{menuurl,jdbcType=VARCHAR},
+      #{displayorder,jdbcType=SMALLINT}, #{parentid,jdbcType=SMALLINT}, #{status,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="Menu" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    <selectKey keyProperty="id" order="AFTER" resultType="short">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into risk_menu
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="menuname != null">
+        menuname,
+      </if>
+      <if test="menulevel != null">
+        menulevel,
+      </if>
+      <if test="menuurl != null">
+        menuurl,
+      </if>
+      <if test="parentid != null">
+        parentid,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="menuname != null">
+        #{menuname,jdbcType=VARCHAR},
+      </if>
+      <if test="menulevel != null">
+        #{menulevel,jdbcType=VARCHAR},
+      </if>
+      <if test="menuurl != null">
+        #{menuurl,jdbcType=VARCHAR},
+      </if>
+      <if test="parentid != null">
+        #{parentid,jdbcType=SMALLINT},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="update" parameterType="Menu">
+    update risk_menu
+    <set>
+      <if test="menuname != null">
+        menuname = #{menuname,jdbcType=VARCHAR},
+      </if>
+      <if test="menuurl != null">
+      menuurl = #{menuurl,jdbcType=VARCHAR},
+      </if>
+      <if test="displayorder != null">
+        displayorder = #{displayorder,jdbcType=SMALLINT},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="Menu">
+    update risk_menu
+    set menuname = #{menuname,jdbcType=VARCHAR},
+    menulevel = #{menulevel,jdbcType=VARCHAR},
+    menuurl = #{menuurl,jdbcType=VARCHAR},
+    displayorder=#{displayorder,jdbcType=SMALLINT},
+    parentid = #{parentid,jdbcType=SMALLINT},
+    status = #{status,jdbcType=CHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+
+  <select id="queryMeunByRole" resultMap="BaseResultMap" parameterType="short" flushCache="true">
+    SELECT a.id,a.menuname,a.menulevel,a.menuurl,a.displayorder,a.parentid,a.status
+    FROM risk_menu a LEFT JOIN risk_role_menu b ON a.id=b.menuid
+    LEFT JOIN risk_role c ON b.roleid=c.id
+    WHERE c.id=#{id,jdbcType=SMALLINT}
+    order by a.id
+  </select>
+
+  <select id="queryBylevel" resultMap="BaseResultMap" parameterType="string">
+    SELECT <include refid="menu_Column_List" />
+    FROM risk_menu
+    WHERE menulevel=#{menulevel,jdbcType=VARCHAR}
+    order by id
+  </select>
+</mapper>

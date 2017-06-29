@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="MerchantLimit" >
+  <resultMap id="merchantLimitMap" type="MerchantLimit" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="userrelateid" property="userrelateid" jdbcType="VARCHAR" />
+    <result column="constid" property="constid" jdbcType="VARCHAR" />
+    <result column="order_date" property="orderDate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="order_time" property="orderTime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="daypay" property="daypay" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="monthpay" property="monthpay" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="seasonpay" property="seasonpay" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="yearpay" property="yearpay" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="dayloannum" property="dayloannum" jdbcType="INTEGER" />
+    <result column="monloannum" property="monloannum" jdbcType="INTEGER" />
+    <result column="sealoannum" property="sealoannum" jdbcType="INTEGER" />
+    <result column="yearloannum" property="yearloannum" jdbcType="INTEGER" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, version,userrelateid, constid, order_date, order_time, daypay, monthpay, seasonpay, yearpay,
+     dayloannum, monloannum, sealoannum, yearloannum,
+     createtime, updatetime
+  </sql>
+
+  <insert id="insert" parameterType="MerchantLimit" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_merchant_limit (userrelateid, constid, order_date, 
+      order_time, daypay, monthpay, 
+      seasonpay, yearpay,
+      dayloannum, monloannum, sealoannum, 
+      yearloannum)
+    values (#{userrelateid,jdbcType=VARCHAR}, #{constid,jdbcType=VARCHAR}, #{orderDate,jdbcType=DATE}, 
+      #{orderTime,jdbcType=TIMESTAMP}, #{daypay,jdbcType=DECIMAL}, #{monthpay,jdbcType=DECIMAL}, 
+      #{seasonpay,jdbcType=DECIMAL}, #{yearpay,jdbcType=DECIMAL},
+      #{dayloannum,jdbcType=INTEGER}, #{monloannum,jdbcType=INTEGER}, #{sealoannum,jdbcType=INTEGER}, 
+      #{yearloannum,jdbcType=INTEGER})
+  </insert>
+  <update id="update" parameterType="MerchantLimit" >
+    update risk_merchant_limit
+    set userrelateid = #{userrelateid,jdbcType=VARCHAR},
+      constid = #{constid,jdbcType=VARCHAR},
+      order_date = #{orderDate,jdbcType=DATE},
+      order_time = #{orderTime,jdbcType=TIMESTAMP},
+      daypay = #{daypay,jdbcType=DECIMAL},
+      monthpay = #{monthpay,jdbcType=DECIMAL},
+      seasonpay = #{seasonpay,jdbcType=DECIMAL},
+      yearpay = #{yearpay,jdbcType=DECIMAL},
+      dayloannum = #{dayloannum,jdbcType=INTEGER},
+      monloannum = #{monloannum,jdbcType=INTEGER},
+      sealoannum = #{sealoannum,jdbcType=INTEGER},
+      yearloannum = #{yearloannum,jdbcType=INTEGER},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      version=version+1
+    where id = #{id,jdbcType=INTEGER}
+    and version=#{version,jdbcType=BIGINT}
+  </update>
+
+  <select id="queryByUserrelateid" resultMap="merchantLimitMap" parameterType="map">
+    SELECT
+    <include refid="columnList"/>
+    FROM risk_merchant_limit
+    WHERE userrelateid = #{userrelateid,jdbcType=VARCHAR}
+    <if test="localDate != null and localDate != ''">
+      AND order_date = #{localDate,jdbcType=VARCHAR}
+    </if>
+    ORDER BY id FOR  UPDATE
+  </select>
+
+  <select id="queryByOrderTime" resultMap="merchantLimitMap" parameterType="map">
+    select
+    <include refid="columnList"/>
+    from risk_merchant_limit t
+    where DATEDIFF(t.order_time, #{localDate})=0
+    ORDER BY id
+  </select>
+  <select id="queryAll" resultMap="merchantLimitMap" >
+    select
+    <include refid="columnList"/>
+    from risk_merchant_limit t
+    ORDER BY id
+  </select>
+
+  <update id="updateByUserRelateId" parameterType="MerchantLimit" >
+    update risk_merchant_limit
+    set userrelateid = #{userrelateid,jdbcType=VARCHAR},
+    constid = #{constid,jdbcType=VARCHAR},
+    order_date = #{orderDate,jdbcType=DATE},
+    order_time = #{orderTime,jdbcType=TIMESTAMP},
+    daypay = #{daypay,jdbcType=DECIMAL},
+    monthpay = #{monthpay,jdbcType=DECIMAL},
+    seasonpay = #{seasonpay,jdbcType=DECIMAL},
+    yearpay = #{yearpay,jdbcType=DECIMAL},
+    dayloannum = #{dayloannum,jdbcType=INTEGER},
+    monloannum = #{monloannum,jdbcType=INTEGER},
+    sealoannum = #{sealoannum,jdbcType=INTEGER},
+    yearloannum = #{yearloannum,jdbcType=INTEGER},
+    createtime = #{createtime,jdbcType=TIMESTAMP},
+    updatetime = #{updatetime,jdbcType=TIMESTAMP},
+    version=version+1
+    where userrelateid = #{userrelateid,jdbcType=VARCHAR}
+    and version=#{version,jdbcType=BIGINT}
+  </update>
+</mapper>

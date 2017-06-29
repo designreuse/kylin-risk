@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Account" >
+  <resultMap id="accountMap" type="Account" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="accountid" property="accountid" jdbcType="VARCHAR" />
+    <result column="userid" property="userid" jdbcType="VARCHAR" />
+    <result column="bizsysid" property="bizsysid" jdbcType="VARCHAR" />
+    <result column="accounttype" property="accounttype" jdbcType="VARCHAR" />
+    <result column="accountccy" property="accountccy" jdbcType="VARCHAR" />
+    <result column="accountbalance" property="accountbalance" jdbcType="DECIMAL" javaType="Amount"/>
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="customerid" property="customerid" jdbcType="VARCHAR" />
+    <result column="merchid" property="merchid" jdbcType="VARCHAR" />
+    <result column="delreason" property="delreason" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, accountid, userid, bizsysid, accounttype, accountccy, accountbalance, status, 
+    customerid, merchid, delreason
+  </sql>
+  <select id="get" resultMap="accountMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_account
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="customerQuery" resultMap="accountMap" parameterType="String">
+    SELECT
+    <include refid="columnList"/>
+    from risk_account
+    where customerid =#{customerid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="merchantQuery" resultMap="accountMap" parameterType="String">
+    SELECT
+    <include refid="columnList"/>
+    from risk_account
+    where merchid =#{merchantid,jdbcType=VARCHAR}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_account
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="Account" >
+    insert into risk_account (accountid, userid, bizsysid, 
+      accounttype, accountccy, accountbalance, 
+      status, customerid, merchid, 
+      delreason)
+    values (#{accountid,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{bizsysid,jdbcType=VARCHAR}, 
+      #{accounttype,jdbcType=VARCHAR}, #{accountccy,jdbcType=VARCHAR}, #{accountbalance,jdbcType=DECIMAL}, 
+      #{status,jdbcType=VARCHAR}, #{customerid,jdbcType=VARCHAR}, #{merchid,jdbcType=VARCHAR}, 
+      #{delreason,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="Account" >
+    update risk_account
+    set accountid = #{accountid,jdbcType=VARCHAR},
+      userid = #{userid,jdbcType=VARCHAR},
+      bizsysid = #{bizsysid,jdbcType=VARCHAR},
+      accounttype = #{accounttype,jdbcType=VARCHAR},
+      accountccy = #{accountccy,jdbcType=VARCHAR},
+      accountbalance = #{accountbalance,jdbcType=DECIMAL},
+      status = #{status,jdbcType=VARCHAR},
+      customerid = #{customerid,jdbcType=VARCHAR},
+      merchid = #{merchid,jdbcType=VARCHAR},
+      delreason = #{delreason,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

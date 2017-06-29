@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Rule" >
+  <resultMap id="ruleMap" type="Rule" >
+    <result column="id" property="id" jdbcType="SMALLINT" />
+    <result column="groupid" property="groupid" jdbcType="SMALLINT" />
+    <result column="rulename" property="rulename" jdbcType="VARCHAR" />
+    <result column="rulecode" property="rulecode" jdbcType="VARCHAR" />
+    <result column="ruleclass" property="ruleclass" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="createoperid" property="createoperid" jdbcType="SMALLINT" />
+    <result column="createopername" property="createopername" jdbcType="VARCHAR" />
+    <result column="priority" property="priority" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="result" property="result" jdbcType="VARCHAR" />
+    <result column="fields" property="fields" jdbcType="VARCHAR" />
+    <result column="conditions" property="conditions" jdbcType="VARCHAR" />
+    <result column="conditionvals" property="conditionvals" jdbcType="VARCHAR" />
+    <result column="logicsym" property="logicsym" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <association column="groupid" property="group" javaType="Group"  select="Group.queryByGroupid"/>
+  </resultMap>
+  <sql id="columnList" >
+    id,groupid,rulename, rulecode, ruleclass,status,createoperid,createopername,priority,remark,createtime,updatetime,
+    result,fields,conditions,conditionvals,logicsym
+  </sql>
+  <select id="get" resultMap="ruleMap" parameterType="short" >
+    select
+    <include refid="columnList" />
+    from risk_rule
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <insert id="insert" parameterType="Rule"  keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_rule (groupid,rulename, rulecode,ruleclass,status,createoperid, createopername,
+       priority,remark,result,fields,conditions,conditionvals,logicsym)
+    values (#{groupid,jdbcType=SMALLINT},#{rulename,jdbcType=VARCHAR},#{rulecode,jdbcType=VARCHAR},#{ruleclass,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR}, #{createoperid,jdbcType=SMALLINT}, #{createopername,jdbcType=VARCHAR},
+      #{priority,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR}, #{result,jdbcType=VARCHAR}, #{fields,jdbcType=VARCHAR},
+      #{conditions,jdbcType=VARCHAR}, #{conditionvals,jdbcType=VARCHAR}, #{logicsym,jdbcType=VARCHAR})
+  </insert>
+  <delete id="delete" parameterType="short" >
+    delete from risk_rule
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <update id="update" parameterType="Rule" >
+    update risk_rule
+    <set>
+    <if test="rulename != null">
+      rulename = #{rulename,jdbcType=VARCHAR},
+    </if>
+    <if test="status != null">
+      status = #{status,jdbcType=VARCHAR},
+    </if>
+    <if test="priority != null">
+      priority = #{priority,jdbcType=VARCHAR},
+    </if>
+    <if test="ruleclass != null">
+      ruleclass = #{ruleclass,jdbcType=VARCHAR},
+    </if>
+      <if test="remark != null">
+      remark = #{remark,jdbcType=VARCHAR},
+    </if>
+      <if test="result != null">
+        result = #{result,jdbcType=VARCHAR},
+    </if>
+      <if test="fields != null">
+        fields = #{fields,jdbcType=VARCHAR},
+    </if>
+      <if test="conditions != null">
+        conditions = #{conditions,jdbcType=VARCHAR},
+    </if>
+      <if test="conditionvals != null">
+        conditionvals = #{conditionvals,jdbcType=VARCHAR},
+    </if>
+      <if test="logicsym != null">
+        logicsym = #{logicsym,jdbcType=VARCHAR},
+    </if>
+    <if test="groupid != null">
+      groupid = #{groupid,jdbcType=SMALLINT},
+    </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="queryMaxRulecode" resultType="string" >
+    select
+    max(rulecode)
+    from risk_rule
+  </select>
+  <select id="queryByGroupidAndSta" resultMap="ruleMap" parameterType="map">
+    select
+    <include refid="columnList" />
+    from risk_rule
+    where groupid = #{groupid,jdbcType=SMALLINT}
+      and status=#{status,jdbcType=VARCHAR}
+  </select>
+  <select id="queryRule" resultMap="ruleMap" parameterType="Role">
+    <if test="rulename != null">
+      <bind name="rulename" value="'%' + rulename + '%'" />
+    </if>
+    <if test="rulecode != null">
+      <bind name="rulecode" value="'%' + rulecode + '%'" />
+    </if>
+    SELECT r.* FROM risk_rule r
+    <where>
+      <if test="rulename != null and ''!=rulename">
+        and rulename like #{rulename}
+      </if>
+      <if test="rulecode != null and ''!=rulecode">
+        and rulecode like #{rulecode}
+      </if>
+      <if test="ruleclass != null and ''!=ruleclass">
+        and ruleclass = #{ruleclass}
+      </if>
+      <if test="status != null and ''!=status">
+        and status = #{status}
+      </if>
+      <if test="groupid != null and ''!=groupid">
+        and groupid = #{groupid,jdbcType=VARCHAR}
+      </if>
+    </where>
+    order by groupid
+   </select>
+
+
+</mapper>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CustomebwgList">
+  <resultMap id="customebwgMap" type="CustomebwgList">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="custid" jdbcType="BIGINT" property="custid" />
+    <result column="customerid" jdbcType="VARCHAR" property="customerid" />
+    <result column="customername" jdbcType="VARCHAR" property="customername" />
+    <result column="accountnum" jdbcType="VARCHAR" property="accountnum" />
+    <result column="opendate" javaType="Datetime" jdbcType="TIMESTAMP" property="opendate" />
+    <result column="failuretime" javaType="LocalDate" jdbcType="DATE" property="failuretime" />
+    <result column="effecttime" javaType="LocalDate" jdbcType="DATE" property="effecttime" />
+    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="type" jdbcType="CHAR" property="type" />
+    <result column="source" jdbcType="CHAR" property="source" />
+    <result column="userid" jdbcType="SMALLINT" property="userid" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="updatetime" javaType="DateTime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="createtime" javaType="DateTime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="checkid" jdbcType="SMALLINT" property="checkid" />
+    <result column="checkname" jdbcType="VARCHAR" property="checkname" />
+    <result column="checktime" javaType="DateTime" jdbcType="TIMESTAMP" property="checktime" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <association column="customerid" javaType="Customerinfo" property="customerinfo" select="Customerinfo.customerBWGQuery" />
+  </resultMap>
+
+  <resultMap id="customebwgListMap" type="CustomebwgList" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="customerid" property="customerid" jdbcType="VARCHAR" />
+    <result column="customername" property="customername" jdbcType="VARCHAR" />
+    <result column="accountnum" property="accountnum" jdbcType="VARCHAR" />
+    <result column="opendate" property="opendate" jdbcType="TIMESTAMP" javaType="Datetime" />
+    <result column="failuretime" property="failuretime" jdbcType="DATE" javaType="LocalDate" />
+    <result column="effecttime" property="effecttime" jdbcType="DATE" javaType="LocalDate" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="property" property="property" jdbcType="CHAR" />
+    <result column="source" property="source" jdbcType="CHAR" />
+    <result column="userid" property="userid" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="checkid" jdbcType="SMALLINT" property="checkid" />
+    <result column="checkname" jdbcType="VARCHAR" property="checkname" />
+    <result column="checktime" javaType="DateTime" jdbcType="TIMESTAMP" property="checktime" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+  </resultMap>
+
+
+  <sql id="columnList">
+    id, custid,customerid, customername, accountnum, opendate, failuretime, effecttime, status,
+    type, source, userid, username, updatetime, reason,createtime,checkid,checkname,checktime
+  </sql>
+  <select id="get" parameterType="integer" resultMap="customebwgMap">
+    select 
+    <include refid="columnList" />
+    from risk_customebwg_list
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryAll" resultMap="customebwgMap">
+    select
+    <include refid="columnList" />
+    from risk_customebwg_list
+  </select>
+
+  <select id="queryCustbwgListByCondition" parameterType="CustomebwgList" resultMap="customebwgMap">
+    SELECT t.*
+    FROM risk_customebwg_list t
+    left join risk_customerinfo c on t.customerid=c.customerid
+    <where>
+       t.status != '99'
+      <if test="customername != null and ''!=customername">
+       AND t.customername LIKE #{customername}
+      </if>
+      <if test="cardtype != null and ''!=cardtype">
+        AND c.certificatetype = #{cardtype}
+      </if>
+      <if test="cardnum != null and ''!=cardnum">
+        AND c.certificateid = #{cardnum}
+      </if>
+      <if test="type != null and ''!=type">
+        AND t.type = #{type}
+      </if>
+      <if test="status != null and ''!=status">
+        AND t.status = #{status}
+      </if>
+    </where>
+    order by t.id
+  </select>
+
+  <select id="queryByCustomeridAndType" resultMap="customebwgListMap" parameterType="map">
+    SELECT
+    <include refid="columnList"/>
+    from risk_customebwg_list
+    where status != '99'
+    AND status !='04'
+    AND customerid =#{customerid,jdbcType=VARCHAR}
+    AND type=#{type,jdbcType=CHAR}
+  </select>
+  <select id="queryByCustomerid" resultMap="customebwgListMap" parameterType="string">
+    SELECT
+    <include refid="columnList"/>
+    from risk_customebwg_list
+    where status != '99'
+    AND status !='04'
+    AND customerid =#{customerid,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="delete" parameterType="integer">
+    delete from risk_customebwg_list
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="CustomebwgList">
+    insert into risk_customebwg_list (custid,
+    customerid,
+    customername,
+    accountnum,
+    opendate,
+    failuretime,
+    effecttime,
+    status,
+    type,
+    source,
+    userid,
+    username,
+    reason,
+    checkid,
+    checkname,
+    checktime)
+    values (#{custid,jdbcType=INTEGER},
+      #{customerid,jdbcType=VARCHAR},
+      #{customername,jdbcType=VARCHAR},
+      #{accountnum,jdbcType=VARCHAR},
+      #{opendate,jdbcType=TIMESTAMP},
+      #{failuretime,jdbcType=DATE},
+      #{effecttime,jdbcType=DATE},
+      #{status,jdbcType=CHAR},
+      #{type,jdbcType=CHAR},
+      #{source,jdbcType=CHAR},
+      #{userid,jdbcType=SMALLINT},
+      #{username,jdbcType=VARCHAR},
+      #{reason,jdbcType=VARCHAR},
+      #{checkid,jdbcType=SMALLINT},
+      #{checkname,jdbcType=VARCHAR},
+      #{checktime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="update" parameterType="CustomebwgList">
+    update risk_customebwg_list
+    set custid = #{custid,jdbcType=INTEGER},
+      customerid = #{customerid,jdbcType=VARCHAR},
+      customername = #{customername,jdbcType=VARCHAR},
+      accountnum = #{accountnum,jdbcType=VARCHAR},
+      opendate = #{opendate,jdbcType=TIMESTAMP},
+      failuretime = #{failuretime,jdbcType=DATE},
+      effecttime = #{effecttime,jdbcType=DATE},
+      status = #{status,jdbcType=CHAR},
+      type = #{type,jdbcType=CHAR},
+      source = #{source,jdbcType=CHAR},
+      userid = #{userid,jdbcType=SMALLINT},
+      username = #{username,jdbcType=VARCHAR},
+      reason = #{reason,jdbcType=VARCHAR},
+      checkid = #{checkid,jdbcType=SMALLINT},
+      checkname = #{checkname,jdbcType=VARCHAR},
+      checktime = #{checktime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

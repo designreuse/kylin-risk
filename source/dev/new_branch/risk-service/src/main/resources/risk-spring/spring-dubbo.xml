@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+	   http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+       <dubbo:application name="risk-service"/>
+       <dubbo:registry protocol="zookeeper" file="risk-service.cache" address="${zookeeper.address}" timeout="12000"/>
+       <bean id="localAddress" class="com.rkylin.risk.service.LocalAddress">
+              <constructor-arg name="networkName" value="${dubbo.networkCard}"/>
+       </bean>
+       <dubbo:protocol name="dubbo" default="true" port="${dubbo.port}"  dispatcher="all" threadpool="fixed"  threads="100" host="#{localAddress.ip}"/>
+
+       <!--provider service start-->
+       <dubbo:provider version="1.0" protocol="dubbo"  retries="0" delay="-1" default="true" timeout="30000"/>
+       <dubbo:service interface="com.rkylin.risk.order.api.OrderApi" group="riskOrderApi"  ref="orderApi"/>
+       <dubbo:service interface="com.rkylin.risk.order.api.OrderStatus" group="riskOrderStatus"  ref="orderStatus"/>
+       <dubbo:service interface="com.rkylin.risk.order.api.MerchantApi" group="merchant"  ref="merchantApi"></dubbo:service>
+       <dubbo:service interface="com.rkylin.risk.operation.api.OperationApi" group="riskOperationApi"  ref="operationApi"/>
+       <dubbo:service interface="com.rkylin.risk.operation.api.PersonApi" group="riskPersonApi"  ref="personApi"/>
+       <dubbo:service interface="com.rkylin.risk.operation.api.ReptileApi" group="reptileApi"  ref="reptileApi"></dubbo:service>
+       <dubbo:service interface="com.rkylin.risk.operation.api.MerchantCheckApi" group="merchantCheck"  ref="merchantCheckApi"></dubbo:service>
+       <dubbo:service interface="com.rkylin.risk.operation.api.OperateFlowStatusApi" group="OperateFlowStatusApi" ref="operateFlowStatusApi"></dubbo:service>
+       <!--provider service end-->
+
+
+       <!--consumer service start-->
+       <dubbo:consumer id="dubboConsumer" default="true" version="1.0" retries="1" check="false"></dubbo:consumer>
+       <dubbo:reference id="flowStatusChangeService" interface="com.rkylin.oprsystem.system.service.FlowStatusChangeService" group="opr"  protocol="dubbo" timeout="5000" version="1.0.0"/>
+       <dubbo:reference id="linkFaceOCRService" interface="com.rkylin.facerecognition.api.service.LinkFaceOCRService"  protocol="dubbo" timeout="12000" version="1.0.0"/>
+       <dubbo:reference id="faceRecognitionService" interface="com.rkylin.facerecognition.api.service.FaceRecognitionService" group="linkFace"   timeout="12000" version="1.0.0"/>
+       <dubbo:reference id="creditService" interface="com.rkylin.gateway.service.CreditService"  group="PY_Credit" protocol="dubbo" timeout="12000" version="1.0.0"/>
+
+
+
+       <!--consumer service end-->
+
+</beans>

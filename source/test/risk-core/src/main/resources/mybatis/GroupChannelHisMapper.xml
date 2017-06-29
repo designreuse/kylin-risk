@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="GroupChannelHis" >
+  <resultMap id="groupChannelHisMap" type="groupChannelHis" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="grouphisid" property="grouphisid" jdbcType="SMALLINT" />
+    <result column="channelcode" property="channelcode" jdbcType="VARCHAR" />
+    <result column="channelname" property="channelname" jdbcType="VARCHAR" />
+    <result column="productcode" property="productcode" jdbcType="VARCHAR" />
+    <result column="productname" property="productname" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, grouphisid, channelcode, channelname, productcode, productname
+  </sql>
+  <select id="get" resultMap="groupChannelHisMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_group_channel_his
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <select id="queryByGroupid" resultMap="groupChannelHisMap" parameterType="short" >
+    select
+    <include refid="columnList" />
+    from risk_group_channel_his
+    where grouphisid = #{groupid,jdbcType=SMALLINT}
+  </select>
+  <delete id="delete" parameterType="short" >
+    delete from risk_group_channel_his
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="GroupChannelHis" >
+    insert into risk_group_channel_his (grouphisid, channelcode, channelname,
+      productcode, productname)
+    values (#{grouphisid,jdbcType=SMALLINT}, #{channelcode,jdbcType=VARCHAR}, #{channelname,jdbcType=VARCHAR},
+      #{productcode,jdbcType=VARCHAR}, #{productname,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertFromGroupChannel" parameterType="GroupChannelHis" >
+    insert into risk_group_channel_his (grouphisid, channelcode, channelname,
+      productcode, productname)
+    select #{id,jdbcType=SMALLINT}, channelcode, channelname,
+      productcode, productname
+    from risk_group_channel
+    where groupid = #{grouphisid,jdbcType=SMALLINT}
+  </insert>
+  <update id="update" parameterType="GroupChannelHis" >
+    update risk_group_channel_his
+    set grouphisid = #{grouphisid,jdbcType=SMALLINT},
+      channelcode = #{channelcode,jdbcType=VARCHAR},
+      channelname = #{channelname,jdbcType=VARCHAR},
+      productcode = #{productcode,jdbcType=VARCHAR},
+      productname = #{productname,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+</mapper>

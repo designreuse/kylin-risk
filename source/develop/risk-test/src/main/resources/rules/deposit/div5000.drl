@@ -1,0 +1,25 @@
+package os.nut.drools.deposit;
+
+import com.rkylin.risk.service.bean.DepositCode;
+import com.rkylin.risk.service.bean.DepositFactor;
+
+rule "div50001"
+    no-loop true
+    salience 133
+    when
+         deposit : DepositFactor( div5000==true)
+         code:DepositCode()
+    then
+        code.setDiv5000("depDiv500001");
+
+end
+
+rule "div50002"
+    no-loop true
+    salience 132
+    when
+         deposit : DepositFactor( div5000 ==false )
+         code:DepositCode()
+    then
+        code.setDiv5000("depDiv500002");
+end

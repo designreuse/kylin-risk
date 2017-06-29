@@ -1,0 +1,15 @@
+package os.nut.drools.PubRecord;
+//salience:19-0
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+
+rule "GPS2"
+    no-loop true
+    salience 19
+    when
+        $GPS : CustomerFactor(GPS=="true");
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setGPS("GPS01");
+end

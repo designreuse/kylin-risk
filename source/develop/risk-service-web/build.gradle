@@ -1,0 +1,28 @@
+apply plugin: 'war'
+
+description = '可部署在web server的风控服务接口'
+
+ext{
+  riskSpringWebVersion = '1.0.0'
+}
+dependencies {
+
+  compile project(":risk-service")
+  compile "com.rkylin.risk:risk-spring-web:${riskSpringWebVersion}"
+  compile "org.springframework:spring-web"
+  compile "org.springframework:spring-context-support"
+
+  providedCompile "javax.servlet:javax.servlet-api"
+  compile "org.apache.logging.log4j:log4j-web"
+
+
+  testCompile "junit:junit"
+  testCompile "org.mockito:mockito-all"
+  testCompile "org.springframework:spring-test"
+  testCompile "com.jayway.jsonpath:json-path"
+  testCompile "org.assertj:assertj-core"
+  testCompile "org.assertj:assertj-guava"
+
+
+  providedCompile "org.projectlombok:lombok"
+}

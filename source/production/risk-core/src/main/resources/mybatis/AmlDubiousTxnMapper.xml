@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="AmlDubiousTxn" >
+  <resultMap id="amlDubiousTxnMap" type="AmlDubiousTxn" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="warnnum" property="warnnum" jdbcType="VARCHAR" />
+    <result column="txncount" property="txncount" jdbcType="VARCHAR" />
+    <result column="txnaccount" property="txnaccount" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="risklevel" property="risklevel" jdbcType="CHAR" />
+    <result column="warndate" property="warndate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="ruleid" property="ruleid" jdbcType="INTEGER" />
+    <result column="customnum" property="customnum" jdbcType="VARCHAR" />
+    <result column="customname" property="customname" jdbcType="VARCHAR" />
+    <result column="dealopinion" property="dealopinion" jdbcType="VARCHAR" />
+    <result column="source" property="source" jdbcType="CHAR" />
+    <result column="filepath" property="filepath" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, warnnum, txncount, txnaccount, risklevel, warndate, ruleid, customnum, customname, 
+    dealopinion, source,filepath
+  </sql>
+  <select id="queryAll" resultMap="amlDubiousTxnMap" parameterType="AmlDubiousTxn" >
+    <if test="customername!=null and ''!=customername">
+      <bind name="customername" value="customername + '%'" />
+    </if>
+    select * from risk_amldubioustxn a
+    <where>
+      <if test="customnum != null and ''!=customnum">
+        a.customnum = #{customnum}
+      </if>
+      <if test="customname != null and ''!=customname">
+        AND a.customname LIKE #{customname}
+      </if>
+      <if test="ruleid != null and ''!=ruleid">
+        AND a.ruleid = #{ruleid}
+      </if>
+      <if test="risklevel != null and ''!=risklevel">
+        AND a.risklevel = #{risklevel}
+      </if>
+      <if test="warndatebeg != null and ''!=warndatebeg" >
+        AND a.warndate &gt;= #{warndatebeg}
+      </if>
+      <if test="warndateend != null and ''!=warndateend">
+        AND a.warndate &lt;= #{warndateend}
+      </if>
+    </where>
+    order by a.id
+  </select>
+
+  <select id="exportBycondition" resultType="map" parameterType="map" >
+
+    select a.* from risk_amldubioustxn a
+    <where>
+      <if test="adt.getCustomnum() != null and ''!=adt.getCustomnum()">
+        a.customnum = #{adt.customnum}
+      </if>
+      <if test="adt.getCustomname() != null and ''!=adt.getCustomname()">
+        AND a.customname LIKE #{adt.customname}
+      </if>
+      <if test="adt.getRisklevel() != null and ''!=adt.getRisklevel() ">
+        AND a.risklevel = #{adt.risklevel}
+      </if>
+      <if test="warndatebeg != null and ''!=warndatebeg" >
+        AND a.warndate &gt;= #{warndatebeg}
+      </if>
+      <if test="warndateend != null and ''!=warndateend">
+        AND a.warndate &lt;= #{warndateend}
+      </if>
+    </where>
+    order by a.id
+  </select>
+
+
+
+  <select id="queryOne" resultMap="amlDubiousTxnMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_amldubioustxn
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_amldubioustxn
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="AmlDubiousTxn" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    insert into risk_amldubioustxn (warnnum, txncount, txnaccount, 
+      risklevel, warndate, ruleid, 
+      customnum, customname, dealopinion, source,filepath)
+    values (#{warnnum,jdbcType=VARCHAR}, #{txncount,jdbcType=VARCHAR}, #{txnaccount,jdbcType=DECIMAL}, 
+      #{risklevel,jdbcType=CHAR}, #{warndate,jdbcType=DATE}, #{ruleid,jdbcType=INTEGER}, 
+      #{customnum,jdbcType=VARCHAR}, #{customname,jdbcType=VARCHAR}, #{dealopinion,jdbcType=VARCHAR},#{source,jdbcType=CHAR},#{filepath,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="AmlDubiousTxn" >
+    update risk_amldubioustxn
+    set
+      dealopinion = #{dealopinion,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

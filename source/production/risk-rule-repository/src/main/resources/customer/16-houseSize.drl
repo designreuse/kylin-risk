@@ -1,0 +1,43 @@
+package os.nut.drools.EstateInfo;
+//salience:219-200
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+rule "houseSize2"
+    no-loop true
+    salience 219
+    when
+        $estateInfo : CustomerFactor(houseSize!=null,houseSize.isGreaterOrEqualThan(144));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseSize("houseSize01");
+end
+
+rule "houseSize3"
+    no-loop true
+    salience 218
+    when
+        $estateInfo : CustomerFactor(houseSize!=null, houseSize.isGreaterOrEqualThan(90)&&houseSize.isLesserThan(144));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseSize("houseSize02");
+end
+
+rule "houseSize4"
+    no-loop true
+    salience 217
+    when
+        $estateInfo : CustomerFactor(houseSize!=null,houseSize.isGreaterOrEqualThan(60)&&houseSize.isLesserThan(90));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseSize("houseSize03");
+end
+
+rule "houseSize5"
+    no-loop true
+    salience 216
+    when
+        $estateInfo : CustomerFactor(houseSize!=null,houseSize.isLesserThan(60));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseSize("houseSize04");
+end

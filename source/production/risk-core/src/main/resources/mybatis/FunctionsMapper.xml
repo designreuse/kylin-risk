@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Functions">
+  <cache type="com.rkylin.risk.mybatis.cache.RedisCache"/>
+  <resultMap id="functionsMap" type="Functions">
+    <id column="id" jdbcType="SMALLINT" property="id" />
+    <result column="functionname" jdbcType="VARCHAR" property="functionname" />
+    <result column="functiontype" jdbcType="VARCHAR" property="functiontype" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="checkflag" jdbcType="CHAR" property="checkflag" />
+    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="menuid" jdbcType="SMALLINT" property="menuid" />
+  </resultMap>
+  <sql id="columnList">
+    id, functionname, functiontype, url, checkflag, status,menuid
+  </sql>
+  <select id="queryOne" parameterType="short" resultMap="functionsMap">
+    select
+    <include refid="columnList" />
+    from risk_functions
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+
+  <select id="queryAll" resultMap="functionsMap">
+    select
+    <include refid="columnList" />
+    from risk_functions
+  </select>
+
+  <select id="query" resultMap="functionsMap" parameterType="Functions">
+     <if test="functionname!=null and ''!=functionname">
+      <bind name="functionname" value="'%'+functionname + '%'" />
+    </if>
+    <if test="url!=null and ''!=url">
+      <bind name="url" value="'%'+url + '%'" />
+    </if>
+    SELECT
+    <include refid="columnList" />
+    FROM risk_functions
+    <where>
+      <if test="functionname != null and ''!=functionname">
+        functionname LIKE #{functionname}
+      </if>
+      <if test="functiontype != null and ''!=functiontype">
+        AND functiontype = #{functiontype}
+      </if>
+      <if test="url != null and ''!=url">
+        AND url like #{url}
+      </if>
+      <if test="status != null and ''!=status">
+        AND status = #{status}
+      </if>
+    </where>
+    order by id
+  </select>
+
+  <delete id="delete" parameterType="short">
+    delete from risk_functions
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+
+  <insert id="insert" parameterType="Functions">
+    <selectKey keyProperty="id" order="AFTER" resultType="short">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into risk_functions (functionname, functiontype, url,
+    checkflag, status,menuid)
+    values (#{functionname,jdbcType=VARCHAR}, #{functiontype,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR},
+    #{checkflag,jdbcType=CHAR}, #{status,jdbcType=CHAR}, #{menuid,jdbcType=SMALLINT})
+  </insert>
+
+  <update id="update" parameterType="Functions">
+    update risk_functions
+    set functionname = #{functionname,jdbcType=VARCHAR},
+    functiontype = #{functiontype,jdbcType=VARCHAR},
+    url = #{url,jdbcType=VARCHAR},
+    status = #{status,jdbcType=CHAR},
+    menuid=#{menuid,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+
+  <select id="queryFunByRole" resultMap="functionsMap" parameterType="short" useCache="false">
+    SELECT a.id,a.functionname,a.functiontype,a.url,a.status
+    FROM risk_functions a LEFT JOIN risk_role_function b ON a.id=b.functionid
+          LEFT JOIN risk_role c ON b.roleid=c.id
+    WHERE c.id=#{id,jdbcType=SMALLINT}
+    order by a.id
+  </select>
+</mapper>

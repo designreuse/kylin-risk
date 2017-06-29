@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.rkylin.com/schema/risk/risk-spring-web"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    targetNamespace="http://www.rkylin.com/schema/risk/risk-spring-web"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+  <xsd:import namespace="http://www.springframework.org/schema/beans"
+      schemaLocation="http://www.springframework.org/schema/beans/spring-beans-4.0.xsd"/>
+
+  <xsd:element name="url-sql">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="sqlmap" minOccurs="1" maxOccurs="unbounded">
+          <xsd:annotation>
+            <xsd:documentation><![CDATA[
+            daemon 的取值
+			]]></xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:attribute name="url" type="xsd:string" use="required"></xsd:attribute>
+            <xsd:attribute name="sqlId" type="xsd:string" use="required"></xsd:attribute>
+            <xsd:attribute name="daemon" default="DEFAULT">
+              <xsd:annotation>
+                <xsd:documentation><![CDATA[
+                后台的分页设置,
+                DEFAULT:分页的设置由浏览器完全决定
+                ALL:数据全部查出假分页
+                PHYSICAL:数据库的物理分页
+                当daemon为ALL或者PHYSICAL时,如果浏览器传递的分页设置与后台配置的不一致,将报错
+                ]]></xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                  <xsd:enumeration value="DEFAULT"/>
+                  <xsd:enumeration value="ALL"/>
+                  <xsd:enumeration value="PHYSICAL"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="maxPageSize" type="xsd:int" default="50">
+              <xsd:annotation>
+                <xsd:documentation><![CDATA[
+                当走物理分页时,支持的最大分页大小
+                ]]></xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="validator-ref"  type="xsd:string">
+              <xsd:annotation>
+                <xsd:documentation><![CDATA[
+                validator的spring bean引用,当前必须是PageValidator的实现类
+				]]></xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="pageHandlerRef" use="required" type="xsd:string"></xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
+
+
+  <xsd:element name="url-view">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element  name="mapping"  minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation><![CDATA[
+            url和页面的映射关系
+			]]></xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType mixed="true">
+            <xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

@@ -1,0 +1,44 @@
+package os.nut.drools.ProduceSch;
+//salience:119-100
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "cashDepositRate2"
+    no-loop true
+    salience 119
+    when
+        $produceSch : CustomerFactor(cashDepositRate!=null,cashDepositRate.isEqualTo(0.3));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setCashDepositRate("cashDepositRate01");
+end
+
+rule "cashDepositRate3"
+    no-loop true
+    salience 118
+    when
+        $produceSch : CustomerFactor(cashDepositRate!=null, cashDepositRate.isEqualTo(0.2));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setCashDepositRate("cashDepositRate02");
+end
+
+rule "cashDepositRate4"
+    no-loop true
+    salience 117
+    when
+        $produceSch : CustomerFactor(cashDepositRate!=null,cashDepositRate.isEqualTo(0));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setCashDepositRate("cashDepositRate03");
+end
+
+rule "cashDepositRate5"
+    no-loop true
+    salience 116
+    when
+        $produceSch : CustomerFactor(cashDepositRate!=null,cashDepositRate.isEqualTo(-1));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setCashDepositRate("cashDepositRate04");
+end

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Factor" >
+  <resultMap id="factorMap" type="Factor" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="weight" property="weight" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="score" property="score" jdbcType="VARCHAR" />
+    <result column="account" property="account" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="customertype" property="customertype" jdbcType="CHAR" />
+    <result column="risktype" property="risktype" jdbcType="CHAR" />
+    <result column="factorlevel" property="factorlevel" jdbcType="CHAR" />
+    <result column="factorid" property="factorid" jdbcType="INTEGER" />
+    <result column="moduletype" property="moduletype" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="userid" property="userid" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, name, code, weight, description, score, account, remark, customertype, risktype, 
+    factorlevel, factorid, moduletype,status, userid, username, updatetime
+  </sql>
+  <select id="get" resultMap="factorMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_factor
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_factor
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="Factor" >
+    insert into risk_factor (name, code, weight, 
+      description, score, account, 
+      remark, customertype, risktype, 
+      factorlevel, factorid, moduletype, status,
+      userid, username
+      )
+    values (#{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{weight,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{score,jdbcType=VARCHAR}, #{account,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{customertype,jdbcType=CHAR}, #{risktype,jdbcType=CHAR}, 
+      #{factorlevel,jdbcType=CHAR}, #{factorid,jdbcType=INTEGER}, #{moduletype,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR},
+      #{userid,jdbcType=SMALLINT}, #{username,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="update" parameterType="Factor" >
+    update risk_factor
+    <set>
+    <if test="name != null">
+      name = #{name,jdbcType=VARCHAR},
+    </if>
+    <if test="code != null">
+      code = #{code,jdbcType=VARCHAR},
+    </if>
+    <if test="weight != null">
+      weight = #{weight,jdbcType=VARCHAR},
+    </if>
+    <if test="description != null">
+      description = #{description,jdbcType=VARCHAR},
+    </if>
+    <if test="score != null">
+      score = #{score,jdbcType=VARCHAR},
+    </if>
+    <if test="account != null">
+      account = #{account,jdbcType=VARCHAR},
+    </if>
+    <if test="remark != null">
+      remark = #{remark,jdbcType=VARCHAR},
+    </if>
+    <if test="customertype != null">
+      customertype = #{customertype,jdbcType=CHAR},
+    </if>
+    <if test="risktype != null">
+      risktype = #{risktype,jdbcType=CHAR},
+    </if>
+    <if test="factorlevel != null">
+      factorlevel = #{factorlevel,jdbcType=CHAR},
+    </if>
+    <if test="factorid != null">
+      factorid = #{factorid,jdbcType=INTEGER},
+    </if>
+    <if test="moduletype != null">
+      moduletype = #{moduletype,jdbcType=VARCHAR},
+    </if>
+    <if test="status != null">
+      status = #{status,jdbcType=VARCHAR},
+    </if>
+    <if test="userid != null">
+      userid = #{userid,jdbcType=SMALLINT},
+    </if>
+    <if test="username != null">
+      username = #{username,jdbcType=VARCHAR},
+    </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryFactorByType" parameterType="Factor" resultMap="factorMap">
+    select <include refid="columnList"></include>
+    from risk_factor
+    where customertype = #{customertype,jdbcType=CHAR}
+    and risktype = #{risktype,jdbcType=CHAR}
+  </select>
+  <select id="queryByParentid" parameterType="int" resultMap="factorMap">
+    select <include refid="columnList"></include>
+    from risk_factor
+    where factorid = #{parentid,jdbcType=INTEGER}
+  </select>
+  <select id="queryByCode" parameterType="string" resultMap="factorMap">
+    select <include refid="columnList"></include>
+    from risk_factor
+    where status='00' and code = #{code,jdbcType=VARCHAR}
+  </select>
+</mapper>

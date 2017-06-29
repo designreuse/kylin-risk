@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+			http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task-4.2.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+  <bean id="parentRopUtil" class="com.rkylin.risk.boss.util.ROPUtil" abstract="true">
+    <property name="mapper" ref="jsonMapper"/>
+  </bean>
+
+  <bean id="fileROP" parent="parentRopUtil">
+    <property name="appKey" value="${file_rop_key}"/>
+    <property name="appSecret" value="${file_rop_secret}"/>
+    <property name="ropUrl" value="${file_rop_url}"/>
+  </bean>
+
+  <bean id="jsonMapper"
+      class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+    <property name="createXmlMapper" value="false"/>
+    <property name="objectMapper">
+      <bean class="com.fasterxml.jackson.datatype.joda.JodaMapper"/>
+    </property>
+    <property name="featuresToEnable">
+      <array>
+        <util:constant
+            static-field="com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES"/>
+        <util:constant
+            static-field="com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_SINGLE_QUOTES"/>
+        <util:constant
+            static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
+      </array>
+    </property>
+    <property name="indentOutput" value="true"/>
+    <property name="simpleDateFormat" value="yyyy-MM-dd HH:mm:ss"/>
+    <property name="serializationInclusion" value="NON_EMPTY"/>
+  </bean>
+
+
+  <bean id="resteasyWebTarget" class="com.rkylin.risk.boss.resteasy.ResteasyWebTargetFactoryBean">
+    <constructor-arg index="0" name="domain" value="${mitou.domain}"/>
+    <constructor-arg index="1" name="publicKey" value="${mitou.publicKey}"/>
+    <property name="objectMapper" ref="jsonMapper"/>
+  </bean>
+
+  <bean id="mitouBiz" class="com.rkylin.risk.boss.resteasy.RestClientProxyFactory">
+    <constructor-arg index="0" name="resteasyWebTarget" ref="resteasyWebTarget"/>
+    <constructor-arg index="1" name="proxyInterface" value="com.rkylin.risk.boss.biz.MitouBiz"/>
+  </bean>
+
+</beans>

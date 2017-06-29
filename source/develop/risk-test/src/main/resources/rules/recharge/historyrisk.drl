@@ -1,0 +1,26 @@
+package os.nut.drools.recharge;
+
+import com.rkylin.risk.service.bean.RechargeFactor;
+
+import com.rkylin.risk.service.bean.RechargeCode;
+
+rule "historyrisk1"
+    no-loop true
+    salience 79
+    when
+         recharge : RechargeFactor( historyrisk==true)
+         code:RechargeCode()
+    then
+        code.setHistoryrisk("recHistoryrisk01");
+
+end
+
+rule "historyrisk2"
+    no-loop true
+    salience 78
+    when
+         recharge : RechargeFactor( historyrisk ==false )
+         code:RechargeCode()
+    then
+        code.setHistoryrisk("recHistoryrisk02");
+end

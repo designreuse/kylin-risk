@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+      http://www.springframework.org/schema/batch
+      http://www.springframework.org/schema/batch/spring-batch-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config></context:annotation-config>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository"/>
+    </bean>
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+    </bean>
+    <bean id="batchTransactionManager"
+          class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+    <!--计算前一日新增客户信息评分的跑批-->
+    <batch:job id="customerFactorJob">
+        <batch:step id="factor_step">
+            <tasklet transaction-manager="batchTransactionManager"  >
+                <chunk reader="custFacItemReader" writer="custFacItemWrite" processor="custFacItemProcessor" commit-interval="1" ></chunk>
+            </tasklet>
+        </batch:step>
+    </batch:job>
+    <bean id="custFacItemReader" class="org.mybatis.spring.batch.MyBatisPagingItemReader" scope="step">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+        <property name="queryId" value="Customer.queryByTimeInPage" />
+        <property name="parameterValues" ref="datesParameters"/>
+        <property name="pageSize" value="200"/>
+    </bean>
+    <bean id="custFacItemWrite" class="com.rkylin.risk.batch.write.CustomerFactorWirte" scope="step" />
+    <bean id="custFacItemProcessor" class="com.rkylin.risk.batch.processor.CustomerFactorProcessor" scope="step"/>
+    <util:map id="datesParameters" scope="step">
+        <entry key="createtime" value="#{jobParameters['createtime']}"/>
+    </util:map>
+
+    <!--计算提现交易时历史高风险触发情况的跑批-->
+    <batch:job id="custRiskJob">
+        <batch:step id="risk_step">
+            <tasklet transaction-manager="batchTransactionManager"  >
+                <chunk reader="custRisktemReader" writer="custRiskItemWrite" processor="custRiskItemProcessor" commit-interval="1" ></chunk>
+            </tasklet>
+        </batch:step>
+    </batch:job>
+    <bean id="custRisktemReader" class="org.mybatis.spring.batch.MyBatisPagingItemReader" scope="step">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+        <property name="queryId" value="Customer.queryInPage" />
+        <property name="pageSize" value="200"/>
+    </bean>
+    <bean id="custRiskItemWrite" class="com.rkylin.risk.batch.write.CustRiskWirte" scope="step" />
+    <bean id="custRiskItemProcessor" class="com.rkylin.risk.batch.processor.CustRiskProcessor" scope="step"/>
+
+
+
+
+
+</beans>

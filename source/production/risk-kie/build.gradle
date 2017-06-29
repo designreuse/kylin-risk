@@ -1,0 +1,81 @@
+ext {
+  springVersion = '4.2.5.RELEASE'
+  slf4jVersion = '1.7.21'
+  droolsVersion = '6.4.0.Final'
+  lombokVersion = '1.16.8'
+
+  junitVersion = '4.12'
+  assertjVersion = '2.4.1'
+  gradleFindbugsVersion = '3.0.1'
+  gradleScriptDir = "${rootProject.projectDir}/gradle"
+  javaVersion = JavaVersion.VERSION_1_7
+}
+assert JavaVersion.current().java7Compatible:
+        "At least Java $javaVersion is required, current JVM is ${JavaVersion.current()}"
+
+buildscript {
+  repositories {
+    maven {
+      url "http://121.40.68.238:8081/nexus/content/repositories/public"
+    }
+    maven { url 'http://repo.spring.io/plugins-release' }
+    mavenCentral()
+    mavenLocal()
+  }
+
+  dependencies {
+    //    classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.1.0'
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+  }
+}
+
+
+allprojects {
+  apply plugin: 'maven'
+  apply plugin: 'propdeps'
+  apply plugin: 'propdeps-idea'
+  apply from: "${gradleScriptDir}/publish-maven.gradle"
+
+  group = 'com.rkylin.risk'
+
+  tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+  }
+}
+
+
+subprojects {
+  apply plugin: 'java'
+  apply plugin: 'findbugs'
+
+
+  sourceCompatibility = 1.7
+  targetCompatibility = 1.7
+
+  repositories {
+    maven { url "http://121.40.68.238:8081/nexus/content/repositories/public" }
+    mavenCentral()
+  }
+
+  configurations {
+    all {
+      exclude module: 'commons-logging'
+      resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+    }
+  }
+
+
+  findbugs {
+    ignoreFailures = true
+    toolVersion = gradleFindbugsVersion
+    sourceSets = [sourceSets.main]
+    effort = "max"
+  }
+  tasks.withType(org.gradle.api.plugins.quality.FindBugs) {
+    reports {
+      xml.enabled = false
+      xml.withMessages = true
+      html.enabled = !xml.isEnabled()
+    }
+  }
+}

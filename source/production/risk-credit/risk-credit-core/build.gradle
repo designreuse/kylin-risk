@@ -1,0 +1,91 @@
+ext {
+  jxlsVersion = '2.3.0'
+  jxlsPOIVersion = '1.0.11'
+
+  bsApiVersion = "2.5.1"
+  upaclientVersion = "1.0"
+  pyCreditApiVersion = "1.0.1"
+  riskCommonsEntityVersion = '1.0.0'
+  jsonLibVersion = '2.4'
+  xstreamVersion = '1.4.8'
+
+  poiVersion = '3.13'
+
+  dubboVersion = '2.5.3'
+  zkclientVersion = '0.4'
+  p6spyVersion = '2.3.1'
+  riskCoreVersion = '1.1-SNAPSHOT'
+}
+
+configurations {
+  all {
+    exclude module: 'logback-core'
+  }
+}
+version="1.0.0-SNAPSHOT"
+description = '风控征信核心接口'
+dependencies {
+
+  compile "com.rkylin.risk:risk-commons-entity:${riskCommonsEntityVersion}"
+  //征信接口开始
+  //鹏圆
+  compile "com.rkylin.PYCredit:PYCredit-api:${pyCreditApiVersion}"
+  //百融
+  compile "com.br:bsApi:${bsApiVersion}"
+  //银联智策
+  compile "com.unionpayadvisors:upaclient:${upaclientVersion}"
+  compile "net.sf.json-lib:json-lib:${jsonLibVersion}:jdk15"
+  //征信接口结束
+
+  compile "org.springframework:spring-context:${springVersion}"
+  provided "org.projectlombok:lombok:${lombokVersion}"
+
+  compile "com.thoughtworks.xstream:xstream:${xstreamVersion}"
+
+  compile group: 'org.codehaus.jettison', name: 'jettison', version: '1.2'
+  compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+  compile group: 'com.alibaba', name: 'fastjson', version: '1.2.16'
+
+  //documents begin
+  //poi
+  optional "org.apache.poi:poi:${poiVersion}"
+  optional "org.apache.poi:poi-ooxml:${poiVersion}"
+  optional "org.apache.poi:poi-ooxml-schemas:${poiVersion}"
+  optional "org.jxls:jxls:${jxlsVersion}"
+  optional "org.jxls:jxls-poi:${jxlsPOIVersion}"
+  //  compile group: 'org.jxls', name: 'jxls-reader', version: '2.0.2'
+  //documents end
+
+  //  compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.2.0'
+
+  compile "joda-time:joda-time:${jodaTimeVersion}"
+
+  optional "com.alibaba:dubbo:${dubboVersion}"
+  optional "com.101tec:zkclient:${zkclientVersion}"
+
+  //  compile "commons-io:commons-io"
+  compile "com.google.guava:guava:${guavaVersion}"
+
+  //json begin
+  compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+  compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+  compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+  //json end
+
+  //log begin
+  compile "org.slf4j:slf4j-api:${slf4jVersion}"
+  compile "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+  compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+  optional "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+  optional "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+  optional "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+  //log end
+
+  testCompile "org.springframework:spring-test:${springVersion}"
+  testCompile "junit:junit:${junitVersion}"
+  testCompile "org.mockito:mockito-all:${mockitoVersion}"
+  testCompile "org.assertj:assertj-core:${assertjVersion}"
+  testCompile "com.rkylin.risk:risk-core:${riskCoreVersion}"
+
+  testCompile "p6spy:p6spy:${p6spyVersion}"
+}

@@ -1,0 +1,11 @@
+package template.rule;
+dialect  "mvel"
+
+rule "test"
+    when
+    then
+    System.out.println("$name");
+    #if ($isTest)
+    System.out.println("test end");
+    #end
+end

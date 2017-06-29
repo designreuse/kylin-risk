@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.rkylin.com/schema/risk/kie-server"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.rkylin.com/schema/risk/kie-server"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+  <xsd:import namespace="http://www.springframework.org/schema/beans"
+              schemaLocation="http://www.springframework.org/schema/beans/spring-beans-4.2.xsd"/>
+
+  <xsd:element name="risk-kie-server">
+    <xsd:annotation>
+      <xsd:documentation source="java:com.rkylin.risk.kie.spring.factorybeans.KieContainerFactoryBean"><![CDATA[
+	风控kie server
+			]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="releaseId" minOccurs="1" maxOccurs="unbounded">
+          <xsd:complexType>
+            <xsd:attribute name="groupId" type="xsd:string" use="required"/>
+            <xsd:attribute name="artifactId" type="xsd:string" use="required"/>
+            <xsd:attribute name="version" type="xsd:string" use="required"/>
+            <xsd:attribute name="scannerEnabled" type="xsd:boolean" default="true" use="optional"/>
+            <xsd:attribute name="scannerInterval" type="xsd:long" default="1000" use="optional"/>
+            <xsd:attribute name="scannerId" type="xsd:string" use="optional"/>
+            <xsd:attribute name="delay" type="xsd:long" use="optional"/>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:string" use="required"/>
+      <xsd:attribute name="releaseIdSniffer" type="xsd:string" use="optional"/>
+      <xsd:attribute name="setting" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation source="java:org.springframework.core.io.Resource"><![CDATA[
+              自定义maven settings.xml的导入位置
+							]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+
+  </xsd:element>
+</xsd:schema>

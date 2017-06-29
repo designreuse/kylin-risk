@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="CusFactorParam" >
+  <resultMap id="cusFactorParamMap" type="CusFactorParam" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="custid" property="custid" jdbcType="BIGINT" />
+    <result column="customerid" property="customerid" jdbcType="VARCHAR" />
+    <result column="rectime" property="rectime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="drecamount" property="drecamount" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="drecnum" property="drecnum" jdbcType="SMALLINT" />
+    <result column="drecmaxamount" property="drecmaxamount" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="drecmaxtype" property="drecmaxtype" jdbcType="VARCHAR" />
+    <result column="trxwrongflag" property="trxwrongflag" jdbcType="VARCHAR" />
+
+
+    <result column="drecmaxbankid" property="drecmaxbankid" jdbcType="VARCHAR" />
+    <result column="drecmaxcardno" property="drecmaxcardno" jdbcType="VARCHAR" />
+    <result column="remark10" property="remark10" jdbcType="VARCHAR" />
+    <result column="remark9" property="remark9" jdbcType="VARCHAR" />
+    <result column="remark8" property="remark8" jdbcType="VARCHAR" />
+    <result column="remark7" property="remark7" jdbcType="VARCHAR" />
+    <result column="remark6" property="remark6" jdbcType="VARCHAR" />
+    <result column="remark5" property="remark5" jdbcType="VARCHAR" />
+    <result column="remark4" property="remark4" jdbcType="VARCHAR" />
+    <result column="remark3" property="remark3" jdbcType="VARCHAR" />
+    <result column="remark1" property="remark1" jdbcType="VARCHAR" />
+    <result column="remark2" property="remark2" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, custid, customerid, rectime, drecamount, drecnum, drecmaxamount, drecmaxtype,trxwrongflag, drecmaxbankid, drecmaxcardno,
+    remark10, remark9, remark8, remark7, remark6, remark5, remark4, remark3, remark1, 
+    remark2
+  </sql>
+  <select id="get" resultMap="cusFactorParamMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_cust_factor_param
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_cust_factor_param
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <update id="updateBycustomerid" parameterType="CusFactorParam" >
+    update risk_cust_factor_param
+    set  customerid = #{customerid,jdbcType=VARCHAR},
+    rectime = #{rectime,jdbcType=TIMESTAMP},
+    drecamount = #{drecamount,jdbcType=DECIMAL},
+    drecmaxtype = #{drecmaxtype,jdbcType=VARCHAR},
+    trxwrongflag = #{trxwrongflag,jdbcType=VARCHAR},
+    drecnum = #{drecnum,jdbcType=SMALLINT},
+    drecmaxamount = #{drecmaxamount,jdbcType=DECIMAL},
+    drecmaxbankid = #{drecmaxbankid,jdbcType=VARCHAR},
+    drecmaxcardno = #{drecmaxcardno,jdbcType=VARCHAR},
+    remark10 = #{remark10,jdbcType=VARCHAR},
+    remark9 = #{remark9,jdbcType=VARCHAR},
+    remark8 = #{remark8,jdbcType=VARCHAR},
+    remark7 = #{remark7,jdbcType=VARCHAR},
+    remark6 = #{remark6,jdbcType=VARCHAR},
+    remark5 = #{remark5,jdbcType=VARCHAR},
+    remark4 = #{remark4,jdbcType=VARCHAR},
+    remark3 = #{remark3,jdbcType=VARCHAR},
+    remark1 = #{remark1,jdbcType=VARCHAR},
+    remark2 = #{remark2,jdbcType=VARCHAR}
+    where 1=1
+    <if test="customerid != null and ''!=customerid">
+      AND customerid =#{customerid,jdbcType=VARCHAR}
+    </if>
+      AND date_format(rectime, '%Y%m%d') = DATE_FORMAT(#{rectime,jdbcType=TIMESTAMP}, '%Y%m%d');
+  </update>
+
+  <insert id="insert" parameterType="CusFactorParam" >
+    insert into risk_cust_factor_param (custid, customerid, rectime, drecamount,
+      drecnum, drecmaxamount, drecmaxtype,trxwrongflag, drecmaxbankid,
+      drecmaxcardno, remark10, remark9, 
+      remark8, remark7, remark6, 
+      remark5, remark4, remark3, 
+      remark1, remark2)
+    values (#{custid,jdbcType=BIGINT}, #{customerid,jdbcType=VARCHAR}, #{rectime,jdbcType=TIMESTAMP}, #{drecamount,jdbcType=DECIMAL},
+      #{drecnum,jdbcType=SMALLINT}, #{drecmaxamount,jdbcType=DECIMAL}, #{drecmaxtype,jdbcType=VARCHAR},
+      #{trxwrongflag,jdbcType=VARCHAR}, #{drecmaxbankid,jdbcType=VARCHAR},
+      #{drecmaxcardno,jdbcType=VARCHAR}, #{remark10,jdbcType=VARCHAR}, #{remark9,jdbcType=VARCHAR}, 
+      #{remark8,jdbcType=VARCHAR}, #{remark7,jdbcType=VARCHAR}, #{remark6,jdbcType=VARCHAR}, 
+      #{remark5,jdbcType=VARCHAR}, #{remark4,jdbcType=VARCHAR}, #{remark3,jdbcType=VARCHAR}, 
+      #{remark1,jdbcType=VARCHAR}, #{remark2,jdbcType=VARCHAR})
+  </insert>
+
+  <update id="updateByUserIdAndTime" parameterType="CusFactorParam" >
+    update risk_cust_factor_param
+    set  trxwrongflag = #{trxwrongflag,jdbcType=VARCHAR}
+    where 1=1
+    <if test="customerid != null and ''!=customerid">
+      AND customerid =#{customerid,jdbcType=VARCHAR}
+    </if>
+    AND date_format(rectime, '%Y%m%d') = DATE_FORMAT(#{rectime,jdbcType=TIMESTAMP}, '%Y%m%d');
+  </update>
+
+  <update id="update" parameterType="CusFactorParam" >
+    update risk_cust_factor_param
+    set custid = #{custid,jdbcType=BIGINT},
+      customerid = #{customerid,jdbcType=VARCHAR},
+      rectime = #{rectime,jdbcType=TIMESTAMP},
+      drecamount = #{drecamount,jdbcType=DECIMAL},
+      drecmaxtype = #{drecmaxtype,jdbcType=VARCHAR},
+      trxwrongflag = #{trxwrongflag,jdbcType=VARCHAR},
+      drecnum = #{drecnum,jdbcType=SMALLINT},
+      drecmaxamount = #{drecmaxamount,jdbcType=DECIMAL},
+      drecmaxbankid = #{drecmaxbankid,jdbcType=VARCHAR},
+      drecmaxcardno = #{drecmaxcardno,jdbcType=VARCHAR},
+      remark10 = #{remark10,jdbcType=VARCHAR},
+      remark9 = #{remark9,jdbcType=VARCHAR},
+      remark8 = #{remark8,jdbcType=VARCHAR},
+      remark7 = #{remark7,jdbcType=VARCHAR},
+      remark6 = #{remark6,jdbcType=VARCHAR},
+      remark5 = #{remark5,jdbcType=VARCHAR},
+      remark4 = #{remark4,jdbcType=VARCHAR},
+      remark3 = #{remark3,jdbcType=VARCHAR},
+      remark1 = #{remark1,jdbcType=VARCHAR},
+      remark2 = #{remark2,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryByCustomerid" resultMap="cusFactorParamMap" parameterType="String" >
+    select
+    <include refid="columnList" />
+    from risk_cust_factor_param t
+    where customerid = #{customerid,jdbcType=VARCHAR}
+    order by t.rectime DESC
+  </select>
+  <update id="updateByCustid" parameterType="CusFactorParam" >
+    update risk_cust_factor_param
+    set  customerid = #{customerid,jdbcType=VARCHAR},
+    rectime = #{rectime,jdbcType=TIMESTAMP},
+    drecamount = #{drecamount,jdbcType=DECIMAL},
+    drecmaxtype = #{drecmaxtype,jdbcType=VARCHAR},
+    trxwrongflag = #{trxwrongflag,jdbcType=VARCHAR},
+    drecnum = #{drecnum,jdbcType=SMALLINT},
+    drecmaxamount = #{drecmaxamount,jdbcType=DECIMAL},
+    drecmaxbankid = #{drecmaxbankid,jdbcType=VARCHAR},
+    drecmaxcardno = #{drecmaxcardno,jdbcType=VARCHAR},
+    remark10 = #{remark10,jdbcType=VARCHAR},
+    remark9 = #{remark9,jdbcType=VARCHAR},
+    remark8 = #{remark8,jdbcType=VARCHAR},
+    remark7 = #{remark7,jdbcType=VARCHAR},
+    remark6 = #{remark6,jdbcType=VARCHAR},
+    remark5 = #{remark5,jdbcType=VARCHAR},
+    remark4 = #{remark4,jdbcType=VARCHAR},
+    remark3 = #{remark3,jdbcType=VARCHAR},
+    remark1 = #{remark1,jdbcType=VARCHAR},
+    remark2 = #{remark2,jdbcType=VARCHAR}
+    where custid = #{custid,jdbcType=BIGINT}
+  </update>
+
+  <select id="queryByUseridAndDate" resultMap="cusFactorParamMap" parameterType="map" >
+    select
+    <include refid="columnList" />
+    from risk_cust_factor_param t
+    where 1=1
+    <if test="customerid != null and ''!=customerid">
+      AND t.customerid = #{customerid,jdbcType=VARCHAR}
+    </if>
+    <if test="orderTime != null and ''!=orderTime">
+      AND date_format(t.rectime,'%Y%m%d')= DATE_FORMAT(#{orderTime}, '%Y%m%d')
+    </if>
+    order by t.rectime DESC
+  </select>
+
+  <select id="queryHighRiskbyUserId" resultType="int" parameterType="String" >
+    select count(t.id)
+    from risk_cust_factor_param t
+    where customerid =#{customerid,jdbcType=VARCHAR}
+    and t.trxwrongflag='true'
+  </select>
+</mapper>

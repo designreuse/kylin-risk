@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Course" >
+  <resultMap id="courseMap" type="Course" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="merchantid" property="merchantId" jdbcType="VARCHAR" />
+    <result column="merchantname" property="merchantName" jdbcType="VARCHAR" />
+    <result column="coursename" property="courseName" jdbcType="VARCHAR" />
+    <result column="courseprice" property="coursePrice" jdbcType="VARCHAR" />
+    <result column="courseTime" property="courseTime" jdbcType="VARCHAR"/>
+    <result column="coursetype" property="courseType" jdbcType="VARCHAR" />
+    <result column="stuage" property="stuAge" jdbcType="VARCHAR" />
+    <result column="createtime" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updatetime" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, merchantid, merchantname, coursename, courseprice, courseTime, coursetype, stuage,
+    createtime, updatetime
+  </sql>
+  <select id="get" parameterType="java.lang.Integer" resultMap="courseMap">
+    select
+    <include refid="Base_Column_List" />
+    from risk_course
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <insert id="insert" parameterType="com.rkylin.risk.core.entity.Course" >
+    insert into risk_course (id, merchantid, merchantname,
+      coursename, courseprice, courseTime, coursetype,
+      stuage
+      )
+    values (#{id,jdbcType=INTEGER}, #{merchantId,jdbcType=VARCHAR}, #{merchantName,jdbcType=VARCHAR}, 
+      #{courseName,jdbcType=VARCHAR}, #{coursePrice,jdbcType=VARCHAR}, #{courseTime,jdbcType=VARCHAR}, #{courseType,jdbcType=VARCHAR},
+      #{stuAge,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <select id="queryByUserrelatedid" resultMap="courseMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from risk_course
+    where merchantid = #{userrelatedid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="queryCourseNameByUserrelatedid" resultType="string"  parameterType="java.lang.String" >
+    select coursename
+    from risk_course
+    where merchantid = #{userrelatedid,jdbcType=VARCHAR}
+  </select>
+  <select id="queryByMerchantidAndCourseName" resultMap="courseMap"  parameterType="map" >
+    select <include refid="Base_Column_List" />
+    from risk_course
+    where merchantid = #{merchantid,jdbcType=VARCHAR}
+    AND coursename = #{coursename,jdbcType=VARCHAR}
+  </select>
+
+  <insert id="addCourseBatch" parameterType="list" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_course (merchantid, merchantname, coursename, courseprice, coursetype, coursetime)
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+      (#{item.merchantId,jdbcType=VARCHAR}, #{item.merchantName,jdbcType=VARCHAR},
+      #{item.courseName,jdbcType=VARCHAR}, #{item.coursePrice,jdbcType=VARCHAR},
+      #{item.courseType,jdbcType=VARCHAR}, #{item.courseTime,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  <select id="queryCourseByCondition" resultMap="courseMap" parameterType="Course">
+    <if test="merchantName != null">
+      <bind name="merchantName" value="'%' + merchantName + '%'" />
+    </if>
+    <if test="courseName != null">
+      <bind name="courseName" value="'%' + courseName + '%'" />
+    </if>
+    select
+    <include refid="Base_Column_List" />
+    from risk_course
+    <where>
+      <if test="merchantName != null and ''!=merchantName">
+        and merchantname like #{merchantName}
+      </if>
+      <if test="courseName != null and ''!=courseName">
+        and coursename like #{courseName}
+      </if>
+      <if test="courseType != null and ''!=courseType">
+      and coursetype = #{courseType}
+     </if>
+    </where>
+    order by id
+  </select>
+
+  <update id="update" parameterType="Course" >
+    update risk_course
+    <set>
+      <if test="merchantId != null">
+        merchantid = #{merchantId,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantName != null">
+        merchantname = #{merchantName,jdbcType=VARCHAR},
+      </if>
+      <if test="courseName != null">
+        coursename = #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="coursePrice != null">
+        courseprice = #{coursePrice,jdbcType=VARCHAR},
+      </if>
+      <if test="courseType != null">
+        coursetype = #{courseType,jdbcType=VARCHAR},
+      </if>
+      <if test="stuAge != null">
+        stuage = #{stuAge,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null">
+        updatetime = #{updatedTime,jdbcType=TIMESTAMP}
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+
+  <delete id="delete" parameterType="java.lang.Integer" >
+    delete from risk_course
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteByMerchantid" parameterType="java.lang.String" >
+    delete from risk_course
+    where merchantid = #{merchantid}
+  </delete>
+
+
+  <select id="queryCourse" resultMap="courseMap" parameterType="Course">
+    select
+    <include refid="Base_Column_List" />
+    from risk_course
+    <where>
+      <if test="id != null and ''!=id">
+        and id != #{id}
+      </if>
+      <if test="merchantId != null and ''!=merchantId">
+        and merchantid = #{merchantId}
+      </if>
+      <if test="merchantName != null and ''!=merchantName">
+        and merchantname = #{merchantName}
+      </if>
+      <if test="courseName != null and ''!=courseName">
+        and coursename = #{courseName}
+      </if>
+      <if test="courseType != null and ''!=courseType">
+        and coursetype = #{courseType}
+      </if>
+      <if test="stuAge != null and ''!=stuAge">
+        and stuage = #{stuAge}
+      </if>
+    </where>
+    order by id
+  </select>
+</mapper>

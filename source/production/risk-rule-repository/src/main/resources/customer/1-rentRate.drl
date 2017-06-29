@@ -1,0 +1,49 @@
+package os.nut.drools.RepayInfo;
+//salience:519-500 租金比
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "rentRate2"
+    no-loop true
+    salience 518
+    when
+        //CustomerFactor(rentRate!=null);
+        $repayInfo : CustomerFactor(rentRate!=null,rentRate.isGreaterOrEqualThan(5));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setRentRate("rentRate01");
+end
+
+rule "rentRate3"
+    no-loop true
+    salience 517
+    when
+        //CustomerFactor(rentRate!=null);
+        $repayInfo : CustomerFactor(rentRate!=null, rentRate.isGreaterOrEqualThan(3) &&rentRate.isLesserThan(5));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setRentRate("rentRate02");
+end
+
+rule "rentRate4"
+    no-loop true
+    salience 516
+    when
+        //CustomerFactor(rentRate!=null);
+        $repayInfo : CustomerFactor(rentRate!=null,rentRate.isGreaterOrEqualThan(1) &&rentRate.isLesserThan(3));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setRentRate("rentRate03");
+end
+
+rule "rentRate5"
+    no-loop true
+    salience 519
+    when
+        //CustomerFactor(rentRate!=null);
+        $repayInfo : CustomerFactor(rentRate!=null,rentRate.isLesserThan(1));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMsg("日租金低于1倍以下");
+        retract($repayInfo);
+end

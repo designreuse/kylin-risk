@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Group" >
+  <resultMap id="groupMap" type="Group" >
+    <result column="id" property="id" jdbcType="SMALLINT" />
+    <result column="groupname" property="groupname" jdbcType="VARCHAR" />
+    <result column="grouptype" property="grouptype" jdbcType="VARCHAR" />
+    <result column="effdate" property="effdate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="expdate" property="expdate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="servicetype" property="servicetype" jdbcType="VARCHAR" />
+    <result column="createoperid" property="createoperid" jdbcType="SMALLINT" />
+    <result column="createopername" property="createopername" jdbcType="VARCHAR" />
+    <result column="issueartifactid" property="issueartifactid" jdbcType="VARCHAR" />
+    <result column="issuegroupid" property="issuegroupid" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="isexecute" property="isexecute" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <resultMap id="groupMapBean" type="Group" >
+    <result column="id" property="id" jdbcType="SMALLINT" />
+    <result column="groupname" property="groupname" jdbcType="VARCHAR" />
+    <result column="grouptype" property="grouptype" jdbcType="VARCHAR" />
+    <result column="effdate" property="effdate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="expdate" property="expdate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="servicetype" property="servicetype" jdbcType="VARCHAR" />
+    <result column="createoperid" property="createoperid" jdbcType="SMALLINT" />
+    <result column="createopername" property="createopername" jdbcType="VARCHAR" />
+    <result column="issueartifactid" property="issueartifactid" jdbcType="VARCHAR" />
+    <result column="issuegroupid" property="issuegroupid" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="isexecute" property="isexecute" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <collection property="groupChannels" ofType="GroupChannel">
+      <result column="channelcode" property="channelcode" jdbcType="VARCHAR" />
+      <result column="channelname" property="channelname" jdbcType="VARCHAR" />
+      <result column="productcode" property="productcode" jdbcType="VARCHAR" />
+      <result column="productname" property="productname" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+  <sql id="columnList" >
+    id, groupname, grouptype, effdate,expdate,status,servicetype,createoperid,createopername,issueartifactid,issuegroupid,version,isexecute,createtime,
+    updatetime
+  </sql>
+  <insert id="insert" parameterType="Group" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_group (groupname, grouptype, effdate, 
+      expdate,status,servicetype,createoperid,createopername,issueartifactid,issuegroupid,version,isexecute)
+    values (#{groupname,jdbcType=VARCHAR}, #{grouptype,jdbcType=VARCHAR}, #{effdate,jdbcType=DATE},#{expdate,jdbcType=DATE},#{status,jdbcType=VARCHAR},#{servicetype,jdbcType=VARCHAR}, #{createoperid,jdbcType=SMALLINT},
+     #{createopername,jdbcType=VARCHAR},#{issueartifactid,jdbcType=VARCHAR}, #{issuegroupid,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}, #{isexecute,jdbcType=VARCHAR})
+  </insert>
+
+  <delete id="delete" parameterType="short" >
+    delete from risk_group
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <select id="get" resultMap="groupMap" parameterType="short" >
+    select
+    <include refid="columnList" />
+    from risk_group
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <select id="queryByGroupid" resultMap="groupMap" parameterType="short" >
+    select
+    <include refid="columnList" />
+    from risk_group
+    where id = #{groupid,jdbcType=SMALLINT}
+  </select>
+  <select id="queryAllGroup" resultMap="groupMap" >
+    select
+    <include refid="columnList" />
+    from risk_group
+  </select>
+
+  <update id="update" parameterType="Group" >
+    update risk_group
+    <set>
+      <if test="groupname != null">
+        groupname = #{groupname,jdbcType=VARCHAR},
+      </if>
+      <if test="grouptype != null">
+        grouptype = #{grouptype,jdbcType=VARCHAR},
+      </if>
+      <if test="effdate != null">
+        effdate = #{effdate,jdbcType=DATE},
+      </if>
+      <if test="expdate != null">
+        expdate = #{expdate,jdbcType=DATE},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=DATE},
+      </if>
+      <if test="servicetype != null">
+        servicetype = #{servicetype,jdbcType=DATE},
+      </if>
+      <if test="isexecute != null">
+        isexecute = #{isexecute,jdbcType=VARCHAR},
+      </if>
+      <if test="issueartifactid != null">
+        issueartifactid = #{issueartifactid,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="queryGroup" resultMap="groupMapBean" parameterType="Group">
+    <if test="groupname != null">
+      <bind name="groupname" value="'%' + groupname + '%'" />
+    </if>
+    SELECT r.id, r.groupname,r.grouptype,r.effdate,r.expdate,r.createopername,r.updatetime,r.isexecute,
+    r.status,r.servicetype,r.version,c.channelname,c.productname
+    FROM risk_group r LEFT JOIN risk_group_channel c on r.id = c.groupid
+    <where>
+      <if test="groupname != null and ''!=groupname">
+        and groupname like #{groupname}
+      </if>
+      <if test="grouptype != null and ''!=grouptype">
+        and grouptype = #{grouptype}
+      </if>
+      <if test="products !=null and products.length !=0 ">
+        AND c.productcode in
+        <foreach collection="products" index="index" item="product" open="(" separator="," close=")">
+          #{product}
+        </foreach>
+      </if>
+      <if test="nullproducts!=null">
+        and c.productcode =#{nullproducts}
+      </if>
+    </where>
+    order by r.id
+  </select>
+
+  <select id="queryByTimeAndStatus" resultMap="groupMap" parameterType="map" >
+    select
+    <include refid="columnList" />
+    from risk_group t
+    where t.expdate &gt;= #{localDate} AND t.effdate &lt;=  #{localDate}
+    and t.issueartifactid=#{issueartifactid} and t.issuegroupid=#{issuegroupid} and  t.`status`='00'
+  </select>
+
+  <select id="queryByChannelAndStatus" resultMap="groupMap" parameterType="map">
+    SELECT r.*
+    FROM risk_group r LEFT JOIN risk_group_channel c on r.id = c.groupid
+    <where>
+      r.status = '00'
+      and c.channelcode = #{channelCode,jdbcType=VARCHAR}
+      and r.servicetype = #{serviceType,jdbcType=VARCHAR}
+    </where>
+  </select>
+
+  <select id="queryByProductAndStatus" resultMap="groupMap" parameterType="map">
+    SELECT r.*
+    FROM risk_group r LEFT JOIN risk_group_channel c on r.id = c.groupid
+    <where>
+      r.status = '00'
+      and c.productcode = #{productCode,jdbcType=VARCHAR}
+      and r.servicetype = #{serviceType,jdbcType=VARCHAR}
+    </where>
+  </select>
+
+</mapper>

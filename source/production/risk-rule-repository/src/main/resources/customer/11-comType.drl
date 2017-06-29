@@ -1,0 +1,45 @@
+package os.nut.drools.WorkInfo;
+//salience:319-300
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.operation.enumType.ComType;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "comType2"
+    no-loop true
+    salience 319
+    when
+        $workInfo : CustomerFactor(ComType.INSTITUTION.toString().equals(comType));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setComType("comType01");
+end
+
+rule "comType3"
+    no-loop true
+    salience 318
+    when
+        $workInfo : CustomerFactor( ComType.COMPANY.toString().equals(comType));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setComType("comType02");
+end
+
+rule "comType4"
+    no-loop true
+    salience 317
+    when
+        $workInfo : CustomerFactor(ComType.INTERPRISE.toString().equals(comType));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setComType("comType03");
+end
+
+rule "comType5"
+    no-loop true
+    salience 316
+    when
+        $workInfo : CustomerFactor(ComType.PRIVATEINTERPRISE.toString().equals(comType));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setComType("comType04");
+end

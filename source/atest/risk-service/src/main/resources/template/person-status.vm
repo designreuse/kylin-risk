@@ -1,0 +1,18 @@
+#macro( makeupChannel $rootinstcd)
+#if($rootinstcd=="M000025")悦视觉
+#elseif($rootinstcd=="M000028")美容分期
+#elseif($rootinstcd=="M000027")旅游分期
+#elseif($rootinstcd=="M000004")课栈
+#elseif($rootinstcd=="M000020")帮帮助学
+#end
+#end
+#if($personOrders.size()>0) 融数贷款记录：本人于
+#foreach($person in $personOrders)$person.ordertime.toString("yyyy-MM-dd HH:mm:ss")在#makeupChannel($person.rootinstcd)渠道申请一笔贷款，金额为$person.amount.divide(100)元;
+ #end
+#end
+#if($firstFlag)
+#if($firstOrders.size()>0)第一联系人于
+#foreach($first in $firstOrders)$first.ordertime.toString("yyyy-MM-dd HH:mm:ss")在#makeupChannel($first.rootinstcd)渠道申请一笔贷款，金额为$first.amount.divide(100)元;
+ #end
+#end
+#end

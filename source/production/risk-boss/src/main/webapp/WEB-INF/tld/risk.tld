@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+        version="2.0">
+
+    <display-name>Risk Tags"</display-name>
+    <tlib-version>1.0</tlib-version>
+    <short-name>risk</short-name>
+    <uri>/risk/tags/util</uri>
+    <tag>
+        <description>将joda time格式化为string</description>
+        <name>formateDateTime</name>
+        <tag-class>com.rkylin.risk.boss.tag.FormateDateTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>日期的值</description>
+            <name>value</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>日期的格式</description>
+            <name>pattern</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+</taglib>

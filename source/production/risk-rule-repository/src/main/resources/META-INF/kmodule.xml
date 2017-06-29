@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+
+  <kbase name="depositKbase" packages="deposit">
+    <ksession name="depositKsession" type="stateful" scope="prototype"/>
+  </kbase>
+  <kbase name="rechargeKbase"  packages="recharge">
+    <ksession name="rechargeKsession" type="stateful" scope="prototype"/>
+  </kbase>
+  <kbase name="customerKbase"  packages="customer">
+    <ksession name="customerKsession" type="stateful" scope="prototype"/>
+  </kbase>
+</kmodule>

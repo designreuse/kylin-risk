@@ -1,0 +1,44 @@
+package os.nut.drools.basicinfo;
+//salience:339-320
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "resideTime2"
+    no-loop true
+    salience 339
+    when
+        $basicInfo : CustomerFactor(resideTime<1);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setResideTime("resideTime01");
+end
+
+rule "resideTime3"
+    no-loop true
+    salience 338
+    when
+        $basicInfo : CustomerFactor( resideTime>=1&&resideTime<3);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setResideTime("resideTime02");
+end
+
+rule "resideTime4"
+    no-loop true
+    salience 337
+    when
+        $basicInfo : CustomerFactor(resideTime>=3&&resideTime<6);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setResideTime("resideTime03");
+end
+
+rule "resideTime5"
+    no-loop true
+    salience 336
+    when
+        $basicInfo : CustomerFactor(resideTime>=6);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setResideTime("resideTime04");
+end

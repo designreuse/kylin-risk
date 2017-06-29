@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+	http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
+
+
+    <context:component-scan base-package="com.rkylin.risk.boss.controller" />
+
+
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+
+    <!-- jsp视图解析器 -->
+    <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+        <property name="order" value="2" />
+    </bean>
+
+    <mvc:view-controller path="/" view-name="redirect:/login.action"/>
+
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="java.lang.Throwable">error/500</prop>
+            </props>
+        </property>
+    </bean>
+
+
+
+
+    <context:component-scan base-package="com.rkylin.risk.boss.restController" />
+
+    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <!--忽略以html请求的Accept作为请求判断MediaType依据-->
+        <property name="ignoreAcceptHeader" value="true"/>
+        <property name="favorPathExtension" value="true"/>
+        <property name="favorParameter" value="true"/>
+        <property name="defaultContentType" value="application/json" />
+        <property name="mediaTypes">
+            <props>
+                <prop key="json">application/json</prop>
+            </props>
+        </property>
+
+    </bean>
+
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+        <!--停用系统默认的converter，使用自定义converter-->
+        <mvc:message-converters register-defaults="false">
+            <!-- 将Jackson2HttpMessageConverter的默认格式化输出设为true -->
+            <bean class="com.rkylin.risk.boss.json.AppendJsonReturnCodeHttpMessageConverter">
+                <constructor-arg name="objectMapper" type="com.fasterxml.jackson.databind.ObjectMapper">
+                    <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+                        <property name="createXmlMapper" value="false"/>
+                        <property name="serializers">
+                            <array value-type="com.fasterxml.jackson.databind.JsonSerializer">
+                                <bean class="com.rkylin.risk.boss.json.serialize.AmountSerializer"></bean>
+                                <bean class="com.rkylin.risk.boss.json.serialize.DateTimeSerializer"></bean>
+                                <bean class="com.rkylin.risk.boss.json.serialize.LocalDateSerializer"></bean>
+                            </array>
+                        </property>
+                        <property name="deserializersByType">
+                            <map key-type="java.lang.Class" value-type="com.fasterxml.jackson.databind.JsonDeserializer">
+                                <entry key="com.rkylin.risk.commons.entity.Amount">
+                                    <bean class="com.rkylin.risk.boss.json.deserialize.AmountDeserializer"></bean>
+                                </entry>
+                                <entry key="org.joda.time.DateTime">
+                                    <bean class="com.rkylin.risk.boss.json.deserialize.DateTimeDeserializer"></bean>
+                                </entry>
+                                <entry key="org.joda.time.LocalDate">
+                                    <bean class="com.rkylin.risk.boss.json.deserialize.LocalDateDeserializer"></bean>
+                                </entry>
+                            </map>
+                        </property>
+                        <property name="indentOutput" value="true"/>
+                        <property name="simpleDateFormat" value="yyyy-MM-dd HH:mm:ss"/>
+                        <property name="serializationInclusion" value="NON_EMPTY"/>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </mvc:message-converters>
+        <!--<mvc:async-support default-timeout="30000" task-executor="executor"></mvc:async-support>-->
+    </mvc:annotation-driven>
+
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**/*"/>
+            <bean class="com.rkylin.risk.boss.intercept.AuthInterceptor">
+                <property name="whiteList">
+                    <set>
+                        <value>main.action</value>
+                        <value>toModifyPassWd.action</value>
+                    </set>
+                </property>
+                <property name="loginWhiteList">
+                    <set>
+                        <value>/</value>
+                        <value>login.action</value>
+                        <value>operatorLogin.action</value>
+                        <value>operatorLogout.action</value>
+                        <value>400.action</value>
+                        <value>500.action</value>
+                        <value>noSession.action</value>
+                        <value>noPermit.action</value>
+                        <value>toModifyPwd.action</value>
+                        <value>pwdupdate.action</value>
+                        <value>checkPasswd.action</value>
+                        <value>createCode.action</value>
+                        <value>send.action</value>
+                    </set>
+                </property>
+            </bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!---注解aop-->
+    <aop:aspectj-autoproxy />
+
+    <!--自动扫描aspect-->
+    <context:component-scan base-package="com.rkylin.risk.boss.intercept.aop">
+        <context:include-filter type="annotation" expression="org.aspectj.lang.annotation.Aspect"/>
+    </context:component-scan>
+
+
+
+    <context:component-scan base-package="com.rkylin.risk.boss.intercept.handler">
+        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+
+
+    
+
+</beans>
+	
+	

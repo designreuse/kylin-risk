@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="CreditResult" >
+  <resultMap id="creditResultMap" type="CreditResult" >
+    <id column="id" property="id" jdbcType="BIGINT" javaType="Long"/>
+    <result column="username" property="userName" jdbcType="VARCHAR" />
+    <result column="idnumber" property="idNumber" jdbcType="CHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="bankcard" property="bankCard" jdbcType="VARCHAR" />
+    <result column="creditproduct" property="creditProduct" jdbcType="VARCHAR" />
+    <result column="creditmoduleid" property="creditModuleId" jdbcType="BIGINT" javaType="Long"/>
+    <result column="result" property="result" jdbcType="VARCHAR" />
+    <result column="creditcode" property="creditCode" jdbcType="VARCHAR" />
+    <result column="riskcode" property="riskCode" jdbcType="CHAR" />
+    <result column="responseid" property="responseId" jdbcType="VARCHAR" />
+    <result column="requesttime" property="requestTime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="querier" property="querier" jdbcType="VARCHAR"/>
+    <result column="channel" property="channel" jdbcType="VARCHAR"/>
+    <result column="workflowid" property="workflowId" jdbcType="VARCHAR"/>
+    <result column="orderid" property="orderId" jdbcType="VARCHAR"/>
+    <result column="userid" property="userId" jdbcType="VARCHAR"/>
+    <result column="price" property="price" jdbcType="DECIMAL" javaType="Amount"/>
+  </resultMap>
+  <sql id="columnList" >
+    id, username, idnumber, mobile, bankcard, creditproduct, creditmoduleid, result, creditcode,riskcode,
+    responseId,requesttime,querier,channel,workflowid,orderid,userid,price
+  </sql>
+  <select id="get" resultMap="creditResultMap" parameterType="long" >
+    select 
+    <include refid="columnList" />
+    from risk_external_credit_result
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="queryCommonCreditResult" resultMap="creditResultMap" parameterType="String" >
+    select
+    <include refid="columnList" />
+    from risk_external_credit_result
+    where idnumber = #{idNumber,jdbcType=CHAR}
+    and creditproduct = #{creditProduct,jdbcType=VARCHAR,typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+    and creditmoduleid = #{creditModuleId,jdbcType=BIGINT,javaType=Long}
+    and riskcode = '10000'
+    order by requesttime desc
+    limit 0,1
+  </select>
+  <select id="queryUnionPayCreditResult" resultMap="creditResultMap" parameterType="map" >
+    select
+    <include refid="columnList" />
+    from risk_external_credit_result
+    where bankcard = #{bankCard,jdbcType=VARCHAR}
+    and  creditproduct = 'UNIONPAY'
+    and riskcode='10000'
+    order by requesttime desc
+  </select>
+  <select id="queryBairongCreditResult" resultMap="creditResultMap" parameterType="map" >
+    select
+    <include refid="columnList" />
+    from risk_external_credit_result
+    where  username=#{userName,jdbcType=VARCHAR}
+    and idnumber= #{idNumber,jdbcType=CHAR}
+    and mobile = #{mobile,jdbcType=VARCHAR}
+    and creditmoduleid = #{creditModuleId,jdbcType=BIGINT,javaType=Long}
+    and  creditproduct = 'BAIRONG'
+    and riskcode='10000'
+    order by requesttime desc
+  </select>
+
+  <delete id="delete" parameterType="long" >
+    delete from risk_external_credit_result
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="CreditResult" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_external_credit_result (username, idnumber, mobile, 
+      bankcard, creditproduct, creditmoduleid,
+      result, creditcode,riskcode,responseid, requesttime,
+      querier,channel,workflowid,orderid,userid,price)
+    values (#{userName,jdbcType=VARCHAR}, #{idNumber,jdbcType=CHAR}, #{mobile,jdbcType=VARCHAR},
+      #{bankCard,jdbcType=VARCHAR}, #{creditProduct,jdbcType=VARCHAR}, #{creditModuleId,jdbcType=BIGINT,javaType=Long},
+      #{result,jdbcType=VARCHAR}, #{creditCode,jdbcType=VARCHAR},#{riskCode,jdbcType=CHAR},
+      #{responseId,jdbcType=VARCHAR}, #{requestTime,jdbcType=TIMESTAMP},
+      #{querier,jdbcType=VARCHAR},#{channel,jdbcType=VARCHAR},
+      #{workflowId,jdbcType=VARCHAR},#{orderId,jdbcType=VARCHAR},
+      #{userId,jdbcType=VARCHAR},#{price,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertBatch" parameterType="list" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_external_credit_result (username, idnumber, mobile,
+      bankcard, creditproduct, creditmoduleid,
+      result, creditcode,riskcode,responseid, requesttime,
+      querier,channel,workflowid,orderid,userid,price)
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+      (#{item.userName,jdbcType=VARCHAR}, #{item.idNumber,jdbcType=CHAR}, #{item.mobile,jdbcType=VARCHAR},
+      #{item.bankCard,jdbcType=VARCHAR}, #{item.creditProduct,jdbcType=VARCHAR}, #{item.creditModuleId,jdbcType=BIGINT,javaType=Long},
+      #{item.result,jdbcType=VARCHAR}, #{item.creditCode,jdbcType=VARCHAR},#{item.riskCode,jdbcType=CHAR},
+      #{item.responseId,jdbcType=VARCHAR}, #{item.requestTime,jdbcType=TIMESTAMP},
+      #{item.querier,jdbcType=VARCHAR},#{item.channel,jdbcType=VARCHAR},
+      #{item.workflowId,jdbcType=VARCHAR},#{item.orderId,jdbcType=VARCHAR},
+      #{item.userId,jdbcType=VARCHAR},#{item.price,jdbcType=DECIMAL})
+    </foreach>
+  </insert>
+</mapper>

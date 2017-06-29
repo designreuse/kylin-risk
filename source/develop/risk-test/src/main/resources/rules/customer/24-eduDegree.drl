@@ -1,0 +1,46 @@
+package os.nut.drools.basicinfo;
+//salience:59-40
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.operation.enumType.EduDegree;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+
+rule "eduDegree2"
+    no-loop true
+    salience 59
+    when
+        $basicInfo : CustomerFactor(EduDegree.MASTER.toString().equals(eduDegree));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setEduDegree("eduDegree01");
+end
+
+rule "eduDegree3"
+    no-loop true
+    salience 58
+    when
+        $basicInfo : CustomerFactor( EduDegree.COLLAGE.toString().equals(eduDegree));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setEduDegree("eduDegree02");
+end
+
+rule "eduDegree4"
+    no-loop true
+    salience 57
+    when
+        $basicInfo : CustomerFactor(EduDegree.HIGHSCHOOL.toString().equals(eduDegree));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setEduDegree("eduDegree03");
+end
+
+rule "eduDegree5"
+    no-loop true
+    salience 56
+    when
+        $basicInfo : CustomerFactor(EduDegree.UNDERHIGHSCHOOL.toString().equals(eduDegree));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setEduDegree("eduDegree04");
+end

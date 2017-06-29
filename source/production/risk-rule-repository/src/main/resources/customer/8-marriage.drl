@@ -1,0 +1,45 @@
+package os.nut.drools.basicinfo;
+//salience:379-360
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.operation.enumType.MarriageType;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "marriage2"
+    no-loop true
+    salience 379
+    when
+        $basicInfo : CustomerFactor(MarriageType.UNMARRIED.toString().equals(marriage));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMarriage("marriage01");
+end
+
+rule "marriage3"
+    no-loop true
+    salience 378
+    when
+        $basicInfo : CustomerFactor(MarriageType.MARRIEDNOCHILD.toString().equals(marriage));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMarriage("marriage02");
+end
+
+rule "marriage4"
+    no-loop true
+    salience 377
+    when
+        $basicInfo : CustomerFactor(MarriageType.MARRIEDANDCHILD.toString().equals(marriage));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMarriage("marriage03");
+end
+
+rule "marriage5"
+    no-loop true
+    salience 376
+    when
+        $basicInfo : CustomerFactor(MarriageType.DIVORCE.toString().equals(marriage));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMarriage("marriage04");
+end

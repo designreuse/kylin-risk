@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+
+    <bean class="com.rkylin.risk.core.common.CustomPropertyPlaceHoderConfigurer">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <array>
+                <value>classpath*:risk.properties</value>
+            </array>
+        </property>
+        <property name="fileEncoding" value="UTF-8"/>
+        <property name="secretKeys">
+            <set value-type="java.lang.String">
+                <value>jdbc.password</value>
+                <value>jdbc.username</value>
+                <value>template.mail.password</value>
+                <value>redis.password</value>
+                <value>maven.password</value>
+            </set>
+        </property>
+        <property name="propertyPlaceClasses">
+            <set>
+                <value>com.rkylin.risk.kie.spring.factorybeans.KieContainerFactoryBean</value>
+            </set>
+        </property>
+    </bean>
+
+    <!--引入risk-core配置-->
+    <import resource="classpath:risk-spring/spring-config.xml" />
+    <import resource="classpath:risk-spring/spring-redis.xml" />
+
+
+    <import resource="classpath:risk-spring/spring-service.xml" />
+    <import resource="classpath:risk-spring/spring-dubbo-provider.xml" />
+    <import resource="classpath:risk-spring/spring-rule.xml" />
+
+</beans>

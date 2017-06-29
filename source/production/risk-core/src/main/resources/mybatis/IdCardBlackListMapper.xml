@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="IdCardBlackList" >
+  <resultMap id="idCardBlackListMap" type="IdCardBlackList" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="identtype" property="identtype" jdbcType="VARCHAR" />
+    <result column="identnum" property="identnum" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="userid" property="userid" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="checkid" property="checkid" jdbcType="SMALLINT" />
+    <result column="checkname" property="checkname" jdbcType="VARCHAR" />
+    <result column="checktime" property="checktime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, name, identtype, identnum, status, userid, username, createtime, checkid, checkname, 
+    checktime, reason
+  </sql>
+  <select id="get" resultMap="idCardBlackListMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_idcard_blacklist
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryByIdentNum" resultMap="idCardBlackListMap" parameterType="string" >
+    select
+    <include refid="columnList" />
+    from risk_idcard_blacklist
+    where status != '99' AND status !='04' and identnum = #{identnum,jdbcType=VARCHAR}
+  </select>
+
+  <select id="queryIdCardBlackByCondition" parameterType="IdCardBlackList" resultMap="idCardBlackListMap">
+    SELECT
+    <include refid="columnList" />
+    FROM risk_idcard_blacklist
+    <where>
+      status != '99'
+      <if test="name != null and ''!=name">
+        AND name LIKE #{name}
+      </if>
+      <if test="identnum != null and ''!=identnum">
+        AND identnum = #{identnum}
+      </if>
+      <if test="status != null and ''!=status">
+        AND status = #{status}
+      </if>
+    </where>
+    order by id
+  </select>
+
+
+  <delete id="delete" parameterType="integer" >
+    delete from risk_idcard_blacklist
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="IdCardBlackList" >
+    insert into risk_idcard_blacklist (name, identtype, identnum, 
+      status, userid, username, 
+      checkid, checkname,
+      checktime, reason)
+    values (#{name,jdbcType=VARCHAR}, #{identtype,jdbcType=VARCHAR}, #{identnum,jdbcType=VARCHAR}, 
+      #{status,jdbcType=CHAR}, #{userid,jdbcType=SMALLINT}, #{username,jdbcType=VARCHAR}, 
+      #{checkid,jdbcType=SMALLINT}, #{checkname,jdbcType=VARCHAR},
+      #{checktime,jdbcType=TIMESTAMP}, #{reason,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="IdCardBlackList" >
+    update risk_idcard_blacklist
+    set name = #{name,jdbcType=VARCHAR},
+      identtype = #{identtype,jdbcType=VARCHAR},
+      identnum = #{identnum,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR},
+      userid = #{userid,jdbcType=SMALLINT},
+      username = #{username,jdbcType=VARCHAR},
+      checkid = #{checkid,jdbcType=SMALLINT},
+      checkname = #{checkname,jdbcType=VARCHAR},
+      checktime = #{checktime,jdbcType=TIMESTAMP},
+      reason = #{reason,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

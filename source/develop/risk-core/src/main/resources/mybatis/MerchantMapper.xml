@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Merchant" >
+  <!--<cache type="cn.creditease.risk.mybatis.cache.RedisCache"/>-->
+  <resultMap id="merchantMap" type="Merchant" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="merchantid" property="merchantid" jdbcType="VARCHAR" />
+    <result column="merchantname" property="merchantname" jdbcType="VARCHAR" />
+    <result column="channelid" property="channelid" jdbcType="VARCHAR" />
+    <result column="checkorderid" property="checkorderid" jdbcType="VARCHAR" />
+    <result column="corpname" property="corpname" jdbcType="VARCHAR" />
+    <result column="corptype" property="corptype" jdbcType="VARCHAR" />
+    <result column="corpproperty" property="corpproperty" jdbcType="VARCHAR" />
+    <result column="industry" property="industry" jdbcType="VARCHAR" />
+    <result column="registrationorga" property="registrationorga" jdbcType="VARCHAR" />
+    <result column="registfinance" property="registfinance" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="district" property="district" jdbcType="VARCHAR" />
+    <result column="merchstartdate" property="merchstartdate" jdbcType="DATE" javaType="LocalDate"/>
+    <result column="merchduedate" property="merchduedate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="corporationid" property="corporationid" jdbcType="VARCHAR" />
+    <result column="ownercerttp" property="ownercerttp" jdbcType="VARCHAR" />
+    <result column="ownercertid" property="ownercertid" jdbcType="VARCHAR" />
+    <result column="ownercertname" property="ownercertname" jdbcType="VARCHAR" />
+    <result column="mobilephone" property="mobilephone" jdbcType="VARCHAR" />
+    <result column="orginstdid" property="orginstdid" jdbcType="VARCHAR" />
+    <result column="taxid" property="taxid" jdbcType="VARCHAR" />
+    <result column="arrpid" property="arrpid" jdbcType="VARCHAR" />
+    <result column="icpid" property="icpid" jdbcType="VARCHAR" />
+    <result column="merchantaddress" property="merchantaddress" jdbcType="VARCHAR" />
+    <result column="creditend" property="creditend" jdbcType="VARCHAR" />
+    <result column="creditline" property="creditline" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="provincenum" property="provincenum" jdbcType="INTEGER" />
+    <result column="subagencynum" property="subagencynum" jdbcType="INTEGER" />
+    <result column="branchflag" property="branchflag" jdbcType="INTEGER" />
+    <result column="foundage" property="foundage" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="trainnumyear" property="trainnumyear" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="trainincomeyear" property="trainincomeyear" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="areateach" property="areateach" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="classprice" property="classprice" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="employeeno" property="employeeno" jdbcType="INTEGER" />
+    <result column="merchantstatus" property="merchantstatus" jdbcType="VARCHAR" />
+    <result column="checkstatus" property="checkstatus" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+
+ <!-- <resultMap id="merchantAccountMap" type="Merchant" extends ="merchantMap">
+    <association property="account" column="merchantid" javaType="Account" select="Account.merchantQuery"/>
+  </resultMap>-->
+  <sql id="columnList" >
+    id, merchantid, merchantname, channelid,checkorderid, corpname, corptype, corpproperty, industry ,registrationorga,registfinance,mobilephone,
+    province, provincenum, city, district,
+    merchstartdate, merchduedate, corporationid, ownercerttp,
+    ownercertid, ownercertname,merchantstatus, orginstdid, taxid, arrpid,
+    icpid, description, merchantaddress, creditend, creditline,
+    subagencynum,branchflag, foundage, trainnumyear, trainincomeyear,
+    areateach,classprice, employeeno,checkstatus, createtime, updatetime
+  </sql>
+  <select id="queryAll" resultMap="merchantMap" parameterType="Merchant">
+    <bind name="merchantid" value="merchantid" />
+    <if test="merchantname !=null and ''!=merchantname">
+      <bind name="merchantname" value="merchantname + '%'" />
+    </if>
+      <bind name="merchstartdate" value="merchstartdate" />
+    SELECT
+       id, merchantid, merchantname, corptype, corpname, channelid, corporationid,
+        merchstartdate, merchduedate
+    FROM risk_merchant
+    <where>
+      <if test="merchantid !=null and '' != merchantid">
+      merchantid = #{merchantid}
+      </if>
+      <if test="merchantname !=null and ''!=merchantname">
+        AND merchantname LIKE #{merchantname}
+      </if>
+      <if test="merchstartdate !=null and ''!=merchstartdate">
+        AND merchstartdate = #{merchstartdate}
+      </if>
+    </where>
+  </select>
+
+  <select id="queryOne" resultMap="merchantMap" parameterType="String" flushCache="false">
+    select
+    <include refid="columnList" />
+    from risk_merchant
+    where merchantid = #{merchantid}
+  </select>
+  <select id="get" resultMap="merchantMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_merchant
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_merchant
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="Merchant" >
+    insert into risk_merchant (merchantid, merchantname, channelid, checkorderid,
+      corpname, corptype, corpproperty, industry,registrationorga,registfinance,mobilephone,
+      province, provincenum, city, district,
+      merchstartdate, merchduedate,
+      corporationid, ownercerttp, ownercertid, ownercertname,
+      merchantstatus, orginstdid, taxid, arrpid,
+      icpid, description,
+      merchantaddress, creditend,
+      creditline, checkstatus,
+      subagencynum,branchflag, foundage, trainnumyear, trainincomeyear,
+      areateach, classprice,employeeno)
+    values (#{merchantid,jdbcType=VARCHAR}, #{merchantname,jdbcType=VARCHAR}, #{channelid,jdbcType=VARCHAR}, #{checkorderid,jdbcType=VARCHAR},
+      #{corpname,jdbcType=VARCHAR}, #{corptype,jdbcType=VARCHAR}, #{corpproperty,jdbcType=VARCHAR},
+      #{industry,jdbcType=VARCHAR},#{registrationorga,jdbcType=VARCHAR},#{registfinance,jdbcType=VARCHAR}, #{mobilephone,jdbcType=VARCHAR},
+      #{province,jdbcType=VARCHAR}, #{provincenum,jdbcType=INTEGER}, #{city,jdbcType=VARCHAR}, #{district,jdbcType=VARCHAR},
+      #{merchstartdate,jdbcType=DATE}, #{merchduedate,jdbcType=DATE},
+      #{corporationid,jdbcType=VARCHAR}, #{ownercerttp,jdbcType=VARCHAR}, #{ownercertid,jdbcType=VARCHAR}, #{ownercertname,jdbcType=VARCHAR},
+      #{merchantstatus,jdbcType=VARCHAR},
+      #{orginstdid,jdbcType=VARCHAR}, #{taxid,jdbcType=VARCHAR}, #{arrpid,jdbcType=VARCHAR}, 
+      #{icpid,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},
+      #{merchantaddress,jdbcType=VARCHAR}, #{creditend,jdbcType=VARCHAR},
+      #{creditline,jdbcType=DECIMAL}, #{checkstatus,jdbcType=VARCHAR},
+      #{subagencynum,jdbcType=INTEGER},#{branchflag,jdbcType=INTEGER},#{foundage,jdbcType=DECIMAL},#{trainnumyear,jdbcType=DECIMAL},
+      #{trainincomeyear,jdbcType=DECIMAL},#{areateach,jdbcType=DECIMAL},#{classprice,jdbcType=DECIMAL},
+      #{employeeno,jdbcType=INTEGER})
+  </insert>
+  <update id="update" parameterType="Merchant" >
+    update risk_merchant
+    set merchantid = #{merchantid,jdbcType=VARCHAR},
+      merchantname = #{merchantname,jdbcType=VARCHAR},
+      channelid = #{channelid,jdbcType=VARCHAR},
+      checkorderid = #{checkorderid,jdbcType=VARCHAR},
+      corpname = #{corpname,jdbcType=VARCHAR},
+      corptype = #{corptype,jdbcType=VARCHAR},
+      corpproperty = #{corpproperty,jdbcType=VARCHAR},
+      industry = #{industry,jdbcType=VARCHAR},
+      registrationorga = #{registrationorga,jdbcType=VARCHAR},
+      registfinance = #{registfinance,jdbcType=VARCHAR},
+      mobilephone = #{mobilephone,jdbcType=VARCHAR},
+      province = #{province,jdbcType=VARCHAR},
+      provincenum = #{provincenum,jdbcType=INTEGER},
+      city = #{city,jdbcType=VARCHAR},
+      district = #{district,jdbcType=VARCHAR},
+      merchstartdate = #{merchstartdate,jdbcType=DATE},
+      merchduedate = #{merchduedate,jdbcType=DATE},
+      corporationid = #{corporationid,jdbcType=VARCHAR},
+      ownercerttp = #{ownercerttp,jdbcType=VARCHAR},
+      ownercertid = #{ownercertid,jdbcType=VARCHAR},
+      ownercertname = #{ownercertname,jdbcType=VARCHAR},
+      merchantstatus = #{merchantstatus,jdbcType=VARCHAR},
+      orginstdid = #{orginstdid,jdbcType=VARCHAR},
+      taxid = #{taxid,jdbcType=VARCHAR},
+      arrpid = #{arrpid,jdbcType=VARCHAR},
+      icpid = #{icpid,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      merchantaddress = #{merchantaddress,jdbcType=VARCHAR},
+      creditend = #{creditend,jdbcType=VARCHAR},
+      creditline = #{creditline,jdbcType=DECIMAL},
+      subagencynum = #{subagencynum,jdbcType=INTEGER},
+      branchflag = #{branchflag,jdbcType=INTEGER},
+      foundage = #{foundage,jdbcType=DECIMAL},
+      checkstatus = #{checkstatus,jdbcType=VARCHAR},
+      trainnumyear = #{trainnumyear,jdbcType=DECIMAL},
+      trainincomeyear = #{trainincomeyear,jdbcType=DECIMAL},
+      areateach = #{areateach,jdbcType=DECIMAL},
+      classprice = #{classprice,jdbcType=DECIMAL},
+      employeeno = #{employeeno,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="queryMerByCondition" resultMap="merchantMap" parameterType="Merchant">
+    SELECT
+    <include refid="columnList" />
+    FROM risk_merchant
+    <where>
+      <if test="merchantid != null and ''!=merchantid">
+        merchantid LIKE #{merchantid}
+      </if>
+      <if test="merchantname != null and ''!=merchantname">
+        AND merchantname = #{merchantname}
+      </if>
+      <if test="ownercertid != null and ''!=ownercertid">
+        AND ownercertid = #{ownercertid}
+      </if>
+      <if test="corporationid != null and ''!=corporationid">
+        AND corporationid = #{corporationid}
+      </if>
+    </where>
+    order by id
+  </select>
+
+  <select id="merchantBWGQuery" resultMap="merchantMap" parameterType="String">
+    SELECT
+    <include refid="columnList"/>
+    from risk_merchant
+    where merchantid =#{merchantid}
+  </select>
+
+  <select id="queryMerchantByCondition" resultMap="merchantMap" parameterType="Merchant">
+    SELECT
+    <include refid="columnList" />
+    FROM risk_merchant
+    <where>
+      <if test="merchantid != null and ''!=merchantid">
+        merchantid LIKE #{merchantid}
+      </if>
+      <if test="merchantname != null and ''!=merchantname">
+        AND merchantname = #{merchantname}
+      </if>
+      <if test="corptype != null and ''!=corptype">
+        AND corptype = #{corptype}
+      </if>
+      <if test="corpname != null and ''!=corpname">
+        AND corpname = #{corpname}
+      </if>
+    </where>
+    order by id
+  </select>
+
+  <insert id="addMerchantBatch" parameterType="list" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_merchant (merchantid, merchantname, channelid,
+    corpname, corptype, corpproperty, merchstartdate, merchduedate,
+    corporationid, ownercertid, merchantstatus, orginstdid)
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+    (#{item.merchantid,jdbcType=VARCHAR}, #{item.merchantname,jdbcType=VARCHAR}, #{item.channelid,jdbcType=VARCHAR},
+    #{item.corpname,jdbcType=VARCHAR}, #{item.corptype,jdbcType=VARCHAR}, #{item.corpproperty,jdbcType=VARCHAR},
+    #{item.merchstartdate,jdbcType=DATE}, #{item.merchduedate,jdbcType=DATE},
+    #{item.corporationid,jdbcType=VARCHAR},  #{item.ownercertid,jdbcType=VARCHAR},
+    #{item.merchantstatus,jdbcType=VARCHAR},  #{item.checkstatus,jdbcType=VARCHAR}, #{item.orginstdid,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+
+  <select id="queryByMerchantid" resultMap="merchantMap" parameterType="String">
+    select
+    <include refid="columnList" />
+    from risk_merchant
+    where merchantid = #{merchantid,jdbcType=VARCHAR}
+  </select>
+  <select id="queryByCheckorderid" resultMap="merchantMap" parameterType="String">
+    select
+    <include refid="columnList" />
+    from risk_merchant
+    where checkorderid = #{checkorderid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="queryAllMerchant" resultMap="merchantMap">
+    SELECT
+    id, merchantid, merchantname
+    FROM risk_merchant where merchantid != ''
+  </select>
+
+</mapper>

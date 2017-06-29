@@ -1,0 +1,46 @@
+#macro( makeupChannel $rootinstcd)
+#if($rootinstcd=="M000025")悦视觉
+#elseif($rootinstcd=="M000028")美容分期
+#elseif($rootinstcd=="M000027")旅游分期
+#elseif($rootinstcd=="M000004")课栈
+#elseif($rootinstcd=="M000020")帮帮助学
+#end
+#end
+#if($personOrders.size()>0) 融数贷款记录：本人于
+#foreach($person in $personOrders)$person.ordertime.toString("yyyy-MM-dd HH:mm:ss")在#makeupChannel($person.rootinstcd)渠道申请一笔贷款，金额为$person.amount.divide(100)元, 状态为
+#if($person.statusid=="20")初审拒绝
+#elseif($person.statusid=="21")初审通过
+#elseif($person.statusid=="22")初审续议
+#elseif($person.statusid=="30")终审拒绝
+#elseif($person.statusid=="31")终审通过
+#elseif($person.statusid=="32")终审续议
+#elseif($person.statusid=="40")协议审拒绝
+#elseif($person.statusid=="41")协议审通过
+#elseif($person.statusid=="42")协议审续议
+#elseif($person.statusid=="50")放款拒绝
+#elseif($person.statusid=="51")放款通过
+#elseif($person.statusid=="52")放款续议
+#elseif($person.statusid=="8")待初审
+#end;
+#end
+#end
+#if($firstFlag)
+#if($firstOrders.size()>0)第一联系人于
+#foreach($first in $firstOrders)$first.ordertime.toString("yyyy-MM-dd HH:mm:ss")在#makeupChannel($first.rootinstcd)渠道申请一笔贷款，金额为$first.amount.divide(100)元，状态为
+#if($first.statusid=="20")初审拒绝
+#elseif($first.statusid=="21")初审通过
+#elseif($first.statusid=="22")初审续议
+#elseif($first.statusid=="30")终审拒绝
+#elseif($first.statusid=="31")终审通过
+#elseif($first.statusid=="32")终审续议
+#elseif($first.statusid=="40")协议审拒绝
+#elseif($first.statusid=="41")协议审通过
+#elseif($first.statusid=="42")协议审续议
+#elseif($first.statusid=="50")放款拒绝
+#elseif($first.statusid=="51")放款通过
+#elseif($first.statusid=="52")放款续议
+#elseif($first.statusid=="8")待初审
+#end;
+#end
+#end
+#end

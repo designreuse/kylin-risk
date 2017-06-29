@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="CustomerRequestIP" >
+  <resultMap id="customerRequestIPMap" type="CustomerRequestIP" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="customerid" property="customerid" jdbcType="VARCHAR" />
+    <result column="requestip" property="requestip" jdbcType="VARCHAR" />
+    <result column="constid" property="constid" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, customerid, requestip, constid, createtime, updatetime
+  </sql>
+  <select id="get" resultMap="customerRequestIPMap" parameterType="long" >
+    select 
+    <include refid="columnList" />
+    from risk_customer_request_ip
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <select id="queryByCustomerid" resultMap="customerRequestIPMap" parameterType="string">
+    select
+    <include refid="columnList"/>
+    from risk_customer_request_ip
+    where customerid = #{customerid,jdbcType=VARCHAR} order by createtime desc
+  </select>
+
+  <delete id="delete" parameterType="long" >
+    delete from risk_customer_request_ip
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="CustomerRequestIP" >
+    insert into risk_customer_request_ip (customerid, requestip, constid)
+    values (#{customerid,jdbcType=VARCHAR}, #{requestip,jdbcType=VARCHAR}, #{constid,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="CustomerRequestIP" >
+    update risk_customer_request_ip
+    set customerid = #{customerid,jdbcType=VARCHAR},
+      requestip = #{requestip,jdbcType=VARCHAR},
+      constid = #{constid,jdbcType=VARCHAR},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

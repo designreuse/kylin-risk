@@ -1,0 +1,20 @@
+description = "Risk :: kie-server"
+
+dependencies {
+
+  compile "org.springframework:spring-context:${springVersion}"
+  compile "org.kie:kie-ci:${droolsVersion}"
+
+  compile "org.slf4j:slf4j-api:${slf4jVersion}"
+  compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+
+  testCompile "ch.qos.logback:logback-classic:1.0.9"
+
+  provided "org.projectlombok:lombok:${lombokVersion}"
+//  optional "org.jolokia:jolokia-core:${jolokiaVersion}"
+
+
+  testCompile "junit:junit:${junitVersion}"
+  testCompile "org.springframework:spring-test:${springVersion}"
+  testCompile "org.assertj:assertj-core:${assertjVersion}"
+}

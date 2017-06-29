@@ -1,0 +1,44 @@
+package os.nut.drools.EstateInfo;
+//salience:139-120
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "otherEstate2"
+    no-loop true
+    salience 139
+    when
+        $estateInfo : CustomerFactor(otherEstate!=null,otherEstate.isLesserOrEqualThan(100000));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setOtherEstate("otherEstate01");
+end
+
+rule "otherEstate3"
+    no-loop true
+    salience 138
+    when
+        $estateInfo : CustomerFactor(otherEstate!=null, otherEstate.isGreaterThan(100000)&&otherEstate.isLesserOrEqualThan(500000));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setOtherEstate("otherEstate02");
+end
+
+rule "otherEstate4"
+    no-loop true
+    salience 137
+    when
+        $estateInfo : CustomerFactor(otherEstate!=null,otherEstate.isGreaterThan(500000)&&otherEstate.isLesserOrEqualThan(1000000));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setOtherEstate("otherEstate03");
+end
+
+rule "otherEstate5"
+    no-loop true
+    salience 136
+    when
+        $estateInfo : CustomerFactor(otherEstate!=null,otherEstate.isGreaterThan(1000000));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setOtherEstate("otherEstate04");
+end

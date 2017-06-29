@@ -1,0 +1,5 @@
+version = "1.5-SNAPSHOT"
+description = '风控订单接口'
+dependencies {
+  provided "org.projectlombok:lombok:${lombokVersion}"
+}

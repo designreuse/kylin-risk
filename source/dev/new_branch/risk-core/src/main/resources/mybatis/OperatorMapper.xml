@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Operator" >
+  <cache type="com.rkylin.risk.mybatis.cache.RedisCache"/>
+  <resultMap id="operatorMap" type="Operator" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="realname" property="realname" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="passwd" property="passwd" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="opertype" property="opertype" jdbcType="VARCHAR" />
+    <result column="passwdeffdate" property="passwdeffdate" jdbcType="DATE" javaType="LocalDate"/>
+    <result column="passwdexpdate" property="passwdexpdate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime"/>
+    <result column="createoper" property="createoper" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="lastpwderrdate" property="lastpwderrdate" jdbcType="DATE" javaType="LocalDate"/>
+    <result column="errtimes" property="errtimes" jdbcType="SMALLINT" />
+    <result column="products" property="products" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="operatorColumnList" >
+    id, username, realname,email,passwd, phone, opertype, passwdeffdate, passwdexpdate, createtime,
+    createoper, status,lastpwderrdate,errtimes,products
+  </sql>
+  <select id="get" resultMap="operatorMap" parameterType="short" >
+    select 
+    <include refid="operatorColumnList" />
+    from risk_operator
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="delete" parameterType="short" >
+    delete from risk_operator
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="Operator" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_operator (username, realname, email,passwd,
+      phone, opertype, passwdeffdate, 
+      passwdexpdate, createoper,
+      status,lastpwderrdate,errtimes,products)
+    values (#{username,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{passwd,jdbcType=VARCHAR},
+      #{phone,jdbcType=VARCHAR}, #{opertype,jdbcType=VARCHAR}, #{passwdeffdate,jdbcType=DATE}, 
+      #{passwdexpdate,jdbcType=DATE},#{createoper,jdbcType=VARCHAR},
+      #{status,jdbcType=CHAR},#{lastpwderrdate,jdbcType=DATE},#{errtimes,jdbcType=SMALLINT},#{products,jdbcType=VARCHAR})
+  </insert>
+
+  <update id="resetpasswd" parameterType="Operator" >
+    update risk_operator
+    set passwd = #{passwd,jdbcType=VARCHAR},
+    passwdexpdate = #{passwdexpdate,jdbcType=DATE},
+    errtimes = #{errtimes,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+
+  <update id="update" parameterType="Operator" >
+    update risk_operator
+    set
+    realname =  #{realname,jdbcType=VARCHAR},
+    phone = #{phone,jdbcType=VARCHAR},
+    email=  #{email,jdbcType=VARCHAR},
+    status = #{status,jdbcType=CHAR},
+    passwdexpdate = #{passwdexpdate,jdbcType=DATE},
+    lastpwderrdate = #{lastpwderrdate,jdbcType=DATE},
+    errtimes = #{errtimes,jdbcType=CHAR},
+    products = #{products,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+
+  <select id="queryOperatorByUsername" parameterType="string" resultMap="operatorMap">
+    select
+    <include refid="operatorColumnList" />
+    from risk_operator
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
+
+  <select id="queryOpersByCondition" resultMap="operatorMap" parameterType="Operator">
+    <if test="username != null and ''!=username">
+      <bind name="usrname" value="username + '%'" />
+    </if>
+    <if test="productid != null and ''!=productid">
+      <bind name="productid" value="'%' + productid + '%'" />
+    </if>
+    SELECT
+    <include refid="operatorColumnList" />
+    FROM risk_operator
+    <where>
+      <if test="username != null and ''!=username">
+        username LIKE #{usrname}
+      </if>
+      <if test="realname != null and ''!=realname">
+        AND realname = #{realname}
+      </if>
+      <if test="email != null and ''!=email">
+        AND email = #{email}
+      </if>
+      <if test="opertype != null and ''!=opertype">
+        AND opertype = #{opertype}
+      </if>
+      <if test="status != null and ''!=status">
+        AND status = #{status}
+      </if>
+      <if test="createoper != null and ''!=createoper">
+        AND createoper = #{createoper}
+      </if>
+      <if test="productid != null and ''!=productid">
+        AND productid like #{productid}
+      </if>
+    </where>
+    order by id
+  </select>
+
+  <select id="queryByOperatorIds" parameterType="list" resultMap="operatorMap">
+    select
+    <include refid="operatorColumnList" />
+    from risk_operator t
+    where id IN
+    <foreach collection="list" item="list" index="index" open="(" close=")" separator=",">
+       #{list.operatorid}
+    </foreach>
+  </select>
+</mapper>

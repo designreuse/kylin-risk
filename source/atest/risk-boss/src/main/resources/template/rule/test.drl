@@ -1,0 +1,359 @@
+package risk.drools.customerrule;
+
+import com.rkylin.risk.core.dto.LogicRuleBean;
+import com.rkylin.risk.core.dto.ResultBean;
+
+rule "customer1"
+no-loop true
+salience 99
+when
+ruleBean : LogicRuleBean(
+                            (dayPayRate!=null&&      dayPayRate.isGreaterOrEqualThan(5)      )              &&                  (dayPayRate1!=null&&      dayPayRate1.isGreaterOrEqualThan(5)      )              &&                  (dayPayRate2!=null&&      dayPayRate2.isGreaterOrEqualThan(5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("6");
+    resultBean.setOffMsg("日培训收入*500%≤连续三天日日放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer2"
+no-loop true
+salience 98
+when
+ruleBean : LogicRuleBean(
+                            (dayPayRate!=null&&      dayPayRate.isGreaterOrEqualThan(10)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("7");
+    resultBean.setOffMsg("日培训收入*1000%≤日放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer3"
+no-loop true
+salience 97
+when
+ruleBean : LogicRuleBean(
+                            (monthPayRate!=null&&      monthPayRate.isGreaterOrEqualThan(4.5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("8");
+    resultBean.setOffMsg("月培训收入*450%≤月放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer4"
+no-loop true
+salience 96
+when
+ruleBean : LogicRuleBean(
+                            (seasonPayRate!=null&&      seasonPayRate.isGreaterOrEqualThan(3)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("9");
+    resultBean.setOffMsg("季培训收入*300%≤季放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer5"
+no-loop true
+salience 95
+when
+ruleBean : LogicRuleBean(
+                            (yearPayRate!=null&&      yearPayRate.isGreaterOrEqualThan(2)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("10");
+    resultBean.setOffMsg("年培训收入*200%≤年放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer6"
+no-loop true
+salience 94
+when
+ruleBean : LogicRuleBean(
+                      (      (dayPayGrowthRate!=null&&      dayPayGrowthRate.isLesserOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isLesserOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isLesserOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isLesserOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isLesserOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isLesserOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isLesserOrEqualThan(-0.3)      )      )        ||            (      (dayPayGrowthRate!=null&&      dayPayGrowthRate.isGreaterOrEqualThan(0.3)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isGreaterOrEqualThan(0.3)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isGreaterOrEqualThan(0.3)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isGreaterOrEqualThan(0.3)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isGreaterOrEqualThan(0.3)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isGreaterOrEqualThan(0.3)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isGreaterOrEqualThan(0.4)      )      )  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("11");
+    resultBean.setOffMsg("日放款连7日日增长率≤-30%或≥30%"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer7"
+no-loop true
+salience 93
+when
+ruleBean : LogicRuleBean(
+                            (dayNumRate!=null&&      dayNumRate.isGreaterOrEqualThan(10)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("12");
+    resultBean.setOffMsg("日培训人数*1000%≤日放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer8"
+no-loop true
+salience 92
+when
+ruleBean : LogicRuleBean(
+                            (dayNumRate!=null&&      dayNumRate.isGreaterOrEqualThan(5)      )              &&                  (dayNumRate1!=null&&      dayNumRate1.isGreaterOrEqualThan(5)      )              &&                  (dayNumRate2!=null&&      dayNumRate2.isGreaterOrEqualThan(5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("13");
+    resultBean.setOffMsg("日培训人数*500%≤连续三天日日放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer9"
+no-loop true
+salience 91
+when
+ruleBean : LogicRuleBean(
+                            (monthNumRate!=null&&      monthNumRate.isGreaterOrEqualThan(4.5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("14");
+    resultBean.setOffMsg("月培训人数*450%≤月放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer10"
+no-loop true
+salience 90
+when
+ruleBean : LogicRuleBean(
+                            (seasonNumRate!=null&&      seasonNumRate.isGreaterOrEqualThan(3)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("15");
+    resultBean.setOffMsg("季培训人数*300%≤季放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer11"
+no-loop true
+salience 89
+when
+ruleBean : LogicRuleBean(
+                            (yearNumRate!=null&&      yearNumRate.isGreaterOrEqualThan(2)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("16");
+    resultBean.setOffMsg("年培训人数*200%≤年放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer12"
+no-loop true
+salience 88
+when
+ruleBean : LogicRuleBean(
+                      (      (dayNumGrowthRate!=null&&      dayNumGrowthRate.isLesserOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isLesserOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isLesserOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isLesserOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isLesserOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isLesserOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isLesserOrEqualThan(-0.3)      )      )        ||            (      (dayNumGrowthRate!=null&&      dayNumGrowthRate.isGreaterOrEqualThan(0.3)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isGreaterOrEqualThan(0.3)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isGreaterOrEqualThan(0.3)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isGreaterOrEqualThan(0.3)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isGreaterOrEqualThan(0.3)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isGreaterOrEqualThan(0.3)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isGreaterOrEqualThan(0.3)      )      )  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("17");
+    resultBean.setOffMsg("日放款人数连续7日日增长率≤-30%或≥30%"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer13"
+no-loop true
+salience 87
+when
+ruleBean : LogicRuleBean(
+                            (dayPayRate!=null&&      dayPayRate.isGreaterOrEqualThan(3)      )              &&                  (dayPayRate!=null&&      dayPayRate.isLesserThan(5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"日培训收入比例3-5"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"18"+",");
+ end
+rule "customer14"
+no-loop true
+salience 86
+when
+ruleBean : LogicRuleBean(
+                            (dayPayRate!=null&&      dayPayRate.isGreaterOrEqualThan(5)      )              &&                  (dayPayRate!=null&&      dayPayRate.isLesserThan(10)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"日培训收入比例5-10"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"19"+",");
+ end
+rule "customer15"
+no-loop true
+salience 85
+when
+ruleBean : LogicRuleBean(
+                            (monthPayRate!=null&&      monthPayRate.isGreaterOrEqualThan(2)      )              &&                  (monthPayRate!=null&&      monthPayRate.isLesserThan(3.5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"月培训收入比例2-3.5"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"20"+",");
+ end
+rule "customer16"
+no-loop true
+salience 84
+when
+ruleBean : LogicRuleBean(
+                            (monthPayRate!=null&&      monthPayRate.isGreaterOrEqualThan(3.5)      )              &&                  (monthPayRate!=null&&      monthPayRate.isLesserThan(4.5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"月培训收入比例3.5-4.5"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"21"+",");
+ end
+rule "customer17"
+no-loop true
+salience 83
+when
+ruleBean : LogicRuleBean(
+                            (seasonPayRate!=null&&      seasonPayRate.isGreaterOrEqualThan(1.5)      )              &&                  (seasonPayRate!=null&&      seasonPayRate.isLesserThan(2)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"季培训收入比例1.5-2"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"22"+",");
+ end
+rule "customer18"
+no-loop true
+salience 82
+when
+ruleBean : LogicRuleBean(
+                            (seasonPayRate!=null&&      seasonPayRate.isGreaterOrEqualThan(2)      )              &&                  (seasonPayRate!=null&&      seasonPayRate.isLesserThan(3)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"季培训收入比例2-3"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"23"+",");
+ end
+rule "customer19"
+no-loop true
+salience 81
+when
+ruleBean : LogicRuleBean(
+                            (yearPayRate!=null&&      yearPayRate.isGreaterOrEqualThan(1.5)      )              &&                  (yearPayRate!=null&&      yearPayRate.isLesserThan(2)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"年培训收入比例1.5-2"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"24"+",");
+ end
+rule "customer20"
+no-loop true
+salience 80
+when
+ruleBean : LogicRuleBean(
+                      (      (dayPayGrowthRate!=null&&      dayPayGrowthRate.isGreaterOrEqualThan(-0.2)      )              &&                  (dayPayGrowthRate!=null&&      dayPayGrowthRate.isLesserThan(-0.1)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isGreaterOrEqualThan(-0.2)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isLesserThan(-0.1)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isGreaterOrEqualThan(-0.2)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isLesserThan(-0.1)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isGreaterOrEqualThan(-0.2)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isLesserThan(-0.1)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isGreaterOrEqualThan(-0.2)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isLesserThan(-0.1)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isGreaterOrEqualThan(-0.2)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isLesserThan(-0.1)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isGreaterOrEqualThan(-0.2)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isLesserThan(-0.1)      )      )        ||            (      (dayPayGrowthRate!=null&&      dayPayGrowthRate.isGreaterOrEqualThan(0.1)      )              &&                  (dayPayGrowthRate!=null&&      dayPayGrowthRate.isLesserThan(0.2)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isGreaterOrEqualThan(0.1)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isLesserThan(0.2)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isGreaterOrEqualThan(0.1)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isLesserThan(0.2)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isGreaterOrEqualThan(0.1)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isLesserThan(0.2)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isGreaterOrEqualThan(0.1)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isLesserThan(0.2)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isGreaterOrEqualThan(0.1)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isLesserThan(0.2)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isGreaterOrEqualThan(0.1)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isLesserThan(0.2)      )      )  );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"日放款额连续7日日增长率"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"25"+",");
+ end
+rule "customer21"
+no-loop true
+salience 79
+when
+ruleBean : LogicRuleBean(
+                      (      (dayPayGrowthRate!=null&&      dayPayGrowthRate.isGreaterOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate!=null&&      dayPayGrowthRate.isLesserThan(-0.2)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isGreaterOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isLesserThan(-0.2)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isGreaterOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isLesserThan(-0.2)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isGreaterOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isLesserThan(-0.2)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isGreaterOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isLesserThan(-0.2)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isGreaterOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isLesserThan(-0.2)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isGreaterOrEqualThan(-0.3)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isLesserThan(-0.2)      )      )        ||            (      (dayPayGrowthRate!=null&&      dayPayGrowthRate.isGreaterOrEqualThan(0.2)      )              &&                  (dayPayGrowthRate!=null&&      dayPayGrowthRate.isLesserThan(0.3)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isGreaterOrEqualThan(0.2)      )              &&                  (dayPayGrowthRate1!=null&&      dayPayGrowthRate1.isLesserThan(0.3)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isGreaterOrEqualThan(0.2)      )              &&                  (dayPayGrowthRate2!=null&&      dayPayGrowthRate2.isLesserThan(0.3)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isGreaterOrEqualThan(0.2)      )              &&                  (dayPayGrowthRate3!=null&&      dayPayGrowthRate3.isLesserThan(0.3)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isGreaterOrEqualThan(0.2)      )              &&                  (dayPayGrowthRate4!=null&&      dayPayGrowthRate4.isLesserThan(0.3)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isGreaterOrEqualThan(0.2)      )              &&                  (dayPayGrowthRate5!=null&&      dayPayGrowthRate5.isLesserThan(0.3)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isGreaterOrEqualThan(0.2)      )              &&                  (dayPayGrowthRate6!=null&&      dayPayGrowthRate6.isLesserOrEqualThan(0.3)      )      )  );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"日放款额连续7日日增长率"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"26"+",");
+ end
+rule "customer22"
+no-loop true
+salience 78
+when
+ruleBean : LogicRuleBean(
+                            (dayNumRate!=null&&      dayNumRate.isGreaterOrEqualThan(3)      )              &&                  (dayNumRate!=null&&      dayNumRate.isLesserThan(5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"日培训人数比例3-5"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"27"+",");
+ end
+rule "customer23"
+no-loop true
+salience 77
+when
+ruleBean : LogicRuleBean(
+                            (dayNumRate!=null&&      dayNumRate.isGreaterOrEqualThan(5)      )              &&                  (dayNumRate!=null&&      dayNumRate.isLesserThan(10)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"日培训人数比例5-10"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"28"+",");
+ end
+rule "customer24"
+no-loop true
+salience 76
+when
+ruleBean : LogicRuleBean(
+                            (monthNumRate!=null&&      monthNumRate.isGreaterOrEqualThan(2)      )              &&                  (monthNumRate!=null&&      monthNumRate.isLesserThan(3.5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"月培训人数比例2-3.5"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"29"+",");
+ end
+rule "customer25"
+no-loop true
+salience 75
+when
+ruleBean : LogicRuleBean(
+                            (monthNumRate!=null&&      monthNumRate.isGreaterOrEqualThan(3.5)      )              &&                  (monthNumRate!=null&&      monthNumRate.isLesserThan(4.5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"月培训人数比例3.5-4.5"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"30"+",");
+ end
+rule "customer26"
+no-loop true
+salience 74
+when
+ruleBean : LogicRuleBean(
+                            (seasonNumRate!=null&&      seasonNumRate.isGreaterOrEqualThan(1.5)      )              &&                  (seasonNumRate!=null&&      seasonNumRate.isLesserThan(2)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"季培训人数1.5-2"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"31"+",");
+ end
+rule "customer27"
+no-loop true
+salience 73
+when
+ruleBean : LogicRuleBean(
+                            (seasonNumRate!=null&&      seasonNumRate.isGreaterOrEqualThan(2)      )              &&                  (seasonNumRate!=null&&      seasonNumRate.isLesserThan(3)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"季培训人数2-3"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"32"+",");
+ end
+rule "customer28"
+no-loop true
+salience 72
+when
+ruleBean : LogicRuleBean(
+                      (      (dayNumGrowthRate!=null&&      dayNumGrowthRate.isGreaterOrEqualThan(-0.2)      )              &&                  (dayNumGrowthRate!=null&&      dayNumGrowthRate.isLesserThan(-0.1)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isGreaterOrEqualThan(-0.2)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isLesserThan(-0.1)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isGreaterOrEqualThan(-0.2)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isLesserThan(-0.1)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isGreaterOrEqualThan(-0.2)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isLesserThan(-0.1)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isGreaterOrEqualThan(-0.2)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isLesserThan(-0.1)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isGreaterOrEqualThan(-0.2)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isLesserThan(-0.1)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isGreaterOrEqualThan(-0.2)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isLesserThan(-0.1)      )      )        ||            (      (dayNumGrowthRate!=null&&      dayNumGrowthRate.isGreaterOrEqualThan(0.1)      )              &&                  (dayNumGrowthRate!=null&&      dayNumGrowthRate.isLesserThan(0.2)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isGreaterOrEqualThan(0.1)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isLesserThan(0.2)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isGreaterOrEqualThan(0.1)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isLesserThan(0.2)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isGreaterOrEqualThan(0.1)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isLesserThan(0.2)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isGreaterOrEqualThan(0.1)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isLesserThan(0.2)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isGreaterOrEqualThan(0.1)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isLesserThan(0.2)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isGreaterOrEqualThan(0.1)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isLesserThan(0.2)      )      )  );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"日放款人数连续7日日增长率"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"33"+",");
+ end
+rule "customer29"
+no-loop true
+salience 71
+when
+ruleBean : LogicRuleBean(
+                      (      (dayNumGrowthRate!=null&&      dayNumGrowthRate.isGreaterOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate!=null&&      dayNumGrowthRate.isLesserThan(-0.2)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isGreaterOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isLesserThan(-0.2)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isGreaterOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isLesserThan(-0.2)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isGreaterOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isLesserThan(-0.2)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isGreaterOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isLesserThan(-0.2)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isGreaterOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isLesserThan(-0.2)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isGreaterOrEqualThan(-0.3)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isLesserThan(-0.2)      )      )        ||            (      (dayNumGrowthRate!=null&&      dayNumGrowthRate.isGreaterOrEqualThan(0.2)      )              &&                  (dayNumGrowthRate!=null&&      dayNumGrowthRate.isLesserThan(0.3)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isGreaterOrEqualThan(0.2)      )              &&                  (dayNumGrowthRate1!=null&&      dayNumGrowthRate1.isLesserThan(0.3)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isGreaterOrEqualThan(0.2)      )              &&                  (dayNumGrowthRate2!=null&&      dayNumGrowthRate2.isLesserThan(0.3)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isGreaterOrEqualThan(0.2)      )              &&                  (dayNumGrowthRate3!=null&&      dayNumGrowthRate3.isLesserThan(0.3)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isGreaterOrEqualThan(0.2)      )              &&                  (dayNumGrowthRate4!=null&&      dayNumGrowthRate4.isLesserThan(0.3)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isGreaterOrEqualThan(0.2)      )              &&                  (dayNumGrowthRate5!=null&&      dayNumGrowthRate5.isLesserThan(0.3)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isGreaterOrEqualThan(0.2)      )              &&                  (dayNumGrowthRate6!=null&&      dayNumGrowthRate6.isLesserThan(0.3)      )      )  );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"日放款人数连续7日日增长率"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"34"+",");
+ end
+rule "customer30"
+no-loop true
+salience 70
+when
+ruleBean : LogicRuleBean(
+                            (overdueRate!=null&&      overdueRate.isGreaterOrEqualThan(0.5)      )        );
+resultBean : ResultBean();
+then
+      resultBean.setOffMsg(resultBean.getOffMsg()+"逾期率"+",");
+    resultBean.setRuleids(resultBean.getRuleids()+"35"+",");
+ end

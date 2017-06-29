@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:task="http://www.springframework.org/schema/task"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xsi:schemaLocation="
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+			http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task-4.2.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+
+	<context:component-scan base-package="com.rkylin.risk.service.biz.impl,com.rkylin.risk.service.api.impl"
+			name-generator="com.rkylin.risk.core.common.AnnotationBeanNameDependInterfaceGenerator" />
+
+	<context:component-scan base-package="com.rkylin.risk.service.validator"/>
+	<bean id="ROPUtil" class="com.rkylin.risk.service.utils.ROPUtil"></bean>
+	<bean id="flowStatusListener" class="com.rkylin.risk.service.event.FlowStatusListener">
+		<constructor-arg index="0" name="flowStatusService" ref="flowStatusChangeService"></constructor-arg>
+	</bean>
+
+	<task:executor id="flowStatusExcutor" keep-alive="10" pool-size="10-50" queue-capacity="10000"/>
+	<bean id="flowStatusEventBus" class="com.rkylin.risk.service.event.EventBusFactoryBean">
+		<property name="eventIdentifier" value="riskFlowStatus"/>
+		<property name="registerObject" ref="flowStatusListener"/>
+		<property name="executor" ref="flowStatusExcutor"/>
+	</bean>
+</beans>

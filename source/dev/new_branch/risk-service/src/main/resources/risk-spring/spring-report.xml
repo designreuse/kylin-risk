@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  <!-- 配置report 逾期率查询数据源 -->
+  <bean id="report" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+    <constructor-arg>
+      <bean class="com.zaxxer.hikari.HikariConfig">
+        <property name="driverClassName" value="${jdbc_report.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc_report.url}"/>
+        <property name="username" value="${jdbc_report.username}"/>
+        <property name="password" value="${jdbc_report.password}"/>
+        <!--<property name="autoCommit" value="true"/> -->
+        <property name="poolName" value="report"/>
+        <property name="connectionTimeout" value="${jdbc.connectionTimeout:30000}"/>
+        <property name="idleTimeout" value="${jdbc.idleTimeout:600000}"/>
+        <property name="maxLifetime" value="${jdbc.maxLifetime:1800000}"/>
+        <property name="maximumPoolSize" value="${jdbc_report.maximumPoolSize:3}"/>
+        <property name="minimumIdle" value="${jdbc.minimumIdle:2}"/>
+        <!--<property name="metricRegistry" ref="metric"/>-->
+        <!--<property name="healthCheckRegistry" ref="healthCheckRegistry"></property> -->
+        <property name="connectionTestQuery" value="SELECT 1"/>
+      </bean>
+    </constructor-arg>
+  </bean>
+</beans>

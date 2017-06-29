@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="AbnormalCountrycode" >
+  <resultMap id="abnormalCountrycodeMap" type="AbnormalCountrycode" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="CNNM" property="cnnm" jdbcType="VARCHAR" />
+    <result column="CNABB" property="cnabb" jdbcType="VARCHAR" />
+    <result column="ENNM" property="ennm" jdbcType="VARCHAR" />
+    <result column="ENABB" property="enabb" jdbcType="VARCHAR" />
+    <result column="TWOLETTER" property="twoletter" jdbcType="VARCHAR" />
+    <result column="THREELTEEER" property="threelteeer" jdbcType="VARCHAR" />
+    <result column="THREENUM" property="threenum" jdbcType="VARCHAR" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+    <result column="LSTMTAUSR" property="lstmtausr" jdbcType="SMALLINT" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, CNNM, CNABB, ENNM, ENABB, TWOLETTER, THREELTEEER, THREENUM, TYPE, LSTMTAUSR, 
+    updatetime,createtime,username
+  </sql>
+  <select id="queryOne" resultMap="abnormalCountrycodeMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_abnormal_countrycode
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryAll" resultMap="abnormalCountrycodeMap" parameterType="AbnormalCountrycode" >
+    <if test="cnnm!=null and ''!=cnnm">
+      <bind name="cnnm" value="cnnm + '%'" />
+    </if>
+    <if test="cnabb!=null and ''!=cnabb">
+      <bind name="cnabb" value="cnabb + '%'" />
+    </if>
+    <if test="ennm!=null and ''!=ennm">
+      <bind name="ennm" value="ennm + '%'" />
+    </if>
+    <if test="enabb!=null and ''!=enabb">
+      <bind name="enabb" value="enabb + '%'" />
+    </if>
+    select
+    <include refid="columnList" />
+    from risk_abnormal_countrycode
+    <where>
+      <if test="cnnm != null and ''!=cnnm">
+        CNNM LIKE #{cnnm}
+      </if>
+      <if test="cnabb != null and ''!=cnabb">
+        AND CNABB LIKE #{cnabb}
+      </if>
+      <if test="ennm != null and ''!=ennm">
+        AND ENNM LIKE #{cnnm}
+      </if>
+      <if test="enabb != null and ''!=enabb">
+        AND ENABB LIKE #{enabb}
+      </if>
+      <if test="twoletter != null and ''!=twoletter">
+        AND TWOLETTER = #{twoletter}
+      </if>
+      <if test="threelteeer != null and ''!=threelteeer">
+        AND THREELTEEER = #{threelteeer}
+      </if>
+      <if test="threenum != null and ''!=threenum">
+        AND THREENUM = #{threenum}
+      </if>
+    </where>
+  </select>
+
+  <delete id="delete" parameterType="integer" >
+    delete from risk_abnormal_countrycode
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="AbnormalCountrycode" >
+    insert into risk_abnormal_countrycode (CNNM, CNABB, ENNM, 
+      ENABB, TWOLETTER, THREELTEEER, 
+      THREENUM, TYPE, LSTMTAUSR,username)
+    values (#{cnnm,jdbcType=VARCHAR}, #{cnabb,jdbcType=VARCHAR}, #{ennm,jdbcType=VARCHAR}, 
+      #{enabb,jdbcType=VARCHAR}, #{twoletter,jdbcType=VARCHAR}, #{threelteeer,jdbcType=VARCHAR}, 
+      #{threenum,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{lstmtausr,jdbcType=SMALLINT}, 
+      #{username,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="AbnormalCountrycode" >
+    update risk_abnormal_countrycode
+    set CNNM = #{cnnm,jdbcType=VARCHAR},
+      CNABB = #{cnabb,jdbcType=VARCHAR},
+      ENNM = #{ennm,jdbcType=VARCHAR},
+      ENABB = #{enabb,jdbcType=VARCHAR},
+      TWOLETTER = #{twoletter,jdbcType=VARCHAR},
+      THREELTEEER = #{threelteeer,jdbcType=VARCHAR},
+      THREENUM = #{threenum,jdbcType=VARCHAR},
+      TYPE = #{type,jdbcType=VARCHAR},
+      LSTMTAUSR = #{lstmtausr,jdbcType=SMALLINT},
+      username= #{username,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

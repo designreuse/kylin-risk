@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="CreditModule" >
+  <cache type="com.rkylin.risk.mybatis.cache.RedisCache"/>
+  <resultMap id="creditModuleMap" type="CreditModule" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="modulequeryname" property="moduleQueryName" jdbcType="VARCHAR" />
+    <result column="modulename" property="moduleName" jdbcType="VARCHAR" />
+    <result column="realmoduleid" property="realModuleId" jdbcType="BIGINT" />
+    <result column="isatomicquery" property="isAtomicQuery" jdbcType="BIT" />
+  </resultMap>
+  <sql id="columnList" >
+    id, modulequeryname, modulename, realmoduleid, isatomicquery, createtime
+  </sql>
+  <select id="get" resultMap="creditModuleMap" parameterType="long" >
+    select 
+    <include refid="columnList" />
+    from risk_credit_module
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="queryByModuleQueryName" resultMap="creditModuleMap" parameterType="string" >
+    select
+    <include refid="columnList" />
+    from risk_credit_module
+    where modulequeryname = #{moduleQueryName,jdbcType=VARCHAR}
+  </select>
+  <select id="queryByModulename" resultMap="creditModuleMap" parameterType="map" >
+    select
+    <include refid="columnList" />
+    from risk_credit_module
+    where modulename = #{moduleName,jdbcType=VARCHAR}
+    and isatomicquery = #{isAtomicQuery,jdbcType=BIT}
+  </select>
+  <delete id="delete" parameterType="long" >
+    delete from risk_credit_module
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="CreditModule" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_credit_module (modulequeryname, modulename, realmoduleid, 
+      isatomicquery)
+    values (#{moduleQueryName,jdbcType=VARCHAR}, #{moduleName,jdbcType=VARCHAR}, #{realModuleId,jdbcType=BIGINT},
+      #{isAtomicQuery,jdbcType=BIT})
+  </insert>
+  <update id="update" parameterType="CreditModule" >
+    update risk_credit_module
+    set modulequeryname = #{moduleQueryName,jdbcType=VARCHAR},
+      modulename = #{moduleName,jdbcType=VARCHAR},
+      realmoduleid = #{realModuleId,jdbcType=BIGINT},
+      isatomicquery = #{isAtomicQuery,jdbcType=BIT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

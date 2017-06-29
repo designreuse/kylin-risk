@@ -1,0 +1,36 @@
+package os.nut.drools.EstateInfo;
+//salience:159-140
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.operation.enumType.MortInfo;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "mortInfo2"
+    no-loop true
+    salience 159
+    when
+        $estateInfo : CustomerFactor(MortInfo.NOTMORTGAGE.toString().equals(mortInfo));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMortInfo("mortInfo01");
+end
+
+rule "mortInfo3"
+    no-loop true
+    salience 158
+    when
+        $estateInfo : CustomerFactor( MortInfo.LIFTMORTGAGE.toString().equals(mortInfo));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMortInfo("mortInfo02");
+end
+
+rule "mortInfo4"
+    no-loop true
+    salience 157
+    when
+        $estateInfo : CustomerFactor(MortInfo.MORTGAGED.toString().equals(mortInfo));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMortInfo("mortInfo03");
+end
+

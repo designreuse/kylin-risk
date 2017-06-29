@@ -1,0 +1,5 @@
+version = "1.2"
+description = '风控米投服务接口'
+dependencies {
+  provided "org.projectlombok:lombok:${lombokVersion}"
+}

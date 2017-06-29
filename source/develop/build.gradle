@@ -1,0 +1,484 @@
+
+
+project.ext {
+  gradleVersion = '2.10'
+  slf4jVersion='1.7.21'
+  log4jVersion='2.6.1'
+
+  riskOrderApiVersion="1.4"
+  riskOperationApiVersion="1.5"
+
+  springVersion='4.2.5.RELEASE'
+  aopallianceVersion='1.0'
+  aspectjVersion='1.8.8'
+  cglibVersion='3.1'
+  mailVersion='1.5.4'
+  velocityVersion='1.7'
+
+
+  springBatchVersion='3.0.6.RELEASE'
+  springRetryVersion='1.1.2.RELEASE'
+  springQuartzVersion='2.2.2'
+
+  springSessionVersion='1.2.1.RELEASE'
+
+  springSecurityVersion='4.0.3.RELEASE'
+
+  pagehelperVersion='4.1.6'
+  jsqlparserVersion='0.9.5'
+  mybatisVersion='3.4.0'
+  mybatisSpringVersion='1.3.0'
+
+  jodaTimeVersion='2.8.2'
+  guavaVersion='18.0'
+
+  jedisVersion='2.7.3'
+  commonsPoolVerion='2.3'
+  springDataRedisVersion='1.7.1.RELEASE'
+
+  hikariCPVersion='2.4.7'
+  javassistVersion='3.20.0-GA'
+  mysqlDriverVersion='5.1.39'
+  metricsVersion='3.1.2'
+
+
+  droolsVersion='6.4.0.Final'
+  xstreamVersion='1.4.8'
+  mvelVersion='2.2.6.Final'
+  antlrVersion='3.5'
+  jdtCompilerVersion='4.3.1'
+
+
+
+  httpclientVersion="4.3.5"
+  httpcoreVersion="4.3.2"
+
+
+  commonsLang3Version='3.4'
+  commonsLang2Version='2.6'
+  commonsFileuploadVersion='1.3.1'
+  commonsIoVersion='2.2'
+  commonsCodecVersion='1.10'
+  modelmapperVersion='0.7.6'
+  lombokVersion='1.16.8'
+
+  jacksonVersion='2.6.5'
+  poiVersion='3.13'
+
+  dubboVersion='2.5.3'
+  zkclientVersion='0.4'
+  curatorVersion='1.3.3'
+  hessianVersion='4.0.7'
+
+
+  retrofitVersion='2.1.0'
+
+
+  hibernateValidatorVersion='4.3.2.Final'
+  validationApiVersion='1.0.0.GA'
+
+  servletApiVersion='3.1.0'
+  jspApiVersion='2.2.1'
+  websocketApiVersion='1.1'
+  jstlApiVersion='1.2.1'
+  jspTaglibsVersion='1.1.2'
+
+  sitemeshVersion='3.0.1'
+
+  mavenVersion='3.3.9'
+  wagonVersion='2.10'
+  aetherVersion='1.0.2.v20150114'
+  eclipseSisuVersion='0.3.2'
+  plexusClassworldsVersion='2.5.2'
+  plexusUtilsVersion='3.0.22'
+  plexusCipherVersion='1.7'
+
+  junitVersion='4.12'
+  mockitoVersion='1.10.19'
+  jsonpathVersion='2.0.0'
+  assertjVersion='2.4.1'
+  assertGuavaVersion='2.0.0'
+
+  p6spyVersion='2.3.1'
+
+  gradleCheckstyleVersion='6.17'
+  gradleFindbugsVersion='3.0.1'
+  gradlePMDVersion='5.4.1'
+
+  profile=defaultProperty('profile','develop')
+  profileFile="${rootDir}/profiles/${profile}.properties"
+
+  gradleScriptDir = "${rootProject.projectDir}/gradle"
+  javaVersion=JavaVersion.VERSION_1_7
+}
+
+
+assert JavaVersion.current().java7Compatible:"At least Java $javaVersion is required, current JVM is ${JavaVersion.current()}"
+assert new File(profileFile).exists():"${profileFile} not found"
+
+buildscript {
+  repositories {
+    maven {
+      url "http://121.40.68.238:8081/nexus/content/groups/public"
+    }
+    maven { url 'http://repo.spring.io/plugins-release' }
+    mavenCentral()
+    mavenLocal()
+  }
+
+  dependencies {
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+    classpath 'io.spring.gradle:dependency-management-plugin:0.5.7.RELEASE'
+  }
+}
+
+def defaultProperty(propertyName, defaultValue) {
+  return hasProperty(propertyName) ? project[propertyName] : defaultValue
+}
+
+
+def loadProperties(){
+  def props = new Properties()
+  new File(profileFile)
+          .withInputStream {
+    stream -> props.load(stream)
+  }
+  def currentProfile="$projectDir.absolutePath/src/main/resources/profiles/$profile"
+  def currentProfileFile=new File(currentProfile)
+  if(currentProfileFile.exists()){
+    currentProfileFile.withInputStream {
+      stream -> props.load(stream)
+    }
+  }
+  props
+}
+
+apply plugin: 'idea'
+
+idea{
+  project{
+    languageLevel = javaVersion
+  }
+}
+
+allprojects {
+  apply plugin: 'maven'
+  apply plugin: "io.spring.dependency-management"
+  apply plugin: 'propdeps'
+  apply plugin: 'propdeps-idea'
+//  apply from: "${gradleScriptDir}/publish-maven.gradle"
+
+  group = 'com.rkylin.risk'
+  repositories {
+    mavenLocal()
+    maven { url "http://121.40.68.238:8081/nexus/content/groups/public" }
+    maven { url "http://121.40.68.238:8081/nexus/content/repositories/snapshots/" }
+  }
+  dependencyManagement{
+    dependencies{
+      //dubbo begin
+      dependency ("org.drools:drools-core:${droolsVersion}"){
+        exclude "commons-codec:commons-codec"
+      }
+      dependency "org.drools:drools-compiler:${droolsVersion}"
+      dependency ("org.kie:kie-spring:${droolsVersion}"){
+        exclude "org.jbpm:jbpm-flow"
+        exclude "org.drools:drools-decisiontables"
+        exclude "org.springframework:spring-tx"
+      }
+      dependency "org.kie:kie-internal:${droolsVersion}"
+      dependency "org.kie:kie-api:${droolsVersion}"
+      dependency ("org.kie:kie-ci:${droolsVersion}"){
+        exclude "org.sonatype.sisu:sisu-guice"
+      }
+      dependency "com.thoughtworks.xstream:xstream:${xstreamVersion}"
+      dependency "org.mvel:mvel2:${mvelVersion}"
+      dependency ("org.antlr:antlr-runtime:${antlrVersion}"){
+        exclude "org.antlr:stringtemplate"
+      }
+      dependency "org.eclipse.jdt.core.compiler:ecj:${jdtCompilerVersion}"
+
+
+      dependency ("com.alibaba:dubbo:${dubboVersion}"){
+        exclude "org.springframework:spring"
+      }
+      dependency ("com.101tec:zkclient:${zkclientVersion}") {
+        exclude "org.slf4j:slf4j-api"
+        exclude "org.slf4j:slf4j-log4j12"
+        exclude "log4j:log4j"
+        exclude "junit:junit"
+
+      }
+
+      dependency "com.caucho:hessian:${hessianVersion}"
+      //dubbo end
+
+
+
+      //log begin
+      dependency "org.slf4j:slf4j-simple:${slf4jVersion}"
+      dependency "org.slf4j:slf4j-api:${slf4jVersion}"
+      dependency "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+      dependency "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+      dependency "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+      dependency "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+      dependency "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+      dependency "org.apache.logging.log4j:log4j-web:${log4jVersion}"
+      //log end
+
+
+      //spring begin
+      dependency "org.springframework:spring-core:${springVersion}"
+      dependency "org.springframework:spring-context:${springVersion}"
+      dependency "org.springframework:spring-expression:${springVersion}"
+      dependency "org.springframework:spring-beans:${springVersion}"
+      dependency "org.springframework:spring-aop:${springVersion}"
+      dependency "org.springframework:spring-tx:${springVersion}"
+      dependency "org.springframework:spring-jdbc:${springVersion}"
+      dependency "org.springframework:spring-context-support:${springVersion}"
+      dependency "org.springframework:spring-web:${springVersion}"
+      dependency "org.springframework:spring-webmvc:${springVersion}"
+      dependency "org.springframework:spring-websocket:${springVersion}"
+      dependency "org.springframework:spring-messaging:${springVersion}"
+      //spring end
+
+      //spring dependencied begin
+      dependency "aopalliance:aopalliance:${aopallianceVersion}"
+      dependency "org.aspectj:aspectjweaver:${aspectjVersion}"
+      dependency "cglib:cglib-nodep:${cglibVersion}"
+      //spring dependencied end
+
+
+      //mybatis begin
+      dependency "org.mybatis:mybatis-spring:${mybatisSpringVersion}"
+      dependency "org.mybatis:mybatis:${mybatisVersion}"
+      dependency "com.github.pagehelper:pagehelper:${pagehelperVersion}"
+      dependency "com.github.jsqlparser:jsqlparser:${jsqlparserVersion}"
+      //mybatis end
+
+
+      //tools begin
+      dependency "com.google.guava:guava:${guavaVersion}"
+      dependency "joda-time:joda-time:${jodaTimeVersion}"
+      dependency "org.apache.commons:commons-lang3:${commonsLang3Version}"
+      dependency "commons-lang:commons-lang:${commonsLang2Version}"
+      dependency "commons-io:commons-io:${commonsIoVersion}"
+      dependency "commons-codec:commons-codec:${commonsCodecVersion}"
+
+      dependency "org.apache.httpcomponents:httpclient:${httpclientVersion}"
+      dependency "org.apache.httpcomponents:httpcore:${httpcoreVersion}"
+
+      dependency "org.modelmapper:modelmapper:${modelmapperVersion}"
+
+      dependency "org.apache.velocity:velocity:${velocityVersion}"
+
+      dependency "com.squareup.retrofit2:retrofit:${retrofitVersion}"
+      dependency "com.squareup.retrofit2:retrofit-mock:${retrofitVersion}"
+      //tools end
+
+      //java mail begin
+      dependency "javax.mail:javax.mail-api:${mailVersion}"
+      dependency "com.sun.mail:javax.mail:${mailVersion}"
+      //java mail end
+
+      //database pool begin
+      dependency "com.zaxxer:HikariCP:${hikariCPVersion}"
+      dependency "org.javassist:javassist:${javassistVersion}"
+      dependency "mysql:mysql-connector-java:${mysqlDriverVersion}"
+      dependency "io.dropwizard.metrics:metrics-core:${metricsVersion}"
+      dependency "io.dropwizard.metrics:metrics-healthchecks:${metricsVersion}"
+      //database pool end
+
+      //json begin
+      dependency "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+      dependency "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+      dependency "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+      //json end
+
+      //redis begin
+      dependency "redis.clients:jedis:${jedisVersion}"
+      dependency "org.apache.commons:commons-pool2:${commonsPoolVerion}"
+      dependency ("org.springframework.data:spring-data-redis:${springDataRedisVersion}"){
+        exclude "org.springframework:spring-context"
+        exclude "org.springframework:spring-context"
+        exclude "org.springframework:spring-aop"
+        exclude "org.springframework:spring-beans"
+        exclude "org.springframework:spring-tx"
+        exclude "org.springframework:spring-core"
+        exclude "org.slf4j:jcl-over-slf4j"
+        exclude "org.slf4j:slf4j-api"
+      }
+      //redis end
+
+      //validation begin
+      dependency "org.hibernate:hibernate-validator:${hibernateValidatorVersion}"
+      dependency "javax.validation:validation-api:${validationApiVersion}"
+      //validation end
+
+      //web api begin
+      dependency "javax.servlet:javax.servlet-api:${servletApiVersion}"
+      dependency "javax.servlet.jsp:javax.servlet.jsp-api:${jspApiVersion}"
+      dependency "javax.websocket:javax.websocket-api:${websocketApiVersion}"
+      dependency "javax.servlet.jsp.jstl:javax.servlet.jsp.jstl-api:${jstlApiVersion}"
+      dependency "taglibs:standard:${jspTaglibsVersion}"
+      //web api end
+
+
+      //test begin
+      dependency "junit:junit:${junitVersion}"
+      dependency "org.mockito:mockito-all:${mockitoVersion}"
+      dependency "org.springframework:spring-test:${springVersion}"
+      dependency "com.jayway.jsonpath:json-path:${jsonpathVersion}"
+      dependency "org.assertj:assertj-core:${assertjVersion}"
+      dependency "org.assertj:assertj-guava:${assertGuavaVersion}"
+      //test end
+
+
+      dependency "org.projectlombok:lombok:${lombokVersion}"
+
+
+      //maven begin
+      dependency "org.apache.maven:maven-core:${mavenVersion}"
+      dependency "org.apache.maven:maven-model-builder:${mavenVersion}"
+      dependency "org.apache.maven:maven-model:${mavenVersion}"
+      dependency "org.apache.maven:maven-settings:${mavenVersion}"
+      dependency "org.apache.maven:maven-settings-builder:${mavenVersion}"
+      dependency "org.apache.maven:maven-builder-support:${mavenVersion}"
+      dependency "org.apache.maven:maven-artifact:${mavenVersion}"
+      dependency "org.apache.maven:maven-plugin-api:${mavenVersion}"
+      dependency "org.apache.maven:maven-aether-provider:${mavenVersion}"
+      dependency "org.apache.maven:maven-compat:${mavenVersion}"
+      dependency "org.apache.maven:maven-embedder:${mavenVersion}"
+      dependency "org.apache.maven.wagon:wagon-provider-api:${wagonVersion}"
+      dependency "org.apache.maven.wagon:wagon-http:${wagonVersion}"
+      dependency "org.eclipse.aether:aether-api:${aetherVersion}"
+      dependency "org.eclipse.aether:aether-util:${aetherVersion}"
+      dependency "org.eclipse.aether:aether-impl:${aetherVersion}"
+      dependency "org.eclipse.aether:aether-connector-basic:${aetherVersion}"
+      dependency "org.eclipse.aether:aether-spi:${aetherVersion}"
+      dependency "org.eclipse.aether:aether-transport-wagon:${aetherVersion}"
+      dependency "org.eclipse.aether:aether-transport-file:${aetherVersion}"
+      dependency "org.eclipse.aether:aether-transport-http:${aetherVersion}"
+      dependency "org.codehaus.plexus:plexus-classworlds:${plexusClassworldsVersion}"
+      dependency "org.codehaus.plexus:plexus-utils:${plexusUtilsVersion}"
+      dependency "org.sonatype.plexus:plexus-cipher:${plexusCipherVersion}"
+      dependency "org.eclipse.sisu:org.eclipse.sisu.plexus:${eclipseSisuVersion}"
+
+      //maven end
+
+      //documents begin
+      //poi
+      dependency "org.apache.poi:poi:${poiVersion}"
+      dependency "org.apache.poi:poi-ooxml:${poiVersion}"
+      dependency "org.apache.poi:poi-ooxml-schemas:${poiVersion}"
+      //documents end
+
+
+    }
+  }
+
+
+  tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+  }
+
+}
+
+
+
+subprojects {
+  apply plugin: 'java'
+
+
+  apply plugin: 'findbugs'
+  apply plugin: 'checkstyle'
+  apply plugin: 'pmd'
+//  apply plugin: 'project-report'
+
+
+  sourceCompatibility = javaVersion
+  targetCompatibility = javaVersion
+
+
+
+  configurations {
+    all{
+      exclude module: 'commons-logging'
+      exclude module: 'log4j'
+      exclude module: 'slf4j-log4j12'
+      resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+    }
+  }
+
+  defaultTasks 'build'
+
+  processResources {
+    from(sourceSets.main.resources.srcDirs) {
+      include '**/*.properties'
+      include 'log4j2.xml'
+      filter(org.apache.tools.ant.filters.ReplaceTokens,
+              tokens: loadProperties()
+      )
+    }
+  }
+
+  processTestResources{
+    from(sourceSets.test.resources.srcDirs) {
+      include '**/*.properties'
+      include 'log4j2.xml'
+      filter(org.apache.tools.ant.filters.ReplaceTokens,
+              tokens: loadProperties()
+      )
+    }
+  }
+
+
+   checkstyle{
+     toolVersion=gradleCheckstyleVersion
+     configFile=file("${project.rootDir}/dev-tools/checkstyle/checkstyle.xml")
+     configProperties.checkstyleSuppressionsFile=file("${project.rootDir}/dev-tools/checkstyle/suppressions.xml").absolutePath
+   }
+
+  findbugs {
+    ignoreFailures = true
+    toolVersion = gradleFindbugsVersion
+    sourceSets = [sourceSets.main]
+    effort = "max"
+//    reportLevel = "high"
+//    includeFilter =     file("$rootProject.projectDir/dev-tools/findbugs/includeFilter.xml")
+//    excludeFilter = file("$rootProject.projectDir/dev-tools/findbugs/excludeFilter.xml")
+  }
+  tasks.withType(FindBugs) {
+    reports {
+      xml.enabled = false
+      xml.withMessages = true
+      html.enabled = !xml.isEnabled()
+    }
+  }
+
+  pmd {
+    ignoreFailures = true
+    toolVersion = gradlePMDVersion
+    sourceSets = [sourceSets.main]
+    ruleSets = []
+    ruleSetFiles=files("$rootProject.projectDir/dev-tools/pmd/ruleset.xml")
+  }
+
+  tasks.withType(Pmd){
+    reports{
+      xml.enabled=true
+      html.enabled=true
+    }
+  }
+
+
+
+}
+
+
+task wrapper(type: Wrapper) {
+  gradleVersion = gradleVersion
+  distributionUrl="http://121.40.68.238:8081/nexus/service/local/repositories/gradle-agent/content/gradle/gradle/2.10/gradle-${gradleVersion}-bin.zip"
+}
+
+

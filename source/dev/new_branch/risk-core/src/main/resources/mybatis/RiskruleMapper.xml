@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Riskrule" >
+  <resultMap id="riskruleMap" type="Riskrule" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="rulename" property="rulename" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="category" property="category" jdbcType="VARCHAR" />
+    <result column="discribe" property="discribe" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime"/>
+    <result column="businesstype" property="businesstype" jdbcType="CHAR" />
+    <result column="behavior" property="behavior" jdbcType="CHAR" />
+    <result column="risktype" property="risktype" jdbcType="CHAR" />
+    <result column="riskscore" property="riskscore" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime"/>
+    <result column="userid" property="userid" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="filename" property="filename" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id,rulename, status, category, discribe, createtime, businesstype,
+     behavior, risktype, riskscore,remark, updatetime, userid, username,filename
+  </sql>
+
+  <select id="queryAll" resultMap="riskruleMap" parameterType="Riskrule">
+    <if test="rulename != null">
+      <bind name="rulename" value="rulename + '%'" />
+    </if>
+    SELECT
+    <include refid="columnList" />
+    FROM risk_riskrule
+    <where>
+      <if test="rulename != null and ''!=rulename">
+        rulename LIKE #{rulename}
+      </if>
+      <if test="status != null and ''!=status">
+        AND status = #{status}
+      </if>
+      <if test="category != null and ''!=category">
+        AND category = #{category}
+      </if>
+    </where>
+    order by id
+  </select>
+
+  <select id="queryOne" resultMap="riskruleMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_riskrule
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_riskrule
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="Riskrule" >
+    insert into risk_riskrule (rulename, status, category, 
+      discribe, businesstype,
+      behavior, risktype, riskscore,
+      userid, username,remark,filename
+      )
+    values (#{rulename,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, #{category,jdbcType=VARCHAR}, 
+      #{discribe,jdbcType=VARCHAR}, #{businesstype,jdbcType=CHAR},
+      #{behavior,jdbcType=CHAR}, #{risktype,jdbcType=CHAR}, #{riskscore,jdbcType=VARCHAR},
+      #{userid,jdbcType=SMALLINT}, #{username,jdbcType=VARCHAR},
+      #{remark,jdbcType=VARCHAR},#{filename,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="update" parameterType="Riskrule" >
+    update risk_riskrule
+    set rulename = #{rulename,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR},
+      category = #{category,jdbcType=VARCHAR},
+      discribe = #{discribe,jdbcType=VARCHAR},
+      businesstype = #{businesstype,jdbcType=CHAR},
+      behavior = #{behavior,jdbcType=CHAR},
+      risktype = #{risktype,jdbcType=CHAR},
+      riskscore = #{riskscore,jdbcType=VARCHAR},
+      userid = #{userid,jdbcType=SMALLINT},
+      username = #{username,jdbcType=VARCHAR},
+      remark=#{remark,jdbcType=VARCHAR},
+      filename=#{filename,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="modifyStatus" parameterType="Riskrule" >
+    update risk_riskrule
+    set
+    status = #{status,jdbcType=CHAR},
+    userid = #{userid,jdbcType=SMALLINT},
+    username = #{username,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

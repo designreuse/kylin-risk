@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sitemesh xmlns="http://sitemesh.org/xml/config"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://sitemesh.org/xml/config">
+    <!--默认情况下，
+        sitemesh 只对 HTTP 响应头中 Content-Type 为 text/html 的类型进行拦截和装饰，
+        我们可以添加更多的 mime 类型-->
+    <mime-type>text/html</mime-type>
+    <mime-type>application/xhtml+xml</mime-type>
+
+    <!-- 默认装饰器，当下面的路径都不匹配时，启用该装饰器进行装饰 -->
+    <mapping decorator="/WEB-INF/jsp/include/defaultDecorator.jsp"/>
+    <!-- 对同一路径，启用多个装饰器 -->
+    <!--see org.sitemesh.config.PathMapper.match()-->
+    <mapping>
+        <path>/*/add*.action</path>
+        <path>/*/toModify</path>
+        <path>/*/get*</path>
+        <path>/*/toAdd*</path>
+        <decorator>/WEB-INF/jsp/include/changeDecorator.jsp</decorator>
+    </mapping>
+
+    <mapping>
+        <path>/*/query*</path>
+        <path>/*/toQuery*</path>
+        <decorator>/WEB-INF/jsp/include/queryDecorator.jsp</decorator>
+    </mapping>
+
+    <mapping>
+        <path>/*/toAjax*</path>
+        <decorator>/WEB-INF/jsp/include/ajaxRequest.jsp</decorator>
+    </mapping>
+
+
+    <mapping path="/*/export*.action" exclue="true"/>
+    <mapping path="/lib/**" exclue="true"/>
+    <mapping path="/css/**" exclue="true"/>
+    <mapping path="/js/**" exclue="true"/>
+    <mapping path="/*/_*" exclue="true"/>
+
+    <content-processor>
+        <tag-rule-bundle class="org.sitemesh.content.tagrules.html.DivExtractingTagRuleBundle"/>
+    </content-processor>
+</sitemesh>

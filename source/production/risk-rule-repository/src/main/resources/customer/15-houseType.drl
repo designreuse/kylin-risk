@@ -1,0 +1,46 @@
+package os.nut.drools.EstateInfo;
+//salience:239-220
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.operation.enumType.HouseType;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+
+rule "houseType2"
+    no-loop true
+    salience 239
+    when
+        $estateInfo : CustomerFactor(HouseType.RESIDENTIAL.toString().equals(houseType));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseType("houseType01");
+end
+
+rule "houseType3"
+    no-loop true
+    salience 238
+    when
+        $estateInfo : CustomerFactor( HouseType.RESIDENTIALANDCOMMERCIAL.toString().equals(houseType));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseType("houseType02");
+end
+
+rule "houseType4"
+    no-loop true
+    salience 237
+    when
+        $estateInfo : CustomerFactor(HouseType.COMMERCIAL.toString().equals(houseType));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseType("houseType03");
+end
+
+rule "houseType5"
+    no-loop true
+    salience 236
+    when
+        $estateInfo : CustomerFactor(HouseType.SMALLPROPERTY.toString().equals(houseType));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseType("houseType04");
+end

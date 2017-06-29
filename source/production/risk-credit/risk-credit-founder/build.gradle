@@ -1,0 +1,40 @@
+ext{
+retrofitVersion='2.1.0'
+bouncycastleVersion='1.54'
+}
+version="1.0.0-SNAPSHOT"
+description = '征信-方正银行卡四要素接口'
+dependencies {
+
+  compile "com.squareup.retrofit2:retrofit:${retrofitVersion}"
+  testCompile "com.squareup.retrofit2:retrofit-mock:${retrofitVersion}"
+
+
+  //json begin
+  compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+  compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+  compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+  //json end
+
+  compile "org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}"
+
+
+  provided "org.projectlombok:lombok:${lombokVersion}"
+
+  compile "joda-time:joda-time:${jodaTimeVersion}"
+
+  //log begin
+  compile "org.slf4j:slf4j-api:${slf4jVersion}"
+  compile "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+  compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+  optional "org.slf4j:slf4j-simple:${slf4jVersion}"
+  //log end
+
+
+
+  testCompile "junit:junit:${junitVersion}"
+  testCompile "org.mockito:mockito-all:${mockitoVersion}"
+  testCompile "org.assertj:assertj-core:${assertjVersion}"
+
+
+}

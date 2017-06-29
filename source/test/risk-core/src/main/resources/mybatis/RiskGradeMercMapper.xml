@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RiskGradeMerc">
+  <resultMap id="riskGradeMercMap" type="RiskGradeMerc">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="merchid" jdbcType="VARCHAR" property="merchid" />
+    <result column="merchantid" jdbcType="VARCHAR" property="merchantid" />
+    <result column="merchantname" jdbcType="VARCHAR" property="merchantname" />
+    <result column="totalscore" jdbcType="VARCHAR" property="totalscore" />
+    <result column="grade" jdbcType="CHAR" property="grade" />
+    <result column="checkgrade" jdbcType="CHAR" property="checkgrade" />
+    <result column="lastgrade" jdbcType="CHAR" property="lastgrade" />
+    <result column="lasttime" javaType="DateTime" jdbcType="TIMESTAMP" property="lasttime" />
+    <result column="ototalscore" jdbcType="VARCHAR" property="ototalscore" />
+    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="risktype" jdbcType="CHAR" property="risktype" />
+    <result column="commitid" jdbcType="SMALLINT" property="commitid" />
+    <result column="commitname" jdbcType="VARCHAR" property="commitname" />
+    <result column="committime" javaType="DateTime" jdbcType="TIMESTAMP" property="committime" />
+    <result column="checkid" jdbcType="SMALLINT" property="checkid" />
+    <result column="checkname" jdbcType="VARCHAR" property="checkname" />
+    <result column="checktime" javaType="DateTime" jdbcType="TIMESTAMP" property="checktime" />
+    <result column="updatereason" jdbcType="VARCHAR" property="updatereason" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList">
+    id, merchid, merchantid, merchantname, totalscore, grade, checkgrade, lastgrade, lasttime,
+    ototalscore, status, risktype, createtime,updatetime, commitid, commitname, committime, checkid,
+    checkname, checktime, updatereason
+  </sql>
+  <select id="get" parameterType="integer" resultMap="riskGradeMercMap" >
+    select 
+    <include refid="columnList" />
+    from risk_riskgrade_merc
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer">
+    delete from risk_riskgrade_merc
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="RiskGradeMerc">
+    insert into risk_riskgrade_merc (merchid, merchantid, merchantname, 
+      totalscore, grade, checkgrade, 
+      lastgrade,lasttime, ototalscore, status,
+      risktype,  commitid,
+      commitname, committime, checkid, 
+      checkname, checktime, updatereason
+      )
+    values (#{merchid,jdbcType=VARCHAR}, #{merchantid,jdbcType=VARCHAR}, #{merchantname,jdbcType=VARCHAR}, 
+      #{totalscore,jdbcType=VARCHAR}, #{grade,jdbcType=CHAR}, #{checkgrade,jdbcType=CHAR}, 
+      #{lastgrade,jdbcType=CHAR},#{lasttime,jdbcType=TIMESTAMP}, #{ototalscore,jdbcType=VARCHAR}, #{status,jdbcType=CHAR},
+      #{risktype,jdbcType=CHAR},  #{commitid,jdbcType=SMALLINT},
+      #{commitname,jdbcType=VARCHAR}, #{committime,jdbcType=TIMESTAMP}, #{checkid,jdbcType=SMALLINT}, 
+      #{checkname,jdbcType=VARCHAR}, #{checktime,jdbcType=TIMESTAMP}, #{updatereason,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="update" parameterType="RiskGradeMerc">
+    update risk_riskgrade_merc
+    <set>
+      <if test="grade != null">
+        grade = #{grade,jdbcType=CHAR},
+      </if>
+      <if test="checkgrade != null">
+        checkgrade = #{checkgrade,jdbcType=CHAR},
+      </if>
+      <if test="lastgrade != null">
+        lastgrade = #{lastgrade,jdbcType=CHAR},
+      </if>
+      <if test="lasttime != null">
+        lasttime = #{lasttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ototalscore != null">
+        ototalscore = #{ototalscore,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="commitid != null">
+        commitid = #{commitid,jdbcType=SMALLINT},
+      </if>
+      <if test="commitname != null">
+        commitname = #{commitname,jdbcType=VARCHAR},
+      </if>
+      <if test="committime != null">
+        committime = #{committime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="checkid != null">
+        checkid = #{checkid,jdbcType=SMALLINT},
+      </if>
+      <if test="checkname != null">
+        checkname = #{checkname,jdbcType=VARCHAR},
+      </if>
+      <if test="checktime != null">
+        checktime = #{checktime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatereason != null">
+        updatereason = #{updatereason,jdbcType=VARCHAR}
+      </if>
+      where id = #{id,jdbcType=INTEGER}
+    </set>
+
+  </update>
+  <select id="queryAmlGradeMerc" parameterType="map" resultType="map">
+    select g.id,g.merchantid,g.merchantname,g.grade,g.totalscore,g.checkgrade,g.lastgrade,g.lasttime,g.status,g.createtime
+    from risk_riskgrade_merc g LEFT JOIN risk_merchant m on g.merchid = m.id
+    <where>
+      <if test="merchantid != null and ''!=merchantid">
+        g.merchantid = #{merchantid}
+      </if>
+      <if test="grade != null and ''!=grade">
+        AND g.grade = #{grade}
+      </if>
+
+      <if test="merchantname != null and ''!=merchantname">
+        AND g.merchantname = #{merchantname}
+      </if>
+      <if test="status != null and ''!=status">
+        AND g.status = #{status}
+      </if>
+      <if test="createtime != null and ''!=createtime">
+        AND date_format(g.createtime,'%Y-%m-%d') = #{createtime}
+      </if>
+      <if test="risktype != null and ''!=risktype">
+        AND g.risktype=#{risktype}
+      </if>
+    </where>
+    order by committime
+  </select>
+
+</mapper>

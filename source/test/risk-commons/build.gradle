@@ -1,0 +1,197 @@
+assert org.gradle.api.JavaVersion.current().java7Compatible:
+        "At least Java $javaVersion is required, current JVM is ${org.gradle.api.JavaVersion.current()}"
+
+
+buildscript {
+  repositories {
+    maven {
+      url "http://121.40.68.238:8081/nexus/content/groups/public"
+    }
+    maven { url 'http://repo.spring.io/plugins-release' }
+    mavenCentral()
+    mavenLocal()
+  }
+
+  dependencies {
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+    classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.0.1"
+  }
+}
+configure(subprojects) { project ->
+  group = 'com.rkylin.risk'
+
+
+  ext {
+    slf4jVersion = '1.7.21'
+    log4jVersion = '2.6.1'
+
+
+    springVersion = '4.2.5.RELEASE'
+
+    mybatisVersion = '3.4.0'
+
+
+    jedisVersion = '2.7.3'
+    commonsPoolVerion = '2.3'
+    springDataRedisVersion = '1.7.1.RELEASE'
+
+    mysqlDriverVersion = '5.1.39'
+
+    lombokVersion = '1.16.8'
+
+    servletApiVersion = '3.1.0'
+
+    junitVersion = '4.12'
+    mockitoVersion = '1.10.19'
+    jsonpathVersion = '2.0.0'
+    assertjVersion = '2.4.1'
+    assertGuavaVersion = '2.0.0'
+
+
+    gradleScriptDir = "${rootProject.projectDir}/gradle"
+    javaVersion = JavaVersion.VERSION_1_7
+  }
+
+  apply plugin: 'propdeps'
+  apply plugin: 'java'
+  apply plugin: 'propdeps-idea'
+
+  apply plugin: "org.sonarqube"
+
+  compileJava {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    options.encoding = 'UTF-8'
+  }
+
+  compileTestJava {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    options.encoding = 'UTF-8'
+    options.compilerArgs += "-parameters"
+  }
+
+  repositories {
+    maven { url "http://121.40.68.238:8081/nexus/content/groups/public" }
+    mavenCentral()
+  }
+}
+
+
+
+
+project("risk-commons-entity") {
+  version = "2.0.0"
+
+  description = '通用的实体'
+  dependencies {
+    provided "org.projectlombok:lombok:${lombokVersion}"
+  }
+}
+
+project("risk-mybatis-redis") {
+  group = 'com.rkylin.risk.mybatis.cache'
+  version = "1.0.0"
+  description = 'mybatis的二级缓存redis支持'
+  dependencies {
+
+    compile "org.mybatis:mybatis:${mybatisVersion}"
+
+    //redis begin
+    compile "redis.clients:jedis:${jedisVersion}"
+    compile "org.apache.commons:commons-pool2:${commonsPoolVerion}"
+    optional "org.springframework.data:spring-data-redis:${springDataRedisVersion}"
+    //redis end
+
+    optional("org.springframework:spring-context:${springVersion}") {
+      exclude(group: 'commons-logging', module: 'commons-logging')
+    }
+
+    //log begin
+    compile "org.slf4j:slf4j-api:${slf4jVersion}"
+    compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+    optional "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    optional "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    optional "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+    //log end
+
+    provided "org.projectlombok:lombok:${lombokVersion}"
+
+    testCompile "junit:junit:${junitVersion}"
+    testCompile "org.assertj:assertj-core:${assertjVersion}"
+    testCompile "org.springframework:spring-test:${springVersion}"
+    testCompile "com.jayway.jsonpath:json-path:${jsonpathVersion}"
+  }
+}
+
+project("risk-spring-web") {
+  version = "2.0.0"
+
+  description = 'spring功能增强'
+  dependencies {
+
+    //spring begin
+    compile ("org.springframework:spring-web:${springVersion}"){
+      exclude(group: 'commons-logging', module: 'commons-logging')
+    }
+    //spring end
+
+    compile "javax.servlet:javax.servlet-api:${servletApiVersion}"
+
+    optional "mysql:mysql-connector-java:${mysqlDriverVersion}"
+
+    provided "org.projectlombok:lombok:${lombokVersion}"
+
+
+    //log begin
+    compile "org.slf4j:slf4j-api:${slf4jVersion}"
+    compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+    optional "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    optional "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    optional "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+    //log end
+
+    testCompile "junit:junit:${junitVersion}"
+    testCompile "org.assertj:assertj-core:${assertjVersion}"
+    testCompile "org.springframework:spring-test:${springVersion}"
+  }
+}
+
+project("risk-springmvc-view-extras") {
+  version = "1.0.0-SNAPSHOT"
+
+  description = 'spring mvc view的扩展'
+  dependencies {
+
+
+    //spring begin
+    compile("org.springframework:spring-webmvc:${springVersion}") {
+      exclude(group: 'commons-logging', module: 'commons-logging')
+    }
+    //spring end
+
+    compile "javax.servlet:javax.servlet-api:${servletApiVersion}"
+
+
+    provided "org.projectlombok:lombok:${lombokVersion}"
+
+    //log begin
+    compile "org.slf4j:slf4j-api:${slf4jVersion}"
+    compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+    optional "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    optional "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    optional "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+    //log end
+
+    testCompile "junit:junit:${junitVersion}"
+    testCompile "org.assertj:assertj-core:${assertjVersion}"
+    testCompile "org.springframework:spring-test:${springVersion}"
+    testCompile "com.jayway.jsonpath:json-path:${jsonpathVersion}"
+  }
+}
+
+//在设置project的version后,才能执行publish-maven
+subprojects {
+  apply from: "${gradleScriptDir}/publish-maven.gradle"
+}
+

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="RuleHis" >
+  <resultMap id="ruleHisMap" type="RuleHis" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="groupversionid" property="groupversionid" jdbcType="SMALLINT" />
+    <result column="rulename" property="rulename" jdbcType="VARCHAR" />
+    <result column="rulecode" property="rulecode" jdbcType="VARCHAR" />
+    <result column="ruleclass" property="ruleclass" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="priority" property="priority" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="result" property="result" jdbcType="VARCHAR" />
+    <result column="fields" property="fields" jdbcType="VARCHAR" />
+    <result column="conditions" property="conditions" jdbcType="VARCHAR" />
+    <result column="conditionvals" property="conditionvals" jdbcType="VARCHAR" />
+    <result column="logicsym" property="logicsym" jdbcType="VARCHAR" />
+    <result column="updateoperid" property="updateoperid" jdbcType="SMALLINT" />
+    <result column="updateopername" property="updateopername" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <association column="groupversionid" property="groupVersion" javaType="GroupVersion"  select="GroupVersion.queryById"/>
+  </resultMap>
+  <sql id="columnList" >
+    id,groupversionid, rulename, rulecode, ruleclass, status, priority,remark, updateoperid,
+    updateopername, createtime, updatetime,result,fields,conditions,conditionvals,logicsym
+  </sql>
+  <select id="get" resultMap="ruleHisMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_rule_his
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+
+  <delete id="delete" parameterType="short" >
+    delete from risk_rule_his
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="RuleHis" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+    insert into risk_rule_his (groupversionid,rulename, rulecode, ruleclass,
+      status,priority,
+      remark, updateoperid, updateopername,result,fields,conditions,conditionvals,logicsym
+      )
+    values (#{groupversionid,jdbcType=SMALLINT},#{rulename,jdbcType=VARCHAR}, #{rulecode,jdbcType=VARCHAR}, #{ruleclass,jdbcType=VARCHAR},
+      #{status,jdbcType=VARCHAR},#{priority,jdbcType=VARCHAR},
+      #{remark,jdbcType=VARCHAR}, #{updateoperid,jdbcType=SMALLINT}, #{updateopername,jdbcType=VARCHAR}, #{result,jdbcType=VARCHAR}, #{fields,jdbcType=VARCHAR},
+      #{conditions,jdbcType=VARCHAR}, #{conditionvals,jdbcType=VARCHAR}, #{logicsym,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="update" parameterType="RuleHis" >
+    update risk_rule_his
+    set
+      groupversionid = #{groupversionid,jdbcType=SMALLINT},
+      rulename = #{rulename,jdbcType=VARCHAR},
+      rulecode = #{rulecode,jdbcType=VARCHAR},
+      ruleclass = #{ruleclass,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      priority = #{priority,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      updateoperid = #{updateoperid,jdbcType=SMALLINT},
+      updateopername = #{updateopername,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="queryRuleHis" resultMap="ruleHisMap" parameterType="RuleHis" >
+    SELECT r.* FROM risk_rule_his r
+    <where>
+      groupversionid = #{groupVersionId,jdbcType=SMALLINT}
+    </where>
+    order by r.id desc
+  </select>
+  <select id="queryByGroupVersionId" resultMap="ruleHisMap" parameterType="short" >
+    SELECT <include refid="columnList" />
+    FROM risk_rule_his
+    <where>
+      groupversionid = #{groupversionid,jdbcType=SMALLINT}
+    </where>
+  </select>
+  <select id="queryByRuleids" resultMap="ruleHisMap" parameterType="map">
+    SELECT <include refid="columnList" />
+    FROM risk_rule_his
+    <where>
+      id in
+      <foreach collection="ruleids" index="index" item="ruleid" open="(" separator="," close=")">
+        #{ruleid}
+      </foreach>
+    </where>
+  </select>
+  <insert id="insertBatch" parameterType="list">
+    insert into risk_rule_his (groupversionid,rulename, rulecode, ruleclass,
+    status,priority,
+    remark, updateoperid, updateopername,result,fields,conditions,conditionvals,logicsym
+    )
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+     (#{item.groupversionid,jdbcType=SMALLINT},#{item.rulename,jdbcType=VARCHAR}, #{item.rulecode,jdbcType=VARCHAR}, #{item.ruleclass,jdbcType=VARCHAR},
+    #{item.status,jdbcType=VARCHAR},#{item.priority,jdbcType=VARCHAR},
+    #{item.remark,jdbcType=VARCHAR}, #{item.updateoperid,jdbcType=SMALLINT}, #{item.updateopername,jdbcType=VARCHAR}, #{item.result,jdbcType=VARCHAR}, #{item.fields,jdbcType=VARCHAR},
+    #{item.conditions,jdbcType=VARCHAR}, #{item.conditionvals,jdbcType=VARCHAR}, #{item.logicsym,jdbcType=VARCHAR}
+    )
+    </foreach>
+  </insert>
+</mapper>

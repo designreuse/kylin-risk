@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Risklevel" >
+  <resultMap id="risklevelMap" type="Risklevel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="target" property="target" jdbcType="VARCHAR" />
+    <result column="weight" property="weight" jdbcType="VARCHAR" />
+    <result column="project" property="project" jdbcType="VARCHAR" />
+    <result column="classdesc" property="classdesc" jdbcType="VARCHAR" />
+    <result column="classscore" property="classscore" jdbcType="VARCHAR" />
+    <result column="score" property="score" jdbcType="VARCHAR" />
+    <result column="checkscore" property="checkscore" jdbcType="VARCHAR" />
+    <result column="account" property="account" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="customertype" property="customertype" jdbcType="CHAR" />
+    <result column="risktype" property="risktype" jdbcType="CHAR" />
+    <result column="userid" property="userid" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, target, weight, project, classdesc, classscore, score,checkscore,account, remark, customertype,
+    risktype, userid, username, updatetime
+  </sql>
+  <select id="get" resultMap="risklevelMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_risklevel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_risklevel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="Risklevel" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+    insert into risk_risklevel (target, weight, project, 
+      classdesc, classscore, score,checkscore,account,
+      remark, customertype, risktype, 
+      userid, username
+      )
+    values (#{target,jdbcType=VARCHAR}, #{weight,jdbcType=VARCHAR}, #{project,jdbcType=VARCHAR}, 
+      #{classdesc,jdbcType=VARCHAR}, #{classscore,jdbcType=VARCHAR}, #{score,jdbcType=VARCHAR},#{checkscore,jdbcType=VARCHAR}, #{account,jdbcType=VARCHAR},
+      #{remark,jdbcType=VARCHAR}, #{customertype,jdbcType=CHAR}, #{risktype,jdbcType=CHAR}, 
+      #{userid,jdbcType=SMALLINT}, #{username,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="update" parameterType="Risklevel" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+    update risk_risklevel
+    <set>
+      <if test="target != null">
+        target = #{target,jdbcType=VARCHAR},
+      </if>
+      <if test="weight != null">
+        weight = #{weight,jdbcType=VARCHAR},
+      </if>
+      <if test="project != null">
+        project = #{project,jdbcType=VARCHAR},
+      </if>
+      <if test="classdesc != null">
+        classdesc = #{classdesc,jdbcType=VARCHAR},
+      </if>
+      <if test="classscore != null">
+        classscore = #{classscore,jdbcType=VARCHAR},
+      </if>
+      <if test="score != null">
+        score = #{score,jdbcType=VARCHAR},
+      </if>
+      <if test="checkscore != null">
+        checkscore = #{checkscore,jdbcType=VARCHAR},
+      </if>
+      <if test="account != null">
+        account = #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="customertype != null">
+        customertype = #{customertype,jdbcType=CHAR},
+      </if>
+      <if test="risktype != null">
+        risktype = #{risktype,jdbcType=CHAR},
+      </if>
+      <if test="userid != null">
+        userid = #{userid,jdbcType=SMALLINT},
+      </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryByRiskAndCustType" parameterType="Risklevel" resultMap="risklevelMap">
+    select <include refid="columnList"></include>
+    from risk_risklevel
+    where customertype = #{customertype,jdbcType=CHAR}
+    and risktype = #{risktype,jdbcType=CHAR}
+  </select>
+</mapper>

@@ -1,0 +1,15 @@
+rootProject.name = 'risk'
+include 'risk-core'
+include 'risk-boss'
+include 'risk-service'
+include 'risk-service-web'
+include 'risk-test'
+
+
+rootProject.children.each { project ->
+  if(project.projectDir.exists()){
+    assert project.projectDir.isDirectory()
+    assert project.buildFile.exists()
+    assert project.buildFile.isFile()
+  }
+}

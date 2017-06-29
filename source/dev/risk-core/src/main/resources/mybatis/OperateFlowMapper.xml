@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="OperateFlow" >
+  <resultMap id="operateFlowMap" type="OperateFlow" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="checkorderid" property="checkorderid" jdbcType="VARCHAR" />
+    <result column="customerid" property="customerid" jdbcType="VARCHAR" />
+    <result column="resultstatus" property="resultstatus" jdbcType="CHAR" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="riskmsg" property="riskmsg" jdbcType="VARCHAR" />
+    <result column="ruleid" property="ruleid" jdbcType="VARCHAR" />
+    <result column="classname" property="classname" jdbcType="VARCHAR" />
+    <result column="classprice" property="classprice" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="courseId" property="courseId" jdbcType="VARCHAR"/>
+    <result column="corporationId" property="corporationId" jdbcType="VARCHAR"/>
+    <result column="corporationname" property="corporationname" jdbcType="VARCHAR"/>
+    <result column="couserStairClassify" property="couserStairClassify" jdbcType="VARCHAR"/>
+    <result column="courseSecondaryClassify" property="courseSecondaryClassify" jdbcType="VARCHAR"/>
+    <result column="constId" property="constId" jdbcType="VARCHAR"/>
+    <result column="mtApiStatus" property="mtApiStatus" jdbcType="VARCHAR"/>
+    <result column="mtMsg" property="mtMsg" jdbcType="VARCHAR"/>
+    <result column="mtReport" property="mtReport" jdbcType="VARCHAR"/>
+    <result column="mtAvailableAmount" property="mtAvailableAmount" jdbcType="VARCHAR"/>
+    <result column="mtcreditAmount" property="mtcreditAmount" jdbcType="VARCHAR"/>
+    <result column="mtcreidtScore" property="mtcreidtScore" jdbcType="VARCHAR"/>
+    <result column="mtmainstatus" property="mtmainstatus" jdbcType="VARCHAR"/>
+    <result column="mtverifystatus" property="mtverifystatus" jdbcType="VARCHAR"/>
+    <result column="mtverifyreason" property="mtverifyreason" jdbcType="VARCHAR"/>
+    <result column="isstudent" property="isstudent" jdbcType="VARCHAR"/>
+    <result column="schoolarea" property="schoolarea" jdbcType="VARCHAR"/>
+    <result column="enroldate" property="enroldate" jdbcType="VARCHAR"/>
+    <result column="finishschool" property="finishschool" jdbcType="VARCHAR"/>
+    <result column="workcompanyname" property="workcompanyname" jdbcType="VARCHAR"/>
+    <result column="workcompanynature" property="workcompanynature" jdbcType="VARCHAR"/>
+    <result column="workcompanyaddress" property="workcompanyaddress" jdbcType="VARCHAR"/>
+    <result column="worktitle" property="worktitle" jdbcType="VARCHAR"/>
+    <result column="urlkeys" property="urlkeys" jdbcType="VARCHAR"/>
+    <result column="creditcard" property="creditcard" jdbcType="VARCHAR"/>
+    <result column="businesstype" property="businesstype" jdbcType="VARCHAR"/>
+    <result column="sceneStatus" property="sceneStatus" jdbcType="VARCHAR"/>
+    <result column="logourlkey" property="logourlkey" jdbcType="VARCHAR"/>
+    <result column="contracturlkey" property="contracturlkey" jdbcType="VARCHAR"/>
+    <result column="photographytype" property="photographytype" jdbcType="VARCHAR"/>
+    <result column="schoolprovince" property="schoolprovince" jdbcType="VARCHAR"/>
+    <result column="schoolcity" property="schoolcity" jdbcType="VARCHAR"/>
+    <result column="salary" property="salary" jdbcType="VARCHAR"/>
+    <result column="unitfulladdress" property="unitfulladdress" jdbcType="VARCHAR"/>
+    <result column="currentaddress" property="currentaddress" jdbcType="VARCHAR"/>
+    <result column="currentfulladdress" property="currentfulladdress" jdbcType="VARCHAR"/>
+    <result column="checkmethod" property="checkmethod" jdbcType="VARCHAR"/>
+    <result column="orderstatus" property="orderstatus" jdbcType="VARCHAR"/>
+    <result column="ordercommitcount" property="ordercommitcount" jdbcType="VARCHAR"/>
+    <result column="personcommitcount" property="personcommitcount" jdbcType="VARCHAR"/>
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, checkorderid,customerid, resultstatus, reason, riskmsg, ruleid, classname, classprice,
+    courseId, corporationId, corporationname, couserStairClassify, courseSecondaryClassify,
+    constId,mtApiStatus,mtMsg,mtReport,mtAvailableAmount,mtcreditAmount,mtcreidtScore,mtmainstatus,mtverifystatus,mtverifyreason,
+    isstudent,schoolarea,enroldate,finishschool,workcompanyname,workcompanynature,workcompanyaddress,worktitle,urlkeys,creditcard,sceneStatus,
+    businesstype,logourlkey,contracturlkey,photographytype,schoolprovince,schoolcity,salary,unitfulladdress,currentaddress,currentfulladdress,
+    checkmethod,orderstatus,ordercommitcount,personcommitcount, createtime, updatetime
+  </sql>
+  <select id="get" resultMap="operateFlowMap" parameterType="long" >
+    select 
+    <include refid="columnList" />
+    from risk_operateflow
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="delete" parameterType="long" >
+    delete from risk_operateflow
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="OperateFlow" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_operateflow (checkorderid, customerid, resultstatus, reason,
+      riskmsg, ruleid, classname, classprice, courseId, corporationId,corporationname,couserStairClassify,
+      courseSecondaryClassify, constId,mtApiStatus,mtMsg,mtReport,mtAvailableAmount,mtcreditAmount,mtcreidtScore,mtmainstatus,
+      mtverifystatus,mtverifyreason,isstudent,schoolarea,enroldate,finishschool,workcompanyname,
+      workcompanynature,workcompanyaddress,worktitle,urlkeys,creditcard,sceneStatus,businesstype,
+      logourlkey,contracturlkey,photographytype,schoolprovince,schoolcity,salary,unitfulladdress,
+      currentaddress,currentfulladdress,checkmethod,orderstatus,ordercommitcount,personcommitcount
+     )
+    values (#{checkorderid,jdbcType=VARCHAR},#{customerid,jdbcType=VARCHAR}, #{resultstatus,jdbcType=CHAR}, #{reason,jdbcType=VARCHAR},
+      #{riskmsg,jdbcType=VARCHAR}, #{ruleid,jdbcType=VARCHAR}, #{classname,jdbcType=VARCHAR}, #{classprice,jdbcType=DECIMAL},
+      #{courseId,jdbcType=VARCHAR}, #{corporationId,jdbcType=VARCHAR}, #{corporationname,jdbcType=VARCHAR},
+      #{couserStairClassify,jdbcType=VARCHAR}, #{courseSecondaryClassify,jdbcType=VARCHAR},
+      #{constId,jdbcType=VARCHAR},#{mtApiStatus,jdbcType=VARCHAR},#{mtMsg,jdbcType=VARCHAR},
+      #{mtReport,jdbcType=VARCHAR},#{mtAvailableAmount,jdbcType=VARCHAR},#{mtcreditAmount,jdbcType=VARCHAR},
+      #{mtcreidtScore,jdbcType=VARCHAR},#{mtmainstatus,jdbcType=VARCHAR},#{mtverifystatus,jdbcType=VARCHAR},#{mtverifyreason,jdbcType=VARCHAR},
+      #{isstudent,jdbcType=VARCHAR},#{schoolarea,jdbcType=VARCHAR},
+      #{enroldate,jdbcType=VARCHAR},#{finishschool,jdbcType=VARCHAR},#{workcompanyname,jdbcType=VARCHAR},
+      #{workcompanynature,jdbcType=VARCHAR},#{workcompanyaddress,jdbcType=VARCHAR},#{worktitle,jdbcType=VARCHAR},
+      #{urlkeys,jdbcType=VARCHAR},#{creditcard,jdbcType=VARCHAR},#{sceneStatus,jdbcType=VARCHAR},#{businesstype,jdbcType=VARCHAR},
+      #{logourlkey,jdbcType=VARCHAR},
+      #{contracturlkey,jdbcType=VARCHAR},
+      #{photographytype,jdbcType=VARCHAR},
+      #{schoolprovince,jdbcType=VARCHAR},
+      #{schoolcity,jdbcType=VARCHAR},
+      #{salary,jdbcType=VARCHAR},
+      #{unitfulladdress,jdbcType=VARCHAR},
+      #{currentaddress,jdbcType=VARCHAR},
+      #{currentfulladdress,jdbcType=VARCHAR},
+      #{checkmethod,jdbcType=VARCHAR},
+      #{orderstatus,jdbcType=VARCHAR},
+      #{ordercommitcount,jdbcType=VARCHAR},
+      #{personcommitcount,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="update" parameterType="OperateFlow" >
+    update risk_operateflow
+    set
+      checkorderid = #{checkorderid,jdbcType=VARCHAR},
+      customerid = #{customerid,jdbcType=VARCHAR},
+      resultstatus = #{resultstatus,jdbcType=CHAR},
+      reason = #{reason,jdbcType=VARCHAR},
+      riskmsg = #{riskmsg,jdbcType=VARCHAR},
+      ruleid = #{ruleid,jdbcType=VARCHAR},
+      classname = #{classname,jdbcType=VARCHAR},
+      classprice = #{classprice,jdbcType=DECIMAL},
+      courseId = #{courseId,jdbcType=VARCHAR},
+      corporationId = #{corporationId,jdbcType=VARCHAR},
+      corporationname = #{corporationname,jdbcType=VARCHAR},
+      couserStairClassify = #{couserStairClassify,jdbcType=VARCHAR},
+      courseSecondaryClassify = #{courseSecondaryClassify,jdbcType=VARCHAR},
+      constId = #{constId,jdbcType=VARCHAR},
+      mtApiStatus = #{mtApiStatus,jdbcType=VARCHAR},
+      mtMsg = #{mtMsg,jdbcType=VARCHAR},
+      mtReport = #{mtReport,jdbcType=VARCHAR},
+      mtAvailableAmount = #{mtAvailableAmount,jdbcType=VARCHAR},
+      mtcreditAmount = #{mtcreditAmount,jdbcType=VARCHAR},
+      mtcreidtScore = #{mtcreidtScore,jdbcType=VARCHAR},
+      mtmainstatus = #{mtmainstatus,jdbcType=VARCHAR},
+      mtverifystatus = #{mtverifystatus,jdbcType=VARCHAR},
+      mtverifyreason = #{mtverifyreason,jdbcType=VARCHAR},
+      isstudent = #{isstudent,jdbcType=VARCHAR},
+      schoolarea = #{schoolarea,jdbcType=VARCHAR},enroldate = #{enroldate,jdbcType=VARCHAR},
+      finishschool = #{finishschool,jdbcType=VARCHAR},workcompanyname = #{workcompanyname,jdbcType=VARCHAR},
+      workcompanynature = #{workcompanynature,jdbcType=VARCHAR},workcompanyaddress = #{workcompanyaddress,jdbcType=VARCHAR},
+      worktitle = #{worktitle,jdbcType=VARCHAR},urlkeys = #{urlkeys,jdbcType=VARCHAR},creditcard = #{creditcard,jdbcType=VARCHAR},
+      sceneStatus = #{sceneStatus,jdbcType=VARCHAR},businesstype = #{businesstype,jdbcType=VARCHAR},
+      logourlkey=#{logourlkey,jdbcType=VARCHAR},
+      contracturlkey=#{contracturlkey,jdbcType=VARCHAR},
+      photographytype=#{photographytype,jdbcType=VARCHAR},
+      schoolprovince=#{schoolprovince,jdbcType=VARCHAR},
+      schoolcity=#{schoolcity,jdbcType=VARCHAR},
+      salary=#{salary,jdbcType=VARCHAR},
+      unitfulladdress=#{unitfulladdress,jdbcType=VARCHAR},
+      currentaddress=#{currentaddress,jdbcType=VARCHAR},
+      currentfulladdress=#{currentfulladdress,jdbcType=VARCHAR},
+      checkmethod=#{checkmethod,jdbcType=VARCHAR},
+      orderstatus=#{orderstatus,jdbcType=VARCHAR},
+      ordercommitcount=#{ordercommitcount,jdbcType=VARCHAR},
+      personcommitcount=#{personcommitcount,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="queryByCheckorderid" resultMap="operateFlowMap" parameterType="String">
+    SELECT
+    <include refid="columnList"/>
+    FROM risk_operateflow
+    WHERE checkorderid = #{checkorderid, jdbcType=VARCHAR}
+  </select>
+
+  <select id="queryByConstidAndStatus" resultMap="operateFlowMap" parameterType="map">
+    SELECT
+    <include refid="columnList"/>
+    FROM risk_operateflow
+    where mtapistatus=#{mtApiStatus} AND resultstatus is null AND constid IN
+    <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="queryOperFlow" resultMap="operateFlowMap" parameterType="OperateFlow">
+    <if test="customerid != null">
+      <bind name="customerid" value="'%' + customerid + '%'" />
+    </if>
+    select
+    <include refid="columnList" />
+    from risk_operateflow
+    <where>
+      <if test="checkorderid != null and ''!=checkorderid">
+        and checkorderid = #{checkorderid}
+      </if>
+
+      <if test="customerid != null and ''!=customerid">
+      and customerid like #{customerid}
+      </if>
+      <if test="resultstatus != null and ''!=resultstatus">
+      and resultstatus = #{resultstatus}
+      </if>
+    </where>
+    order by id
+  </select>
+
+
+  <select id="queryByCustomerid" resultMap="operateFlowMap" parameterType="string" >
+    select
+    <include refid="columnList" />
+    from risk_operateflow
+    where customerid = #{customerid,jdbcType=VARCHAR} ORDER BY createtime DESC LIMIT 1
+  </select>
+
+
+  <update id="updateOperFlowStatus" parameterType="OperateFlow">
+    UPDATE risk_operateflow
+    SET resultstatus = #{resultstatus}
+    <if test="reason != null and reason != ''">
+      , reason = #{reason}
+    </if>
+    <if test="orderstatus != null and orderstatus != ''">
+    , orderstatus=#{orderstatus}
+    </if>
+    WHERE checkorderid = #{checkorderid}
+  </update>
+
+  <update id="updateOperFlowByOrder" parameterType="OperateFlow">
+    UPDATE risk_operateflow
+    SET  riskmsg = #{riskmsg}, orderstatus=#{orderstatus},ordercommitcount = #{ordercommitcount}
+    WHERE checkorderid = #{checkorderid}
+  </update>
+
+  <update id="updateMitouResponse" parameterType="OperateFlow">
+    UPDATE risk_operateflow
+    SET mtapistatus = #{mtApiStatus}, mtmsg = #{mtMsg},mtreport=#{mtReport}
+    ,mtavailableamount=#{mtAvailableAmount},mtcreditamount=#{mtcreditAmount}
+    ,mtcreidtscore=#{mtcreidtScore},mtmainstatus=#{mtmainstatus}
+    ,mtverifystatus=#{mtverifystatus},mtverifyreason=#{mtverifyreason},
+    sceneStatus=#{sceneStatus}
+    WHERE checkorderid = #{checkorderid}
+  </update>
+
+
+</mapper>

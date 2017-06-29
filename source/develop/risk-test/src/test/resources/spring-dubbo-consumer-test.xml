@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd
+       http://code.alibabatech.com/schema/dubbo
+	   http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+  <context:property-placeholder location="classpath:/risk.properties" />
+
+  <dubbo:application name="rule-serive-test" />
+  <dubbo:registry protocol="zookeeper" address="${zookeeper.address}" timeout="12000"/>
+
+
+  <!--default reference options-->
+  <dubbo:consumer id="dubboConsumer" default="true" version="1.0" retries="2" check="false"/>
+
+  <!--dubbo consumer begin-->
+  <dubbo:reference id="orderApiTest" interface="com.rkylin.risk.order.api.OrderApi" group="riskOrderApi" protocol="dubbo"/>
+
+  <!--dubbo consumer end-->
+
+</beans>

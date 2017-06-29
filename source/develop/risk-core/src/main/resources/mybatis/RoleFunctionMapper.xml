@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="RoleFunction" >
+  <cache type="com.rkylin.risk.mybatis.cache.RedisCache"/>
+  <resultMap id="roleFunctionMap" type="RoleFunction" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="roleid" property="roleid" jdbcType="SMALLINT" />
+    <result column="functionid" property="functionid" jdbcType="SMALLINT" />
+  </resultMap>
+  <sql id="columnList" >
+    id, roleid, functionid
+  </sql>
+  <select id="queryAll" resultMap="roleFunctionMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_role_function
+    where roleid = #{roleid,jdbcType=SMALLINT}
+  </select>
+
+  <delete id="delete" parameterType="short" >
+    delete from risk_role_function
+    where roleid = #{roleid,jdbcType=SMALLINT}
+  </delete>
+
+  <insert id="insert" parameterType="RoleFunction" >
+    insert into risk_role_function (roleid, functionid)
+    values (#{roleid,jdbcType=SMALLINT}, #{functionid,jdbcType=SMALLINT})
+  </insert>
+
+  <update id="update" parameterType="RoleFunction" >
+    update risk_role_function
+    set roleid = #{roleid,jdbcType=SMALLINT},
+      functionid = #{functionid,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+</mapper>

@@ -1,0 +1,55 @@
+package os.nut.drools.deposit;
+
+import com.rkylin.risk.service.bean.DepositCode;
+import com.rkylin.risk.service.bean.DepositFactor;
+
+rule "interval1"
+    no-loop true
+    salience 145
+    when
+         deposit : DepositFactor(interval!=null&&interval.isLesserThan(0.5))
+         code:DepositCode()
+    then
+        code.setInterval("depInterval01");
+
+end
+
+rule "interval2"
+    no-loop true
+    salience 144
+    when
+         deposit : DepositFactor(interval!=null&&interval.isGreaterOrEqualThan(0.5)&&interval.isLesserThan(1))
+         code:DepositCode()
+    then
+        code.setInterval("depInterval02");
+end
+
+rule "interval3"
+    no-loop true
+    salience 143
+    when
+         deposit : DepositFactor(interval!=null&&interval.isGreaterOrEqualThan(1)&&interval.isLesserThan(3))
+         code:DepositCode()
+    then
+        code.setInterval("depInterval03");
+end
+
+rule "interval4"
+    no-loop true
+    salience 142
+    when
+         deposit : DepositFactor(interval!=null&&interval.isGreaterOrEqualThan(3)&&interval.isLesserThan(12))
+         code:DepositCode()
+    then
+        code.setInterval("depInterval04");
+end
+
+rule "interval5"
+    no-loop true
+    salience 141
+    when
+         deposit : DepositFactor(interval!=null&&interval.isGreaterOrEqualThan(12))
+         code:DepositCode()
+    then
+        code.setInterval("depInterval05");
+end

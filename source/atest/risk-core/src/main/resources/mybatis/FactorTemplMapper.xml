@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="FactorTempl" >
+  <resultMap id="factorTemplMap" type="FactorTempl" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="groupid" property="groupid" jdbcType="SMALLINT"  />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <association column="groupid" property="group" javaType="Group"  select="Group.queryByGroupid"/>
+  </resultMap>
+  <sql id="columnList" >
+    id,groupid, name, code, createtime, updatetime
+  </sql>
+  <select id="get" resultMap="factorTemplMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_factor_templ
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="delete" parameterType="short" >
+    delete from risk_factor_templ
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="FactorTempl" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_factor_templ (groupid,name, code)
+    values (#{groupid,jdbcType=SMALLINT},#{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="FactorTempl" >
+    update risk_factor_templ
+    <set>
+    <if test="groupid != null">
+      groupid = #{groupid,jdbcType=SMALLINT},
+    </if>
+    <if test="name != null">
+      name = #{name,jdbcType=VARCHAR},
+    </if>
+    <if test="code != null">
+      code = #{code,jdbcType=VARCHAR},
+    </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <select id="queryByGroup" resultMap="factorTemplMap" parameterType="short" >
+    select
+    <include refid="columnList" />
+    from risk_factor_templ
+    where groupid = #{groupid,jdbcType=VARCHAR}
+  </select>
+  <select id="queryFactorTempl" resultMap="factorTemplMap" parameterType="FactorTempl" >
+    <if test="factorname!=null and ''!=factorname">
+      <bind name="factorname" value="'%'+factorname + '%'" />
+    </if>
+    select
+    <include refid="columnList" />
+    from risk_factor_templ
+    <where>
+      <if test="factorname!=null and factorname != ''">
+        name like #{factorname,jdbcType=VARCHAR}
+      </if>
+      <if test="groupid!=null and groupid != ''">
+       and  groupid = #{groupid,jdbcType=SMALLINT}
+      </if>
+    </where>
+    order by groupid,id
+  </select>
+</mapper>

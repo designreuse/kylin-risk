@@ -1,0 +1,47 @@
+package os.nut.drools.PubRecord;
+//salience:419-400 违法违规记录
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "illegalRecord2"
+    no-loop true
+    salience 418
+    when
+        $illegalRecord : CustomerFactor(illegalRecord=="ADMPENALTY");//有行政处罚记录
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setIllegalRecord("illegalRecord01");
+end
+
+rule "illegalRecord3"
+    no-loop true
+    salience 417
+    when
+        $illegalRecord : CustomerFactor( illegalRecord=="CIVILCOMPLETE");//民事诉讼被执行完
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setIllegalRecord("illegalRecord02");
+end
+
+
+rule "illegalRecord4"
+    no-loop true
+    salience 416
+    when
+        $illegalRecord : CustomerFactor( illegalRecord=="CIVILPROCEEDING");//民事诉讼执行中
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setIllegalRecord("illegalRecord02");
+end
+
+rule "illegalRecord5"
+    no-loop true
+    salience 419
+    when
+        $illegalRecord : CustomerFactor( illegalRecord=="CROWNASE")//涉毒、涉赌刑事案件
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMsg("违法违规记录中有涉毒、涉赌等刑事案件");
+        retract($illegalRecord);
+
+end

@@ -1,0 +1,177 @@
+
+package risk.drools.customerrule;
+
+import com.rkylin.risk.core.dto.LogicRuleBean;
+import com.rkylin.risk.core.dto.ResultBean;
+
+rule "customer1"
+no-loop true
+salience 99
+when
+ruleBean : LogicRuleBean(
+                                                                    (dayPayRate!=null&&  dayPayRate.isGreaterOrEqualThan(10)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("101");
+    resultBean.setOffMsg("日培训收入*1000%≤日放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer2"
+no-loop true
+salience 98
+when
+ruleBean : LogicRuleBean(
+                                                                    (dayPayRate!=null&&  dayPayRate.isGreaterOrEqualThan(5)
+  )                                  &&                                                (dayPayRate1!=null&&  dayPayRate1.isGreaterOrEqualThan(5)
+  )                                  &&                                                (dayPayRate2!=null&&  dayPayRate2.isGreaterOrEqualThan(5)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("102");
+    resultBean.setOffMsg("日培训收入*500%≤连续三天日日放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer3"
+no-loop true
+salience 97
+when
+ruleBean : LogicRuleBean(
+                                                                    (monthPayRate!=null&&  monthPayRate.isGreaterOrEqualThan(4.5)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("103");
+    resultBean.setOffMsg("月培训收入*450%≤月放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer4"
+no-loop true
+salience 96
+when
+ruleBean : LogicRuleBean(
+                                                                    (seasonPayRate!=null&&  seasonPayRate.isGreaterOrEqualThan(3)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("104");
+    resultBean.setOffMsg("季培训收入*300%≤季放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer5"
+no-loop true
+salience 95
+when
+ruleBean : LogicRuleBean(
+                                                                    (yearPayRate!=null&&  yearPayRate.isGreaterOrEqualThan(2)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("105");
+    resultBean.setOffMsg("年培训收入*200%≤年放款额"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer6"
+no-loop true
+salience 94
+when
+ruleBean : LogicRuleBean(
+                                                    (                (dayPayGrowthRate!=null&&  dayPayGrowthRate.isLesserOrEqualThan(-0.3)
+  )                                  &&                                                (dayPayGrowthRate1!=null&&  dayPayGrowthRate1.isLesserOrEqualThan(-0.3)
+  )                                  &&                                                (dayPayGrowthRate2!=null&&  dayPayGrowthRate2.isLesserOrEqualThan(-0.3)
+  )                                  &&                                                (dayPayGrowthRate3!=null&&  dayPayGrowthRate3.isLesserOrEqualThan(-0.3)
+  )                                  &&                                                (dayPayGrowthRate4!=null&&  dayPayGrowthRate4.isLesserOrEqualThan(-0.3)
+  )                                  &&                                                (dayPayGrowthRate5!=null&&  dayPayGrowthRate5.isLesserOrEqualThan(-0.3)
+  )                                  &&                                                (dayPayGrowthRate6!=null&&  dayPayGrowthRate6.isLesserOrEqualThan(-0.3)
+  )                )                  ||                                (                (dayPayGrowthRate!=null&&  dayPayGrowthRate.isGreaterOrEqualThan(0.3)
+  )                                  &&                                                (dayPayGrowthRate1!=null&&  dayPayGrowthRate1.isGreaterOrEqualThan(0.3)
+  )                                  &&                                                (dayPayGrowthRate2!=null&&  dayPayGrowthRate2.isGreaterOrEqualThan(0.3)
+  )                                  &&                                                (dayPayGrowthRate3!=null&&  dayPayGrowthRate3.isGreaterOrEqualThan(0.3)
+  )                                  &&                                                (dayPayGrowthRate4!=null&&  dayPayGrowthRate4.isGreaterOrEqualThan(0.3)
+  )                                  &&                                                (dayPayGrowthRate5!=null&&  dayPayGrowthRate5.isGreaterOrEqualThan(0.3)
+  )                                  &&                                                (dayPayGrowthRate6!=null&&  dayPayGrowthRate6.isGreaterOrEqualThan(0.3)
+  )                )  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("106");
+    resultBean.setOffMsg("日放款连7日日增长率≤-30%或≥30%"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer7"
+no-loop true
+salience 93
+when
+ruleBean : LogicRuleBean(
+                                                                    (dayNumRate!=null&&  dayNumRate.isGreaterOrEqualThan(10)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("107");
+    resultBean.setOffMsg("日培训人数*1000%≤日放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer8"
+no-loop true
+salience 92
+when
+ruleBean : LogicRuleBean(
+                                                                    (dayNumRate!=null&&  dayNumRate.isGreaterOrEqualThan(5)
+  )                                  &&                                                (dayNumRate1!=null&&  dayNumRate1.isGreaterOrEqualThan(5)
+  )                                  &&                                                (dayNumRate2!=null&&  dayNumRate2.isGreaterOrEqualThan(5)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("108");
+    resultBean.setOffMsg("日培训人数*500%≤连续三天日日放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer9"
+no-loop true
+salience 91
+when
+ruleBean : LogicRuleBean(
+                                                                    (monthNumRate!=null&&  monthNumRate.isGreaterOrEqualThan(4.5)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("109");
+    resultBean.setOffMsg("月培训人数*450%≤月放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer10"
+no-loop true
+salience 90
+when
+ruleBean : LogicRuleBean(
+                                                                    (seasonNumRate!=null&&  seasonNumRate.isGreaterOrEqualThan(3)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("110");
+    resultBean.setOffMsg("季培训人数*300%≤季放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end
+rule "customer11"
+no-loop true
+salience 89
+when
+ruleBean : LogicRuleBean(
+                                                                    (yearNumRate!=null&&  yearNumRate.isGreaterOrEqualThan(2)
+  )                  );
+resultBean : ResultBean();
+then
+      resultBean.setIsOff("1");
+    resultBean.setRuleids("111");
+    resultBean.setOffMsg("年培训人数*200%≤年放款人数"+",导致禁入！");
+    retract(ruleBean);
+ end

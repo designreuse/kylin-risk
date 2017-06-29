@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+	   http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+       <dubbo:application name="risk-service-test"/>
+       <dubbo:registry protocol="zookeeper" file="risk-service-test.cache" address="${zookeeper.address}" timeout="12000"/>
+       <dubbo:protocol name="dubbo" port="${dubbo.port}"  dispatcher="all" threadpool="fixed"  threads="100" host="${dubbo.address}"/>
+
+
+
+       <!--consumer service start-->
+       <dubbo:consumer id="dubboConsumer" default="true" version="1.0" retries="0" check="false"></dubbo:consumer>
+       <dubbo:reference id="orderApi" interface="com.rkylin.risk.order.api.OrderApi" group="riskOrderApi"  protocol="dubbo" timeout="5000"/>
+       <dubbo:reference id="personApi" interface="com.rkylin.risk.operation.api.PersonApi" group="riskPersonApi"  protocol="dubbo" timeout="12000"/>
+       <!--consumer service end-->
+
+</beans>

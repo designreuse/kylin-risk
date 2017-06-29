@@ -1,0 +1,26 @@
+package os.nut.drools.recharge;
+
+import com.rkylin.risk.service.bean.RechargeFactor;
+
+import com.rkylin.risk.service.bean.RechargeCode;
+
+rule "rechway1"
+    no-loop true
+    salience 77
+    when
+         recharge : RechargeFactor( rechway=="gateway")
+         code:RechargeCode()
+    then
+        code.setRechway("recRechway01");
+
+end
+
+rule "rechway2"
+    no-loop true
+    salience 76
+    when
+         recharge : RechargeFactor( rechway =="quick" )
+         code:RechargeCode()
+    then
+        code.setRechway("recRechway02");
+end

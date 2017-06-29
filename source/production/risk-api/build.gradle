@@ -1,0 +1,61 @@
+project.ext {
+  lombokVersion = '1.16.8'
+  gradleScriptDir = "${rootProject.projectDir}/gradle"
+  javaVersion = JavaVersion.VERSION_1_6
+}
+
+assert org.gradle.api.JavaVersion.current().java6Compatible:"At least Java $javaVersion is required, current JVM is ${org.gradle.api.JavaVersion.current()}"
+
+buildscript {
+  repositories {
+    maven {
+      url "http://121.40.68.238:8081/nexus/content/groups/public"
+    }
+    maven { url 'http://repo.spring.io/plugins-release' }
+    mavenCentral()
+    mavenLocal()
+  }
+
+  dependencies {
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+  }
+}
+
+
+
+
+
+
+subprojects {
+
+  apply plugin: 'java'
+
+  apply plugin: 'propdeps'
+  apply plugin: 'propdeps-idea'
+  apply from: "${gradleScriptDir}/publish-maven.gradle"
+
+  sourceCompatibility = javaVersion
+  targetCompatibility = javaVersion
+
+  group = 'com.rkylin.risk'
+
+  repositories {
+    maven { url "http://121.40.68.238:8081/nexus/content/groups/public" }
+    mavenCentral()
+  }
+
+  tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+  }
+
+  javadoc {
+    options{
+      encoding = "UTF-8"
+      charSet 'UTF-8'
+      version true
+      author true
+      links "http://docs.oracle.com/javase/7/docs/api"
+    }
+  }
+}
+

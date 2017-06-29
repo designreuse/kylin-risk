@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:task="http://www.springframework.org/schema/task"
+		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xsi:schemaLocation="
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+			http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task-4.2.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+<context:component-scan base-package="com.rkylin.risk.service.biz.impl,com.rkylin.risk.service.api.impl"
+			name-generator="com.rkylin.risk.core.common.AnnotationBeanNameDependInterfaceGenerator" />
+
+	<context:component-scan base-package="com.rkylin.risk.service.validator"/>
+
+	<bean id="parentRopUtil" class="com.rkylin.risk.service.utils.ROPUtil" abstract="true" >
+		<property name="mapper" ref="jsonMapper"/>
+	</bean>
+
+	<bean id="commonROP" parent="parentRopUtil">
+		<property name="appKey" value="${app.key}"/>
+		<property name="appSecret" value="${app.secret}"/>
+		<property name="ropUrl" value="${rop.url}"/>
+	</bean>
+	<bean id="fileROP" parent="parentRopUtil">
+		<property name="appKey" value="${file_rop_key}"/>
+		<property name="appSecret" value="${file_rop_secret}"/>
+		<property name="ropUrl" value="${file_rop_url}"/>
+	</bean>
+	<bean id="accountROP" parent="parentRopUtil">
+		<property name="appKey" value="${account_rop_key}"/>
+		<property name="appSecret" value="${account_rop_secret}"/>
+		<property name="ropUrl" value="${account_rop_url}"/>
+	</bean>
+
+	<bean id="flowStatusListener" class="com.rkylin.risk.service.event.FlowStatusListener">
+	</bean>
+	<bean id="perSonOCRListener" class="com.rkylin.risk.service.event.PersonOCRListener"></bean>
+
+
+	<task:executor id="flowStatusExcutor" keep-alive="10" pool-size="10-50" queue-capacity="10000"/>
+	<bean id="flowStatusEventBus" class="com.rkylin.risk.service.event.EventBusFactoryBean">
+		<property name="eventIdentifier" value="riskFlowStatus"/>
+		<property name="registerObject">
+			<array>
+				<ref bean="flowStatusListener"/>
+				<ref bean="perSonOCRListener"/>
+			</array>
+		</property>
+		<property name="executor" ref="flowStatusExcutor"/>
+	</bean>
+	<!--<bean id="riskmsgflowStatusEventBus" class="com.rkylin.risk.service.event.EventBusFactoryBean">-->
+		<!--<property name="eventIdentifier" value="riskMsgStatus"/>-->
+		<!--<property name="registerObject" ref="perSonOCRListener"/>-->
+		<!--<property name="executor" ref="flowStatusExcutor"/>-->
+	<!--</bean>-->
+
+
+
+	<bean id="jsonMapper"
+			class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+		<property name="createXmlMapper" value="false"/>
+		<property name="objectMapper">
+			<bean class="com.fasterxml.jackson.datatype.joda.JodaMapper"/>
+		</property>
+		<property name="featuresToEnable">
+			<array>
+				<util:constant
+						static-field="com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES"/>
+				<util:constant
+						static-field="com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_SINGLE_QUOTES"/>
+			</array>
+		</property>
+		<property name="featuresToDisable">
+			<util:constant
+					static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
+		</property>
+		<property name="indentOutput" value="true"/>
+		<property name="simpleDateFormat" value="yyyy-MM-dd HH:mm:ss"/>
+		<property name="serializationInclusion" value="NON_EMPTY"/>
+	</bean>
+</beans>

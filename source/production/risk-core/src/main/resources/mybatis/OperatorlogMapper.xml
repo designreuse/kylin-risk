@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Operatorlog" >
+  <resultMap id="operatorlogMap" type="Operatorlog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="operatorid" property="operatorid" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="operatedate" property="operatedate" jdbcType="TIMESTAMP" javaType="DateTime"/>
+    <result column="operateobj" property="operateobj" jdbcType="VARCHAR" />
+    <result column="operatedes" property="operatedes" jdbcType="VARCHAR" />
+    <result column="operateremark" property="operateremark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, operatorid, username, operatedate, operateobj, operatedes, operateremark
+  </sql>
+  <select id="get" resultMap="operatorlogMap" parameterType="integer" >
+    select
+    <include refid="columnList" />
+    from risk_operatorlog
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_operatorlog
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="Operatorlog" >
+    insert into risk_operatorlog (operatorid, username, operatedate,
+    operateobj, operatedes, operateremark
+    )
+    values (#{operatorid,jdbcType=SMALLINT}, #{username,jdbcType=VARCHAR}, #{operatedate,jdbcType=TIMESTAMP},
+    #{operateobj,jdbcType=VARCHAR}, #{operatedes,jdbcType=VARCHAR}, #{operateremark,jdbcType=VARCHAR}
+    )
+  </insert>
+  <update id="update" parameterType="Operatorlog" >
+    update risk_operatorlog
+    set operatorid = #{operatorid,jdbcType=SMALLINT},
+    username = #{username,jdbcType=VARCHAR},
+    operatedate = #{operatedate,jdbcType=TIMESTAMP},
+    operateobj = #{operateobj,jdbcType=VARCHAR},
+    operatedes = #{operatedes,jdbcType=VARCHAR},
+    operateremark = #{operateremark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryByOperLog" parameterType="map" resultMap="operatorlogMap" >
+    select
+    <include refid="columnList" />
+    from risk_operatorlog
+    <where>
+      <if test="username != null and ''!=username">
+        AND username LIKE #{username,jdbcType=VARCHAR}
+      </if>
+      <if test="operatedes != null and ''!=operatedes">
+        AND operatedes LIKE #{operatedes,jdbcType=VARCHAR}
+      </if>
+      <if test="startTimeStr != null and ''!=startTimeStr" >
+        AND operatedate &gt;= #{startTimeStr,jdbcType=TIMESTAMP}
+      </if>
+      <if test="endTimeStr != null and ''!=endTimeStr">
+        AND operatedate &lt;= #{endTimeStr,jdbcType=TIMESTAMP}
+      </if>
+      <if test="operateobj != null and ''!=operateobj">
+        AND operateobj = #{operateobj,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+</mapper>

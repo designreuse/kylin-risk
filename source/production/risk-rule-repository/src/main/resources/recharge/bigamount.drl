@@ -1,0 +1,56 @@
+package os.nut.drools.recharge;
+
+import com.rkylin.risk.service.bean.RechargeFactor;
+
+import com.rkylin.risk.service.bean.RechargeCode;
+
+rule "bigamount1"
+    no-loop true
+    salience 94
+    when
+         recharge : RechargeFactor(bigamount!=null&&bigamount.isGreaterOrEqualThan(200000))
+         code:RechargeCode()
+    then
+        code.setBigamount("recBigamount01");
+
+end
+
+rule "bigamount2"
+    no-loop true
+    salience 93
+    when
+         recharge : RechargeFactor(bigamount!=null&&bigamount.isGreaterOrEqualThan(100000)&&bigamount.isLesserThan(200000) )
+         code:RechargeCode()
+    then
+        code.setBigamount("recBigamount02");
+end
+
+rule "bigamount3"
+    no-loop true
+    salience 92
+    when
+         recharge : RechargeFactor(bigamount!=null&&bigamount.isGreaterOrEqualThan(50000)&&bigamount.isLesserThan(100000))
+         code:RechargeCode()
+    then
+        code.setBigamount("recBigamount03");
+end
+
+rule "bigamount4"
+    no-loop true
+    salience 91
+    when
+         recharge : RechargeFactor(bigamount!=null&&bigamount.isGreaterOrEqualThan(30000)&&bigamount.isLesserThan(50000))
+         code:RechargeCode()
+    then
+        code.setBigamount("recBigamount04");
+end
+
+rule "bigamount5"
+    no-loop true
+    salience 90
+    when
+         recharge : RechargeFactor(bigamount!=null&&bigamount.isLesserThan(30000))
+         code:RechargeCode()
+    then
+        code.setBigamount("recBigamount05");
+end

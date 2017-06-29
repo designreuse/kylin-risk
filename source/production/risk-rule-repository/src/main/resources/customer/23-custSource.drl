@@ -1,0 +1,45 @@
+package os.nut.drools.ProduceSch;
+//salience:79-60
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.operation.enumType.CustSource;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "custSource2"
+    no-loop true
+    salience 79
+    when
+        $produceSch : CustomerFactor(CustSource.COMPANY.toString().equals(custSource));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setCustSource("custSource01");
+end
+
+rule "custSource3"
+    no-loop true
+    salience 78
+    when
+        $produceSch : CustomerFactor( CustSource.STAFF.toString().equals(custSource));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setCustSource("custSource02");
+end
+
+rule "custSource4"
+    no-loop true
+    salience 77
+    when
+        $produceSch : CustomerFactor(CustSource.OLDCUST.toString().equals(custSource));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setCustSource("custSource03");
+end
+
+rule "custSource5"
+    no-loop true
+    salience 76
+    when
+        $produceSch : CustomerFactor(CustSource.CHANNEL.toString().equals(custSource));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setCustSource("custSource04");
+end

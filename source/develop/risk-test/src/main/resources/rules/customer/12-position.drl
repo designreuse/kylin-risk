@@ -1,0 +1,45 @@
+package os.nut.drools.WorkInfo;
+//salience:299-280
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.operation.enumType.Position;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "position2"
+    no-loop true
+    salience 299
+    when
+        $workInfo : CustomerFactor(Position.CHAIRMAN.toString().equals(position));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setPosition("position01");
+end
+
+rule "position3"
+    no-loop true
+    salience 298
+    when
+        $workInfo : CustomerFactor( Position.MANAGER.toString().equals(position));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setPosition("position02");
+end
+
+rule "position4"
+    no-loop true
+    salience 297
+    when
+        $workInfo : CustomerFactor(Position.STAFF.toString().equals(position));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setPosition("position03");
+end
+
+rule "position5"
+    no-loop true
+    salience 296
+    when
+        $workInfo : CustomerFactor(Position.TEMWORKER.toString().equals(position));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setPosition("position04");
+end

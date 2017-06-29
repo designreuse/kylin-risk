@@ -1,0 +1,25 @@
+package os.nut.drools.PubRecord;
+//salience:459-440 近两年总逾期次数
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "overdue2"
+    no-loop true
+    salience 458
+    when
+        $estateInfo : CustomerFactor(overdue>=6&&overdue<12);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setOverdue("overdue01");
+end
+
+rule "overdue3"
+    no-loop true
+    salience 459
+    when
+        $estateInfo : CustomerFactor( overdue>=12);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMsg("近两年总逾期次数12次以上");
+        retract($estateInfo);
+end

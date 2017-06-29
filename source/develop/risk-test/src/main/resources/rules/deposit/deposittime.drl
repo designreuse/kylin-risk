@@ -1,0 +1,55 @@
+package os.nut.drools.deposit;
+
+import com.rkylin.risk.service.bean.DepositCode;
+import com.rkylin.risk.service.bean.DepositFactor;
+
+rule "deposittime1"
+    no-loop true
+    salience 131
+    when
+         deposit : DepositFactor(deposittime >= 3&&deposittime<5)
+         code:DepositCode()
+    then
+        code.setDeposittime("depDeposittime01");
+
+end
+
+rule "deposittime2"
+    no-loop true
+    salience 130
+    when
+         deposit : DepositFactor(deposittime >= 1&&deposittime<3 )
+         code:DepositCode()
+    then
+        code.setDeposittime("depDeposittime02");
+end
+
+rule "deposittime3"
+    no-loop true
+    salience 129
+    when
+         deposit : DepositFactor((deposittime >= 23&&deposittime<24)||(deposittime>=0&&deposittime<1))
+         code:DepositCode()
+    then
+        code.setDeposittime("depDeposittime03");
+end
+
+rule "deposittime4"
+    no-loop true
+    salience 128
+    when
+         deposit : DepositFactor(deposittime > =5&&deposittime<7)
+         code:DepositCode()
+    then
+        code.setDeposittime("depDeposittime04");
+end
+
+rule "deposittime5"
+    no-loop true
+    salience 127
+    when
+         deposit : DepositFactor(deposittime >= 7&&deposittime<23)
+         code:DepositCode()
+    then
+        code.setDeposittime("depDeposittime05");
+end

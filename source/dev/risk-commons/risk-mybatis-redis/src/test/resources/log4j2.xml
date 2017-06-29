@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info">
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1}  [%t] (%location %class{.}:%method-%file:%line) - %m%n"/>
+        </Console>
+        <File name="file" fileName="risk.log" append="true">
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t] %C{2} (%F:%L) - %m%n"/>
+        </File>
+        <Async name="async">
+            <AppenderRef ref="console"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="async"/>
+        </Root>
+    </Loggers>
+</Configuration>

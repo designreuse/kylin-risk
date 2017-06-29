@@ -1,0 +1,55 @@
+package os.nut.drools.deposit;
+
+import com.rkylin.risk.service.bean.DepositCode;
+import com.rkylin.risk.service.bean.DepositFactor;
+
+rule "bigamount1"
+    no-loop true
+    salience 160
+    when
+         deposit : DepositFactor(bigamount!=null&&bigamount.isGreaterOrEqualThan(100000))
+         code:DepositCode()
+    then
+        code.setBigamount("depBigamount01");
+
+end
+
+rule "bigamount2"
+    no-loop true
+    salience 159
+    when
+         deposit : DepositFactor(bigamount!=null&&bigamount.isGreaterOrEqualThan(60000)&&bigamount.isLesserThan(100000) )
+         code:DepositCode()
+    then
+        code.setBigamount("depBigamount02");
+end
+
+rule "bigamount3"
+    no-loop true
+    salience 158
+    when
+         deposit : DepositFactor(bigamount!=null&&bigamount.isGreaterOrEqualThan(30000)&&bigamount.isLesserThan(60000))
+         code:DepositCode()
+    then
+        code.setBigamount("depBigamount03");
+end
+
+rule "bigamount4"
+    no-loop true
+    salience 157
+    when
+         deposit : DepositFactor(bigamount!=null&&bigamount.isGreaterOrEqualThan(10000)&&bigamount.isLesserThan(30000))
+         code:DepositCode()
+    then
+        code.setBigamount("depBigamount04");
+end
+
+rule "bigamount5"
+    no-loop true
+    salience 156
+    when
+         deposit : DepositFactor(bigamount!=null&&bigamount.isLesserThan(10000))
+         code:DepositCode()
+    then
+        code.setBigamount("depBigamount05");
+end

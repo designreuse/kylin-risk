@@ -1,0 +1,45 @@
+package os.nut.drools.EstateInfo;
+//salience:179-160
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.operation.enumType.HouseArea;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "houseArea2"
+    no-loop true
+    salience 179
+    when
+        $estateInfo : CustomerFactor(HouseArea.URBANDISTRICT.toString().equals(HouseArea));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseArea("houseArea01");
+end
+
+rule "houseArea3"
+    no-loop true
+    salience 178
+    when
+        $estateInfo : CustomerFactor( HouseArea.SUBURB.toString().equals(HouseArea));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseArea("houseArea02");
+end
+
+rule "houseArea4"
+    no-loop true
+    salience 177
+    when
+        $estateInfo : CustomerFactor(HouseArea.COUNTYTOWN.toString().equals(HouseArea));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseArea("houseArea03");
+end
+
+rule "houseArea5"
+    no-loop true
+    salience 176
+    when
+        $estateInfo : CustomerFactor(HouseArea.TOWNSHIP.toString().equals(HouseArea));
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseArea("houseArea04");
+end

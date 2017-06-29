@@ -1,0 +1,114 @@
+ext {
+  riskKieServerVersion = "1.2.3"
+  riskROPVersion = "1.0.1"
+  oprsystemAPIVersion = "1.7.4"
+
+  jsonLibVersion = '2.4'
+  facerecognitionVersion = "1.0.0"
+  PYCreditVersion = "1.0.1"
+}
+description = '风控对外服务接口核心'
+dependencies {
+  compile project(":risk-core")
+
+  compile "com.rkylin.risk:risk-operation-api:${riskOperationApiVersion}"
+  compile "com.rkylin.risk:risk-order-api:${riskOrderApiVersion}"
+  compile "com.rkylin.risk:risk-kie-server:${riskKieServerVersion}"
+
+
+  compile "net.sf.json-lib:json-lib:${jsonLibVersion}:jdk15"
+
+  //  compile "com.rkylin.facerecognition:rkylin-facerecognition-api:${facerecognitionVersion}"
+  compile group:"com.rkylin.facerecognition",name:"rkylin-facerecognition-api",version:"0.0.1-SNAPSHOT"
+//  compile(group: 'com.rkylin.facerecognition', name: 'rkylin-facerecognition', version: '1.0.0-SNAPSHOT')
+  compile "com.rkylin.PYCredit:PYCredit-api:${PYCreditVersion}"
+  compile "com.rkylin.risk:rop:${riskROPVersion}"
+  compile "com.rkylin.wheatfield:rsjf-oprsystem-api:${oprsystemAPIVersion}"
+
+  testCompile "org.springframework:spring-jdbc:${springVersion}"
+
+  //redis begin
+  compile "redis.clients:jedis"
+  compile "org.apache.commons:commons-pool2"
+  compile "org.springframework.data:spring-data-redis"
+  //redis end
+
+  //drools begin
+  compile "org.drools:drools-core"
+  runtime "org.drools:drools-compiler"
+
+  compile "org.kie:kie-internal"
+  compile "org.kie:kie-api"
+
+  compile "org.kie:kie-ci"
+
+
+  compile "com.thoughtworks.xstream:xstream"
+
+  compile "org.mvel:mvel2"
+  compile "org.antlr:antlr-runtime"
+  compile "org.eclipse.jdt.core.compiler:ecj"
+  //drools end
+
+  //maven begin
+  compile 'org.apache.maven:maven-core'
+  compile 'org.apache.maven:maven-model-builder'
+  compile 'org.apache.maven:maven-model'
+  compile 'org.apache.maven:maven-settings'
+  compile 'org.apache.maven:maven-settings-builder'
+  compile 'org.apache.maven:maven-builder-support'
+  compile 'org.apache.maven:maven-artifact'
+  compile 'org.apache.maven:maven-plugin-api'
+  compile 'org.apache.maven:maven-aether-provider'
+  compile 'org.apache.maven:maven-compat'
+  compile 'org.apache.maven.wagon:wagon-provider-api'
+  compile 'org.apache.maven.wagon:wagon-http'
+  compile 'org.eclipse.aether:aether-api'
+  compile 'org.eclipse.aether:aether-util'
+  compile 'org.eclipse.aether:aether-impl'
+  compile 'org.eclipse.aether:aether-connector-basic'
+  compile 'org.eclipse.aether:aether-spi'
+  compile 'org.eclipse.aether:aether-transport-wagon'
+  compile "org.eclipse.aether:aether-transport-file"
+  compile "org.eclipse.aether:aether-transport-http"
+  compile 'org.codehaus.plexus:plexus-classworlds'
+  compile 'org.codehaus.plexus:plexus-utils'
+  compile 'org.sonatype.plexus:plexus-cipher'
+  compile 'org.eclipse.sisu:org.eclipse.sisu.plexus'
+  //maven end
+
+  compile "com.alibaba:dubbo"
+  compile "com.101tec:zkclient"
+
+
+
+  //log begin
+  compile "org.slf4j:slf4j-api"
+  compile "org.slf4j:log4j-over-slf4j"
+  compile "org.slf4j:jcl-over-slf4j"
+  compile "org.apache.logging.log4j:log4j-core"
+  compile "org.apache.logging.log4j:log4j-api"
+  compile "org.apache.logging.log4j:log4j-slf4j-impl"
+  //log end
+
+  provided "org.projectlombok:lombok"
+
+  //test begin
+  testCompile "junit:junit"
+  testCompile "org.mockito:mockito-all"
+  testCompile "org.springframework:spring-test"
+  testCompile "com.jayway.jsonpath:json-path"
+  testCompile "org.assertj:assertj-core"
+  testCompile "org.assertj:assertj-guava"
+  //test end
+
+  testCompile "org.apache.poi:poi"
+  testCompile "org.apache.poi:poi-ooxml"
+  testCompile "org.apache.poi:poi-ooxml-schemas"
+
+  //json begin
+  compile "com.fasterxml.jackson.core:jackson-core"
+  compile "com.fasterxml.jackson.core:jackson-annotations"
+  compile "com.fasterxml.jackson.core:jackson-databind"
+  //json end
+}

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Reptile" >
+  <resultMap id="reptileMap" type="Reptile" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="verifyId" property="verifyId" jdbcType="BIGINT" />
+    <result column="checkorderid" property="checkorderid" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="identity" property="identity" jdbcType="VARCHAR" />
+    <result column="timeout" property="timeout" jdbcType="INTEGER" />
+    <result column="lainum" property="lainum" jdbcType="INTEGER" />
+    <result column="loanblacknum" property="loanblacknum" jdbcType="INTEGER" />
+    <result column="creditnetnum" property="creditnetnum" jdbcType="INTEGER" />
+    <result column="executionnetnum" property="executionnetnum" jdbcType="INTEGER" />
+    <result column="refereenetnum" property="refereenetnum" jdbcType="INTEGER" />
+    <result column="baidunum" property="baidunum" jdbcType="INTEGER" />
+    <result column="sogounum" property="sogounum" jdbcType="INTEGER" />
+    <result column="threesearchnum" property="threesearchnum" jdbcType="INTEGER" />
+    <result column="baseinfonum" property="baseinfonum" jdbcType="INTEGER" />
+    <result column="shareholdernum" property="shareholdernum" jdbcType="INTEGER" />
+    <result column="keypersionnum" property="keypersionnum" jdbcType="INTEGER" />
+    <result column="buschangenum" property="buschangenum" jdbcType="INTEGER" />
+    <result column="judicialnum" property="judicialnum" jdbcType="INTEGER" />
+    <result column="courtnum" property="courtnum" jdbcType="INTEGER" />
+    <result column="execupersonnum" property="execupersonnum" jdbcType="INTEGER" />
+    <result column="dishonestnum" property="dishonestnum" jdbcType="INTEGER" />
+    <result column="judicialsalenum" property="judicialsalenum" jdbcType="INTEGER" />
+    <result column="operabnormalnum" property="operabnormalnum" jdbcType="INTEGER" />
+    <result column="taxinfonum" property="taxinfonum" jdbcType="INTEGER" />
+    <result column="outstocknum" property="outstocknum" jdbcType="INTEGER" />
+    <result column="chattelmortnum" property="chattelmortnum" jdbcType="INTEGER" />
+    <result column="announnum" property="announnum" jdbcType="INTEGER" />
+    <result column="investabroadnum" property="investabroadnum" jdbcType="INTEGER" />
+    <result column="beedata" property="beedata" jdbcType="INTEGER" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, verifyId, checkorderid, type, name, identity,
+    timeout, lainum, loanblacknum, creditnetnum, executionnetnum, refereenetnum, baidunum,
+    sogounum, threesearchnum, baseinfonum, shareholdernum, keypersionnum, buschangenum, 
+    judicialnum, courtnum, execupersonnum, dishonestnum, judicialsalenum, operabnormalnum, 
+    taxinfonum, outstocknum, chattelmortnum, announnum, investabroadnum, beedata, createtime, updatetime
+  </sql>
+  <select id="get" resultMap="reptileMap" parameterType="long" >
+    select 
+    <include refid="columnList" />
+    from risk_reptile
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="queryByCheckorderid" resultMap="reptileMap" parameterType="map" >
+    select
+    <include refid="columnList" />
+    from risk_reptile
+    where checkorderid = #{checkorderid,jdbcType=BIGINT}
+    AND type = #{type,jdbcType=CHAR}
+  </select>
+  <delete id="delete" parameterType="long" >
+    delete from risk_reptile
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="Reptile" >
+    insert into risk_reptile (verifyId, checkorderid,
+      type, name, identity, timeout,
+      lainum, loanblacknum, creditnetnum, 
+      executionnetnum, refereenetnum, baidunum, 
+      sogounum, threesearchnum, baseinfonum, 
+      shareholdernum, keypersionnum, buschangenum, 
+      judicialnum, courtnum, execupersonnum, 
+      dishonestnum, judicialsalenum, operabnormalnum, 
+      taxinfonum, outstocknum, chattelmortnum, 
+      announnum, investabroadnum,beedata)
+    values (#{verifyId,jdbcType=BIGINT}, #{checkorderid,jdbcType=VARCHAR},
+      #{type,jdbcType=CHAR}, #{name,jdbcType=VARCHAR}, #{identity,jdbcType=VARCHAR}, 
+      #{timeout,jdbcType=INTEGER},
+      #{lainum,jdbcType=INTEGER}, #{loanblacknum,jdbcType=INTEGER}, #{creditnetnum,jdbcType=INTEGER}, 
+      #{executionnetnum,jdbcType=INTEGER}, #{refereenetnum,jdbcType=INTEGER}, #{baidunum,jdbcType=INTEGER}, 
+      #{sogounum,jdbcType=INTEGER}, #{threesearchnum,jdbcType=INTEGER}, #{baseinfonum,jdbcType=INTEGER}, 
+      #{shareholdernum,jdbcType=INTEGER}, #{keypersionnum,jdbcType=INTEGER}, #{buschangenum,jdbcType=INTEGER}, 
+      #{judicialnum,jdbcType=INTEGER}, #{courtnum,jdbcType=INTEGER}, #{execupersonnum,jdbcType=INTEGER}, 
+      #{dishonestnum,jdbcType=INTEGER}, #{judicialsalenum,jdbcType=INTEGER}, #{operabnormalnum,jdbcType=INTEGER}, 
+      #{taxinfonum,jdbcType=INTEGER}, #{outstocknum,jdbcType=INTEGER}, #{chattelmortnum,jdbcType=INTEGER}, 
+      #{announnum,jdbcType=INTEGER}, #{investabroadnum,jdbcType=INTEGER}, #{beedata,jdbcType=INTEGER})
+  </insert>
+  <update id="update" parameterType="Reptile" >
+    update risk_reptile
+    set verifyId = #{verifyId,jdbcType=BIGINT},
+      checkorderid = #{checkorderid,jdbcType=VARCHAR},
+      type = #{type,jdbcType=CHAR},
+      name = #{name,jdbcType=VARCHAR},
+      identity = #{identity,jdbcType=VARCHAR},
+      timeout = #{timeout,jdbcType=INTEGER},
+      lainum = #{lainum,jdbcType=INTEGER},
+      loanblacknum = #{loanblacknum,jdbcType=INTEGER},
+      creditnetnum = #{creditnetnum,jdbcType=INTEGER},
+      executionnetnum = #{executionnetnum,jdbcType=INTEGER},
+      refereenetnum = #{refereenetnum,jdbcType=INTEGER},
+      baidunum = #{baidunum,jdbcType=INTEGER},
+      sogounum = #{sogounum,jdbcType=INTEGER},
+      threesearchnum = #{threesearchnum,jdbcType=INTEGER},
+      baseinfonum = #{baseinfonum,jdbcType=INTEGER},
+      shareholdernum = #{shareholdernum,jdbcType=INTEGER},
+      keypersionnum = #{keypersionnum,jdbcType=INTEGER},
+      buschangenum = #{buschangenum,jdbcType=INTEGER},
+      judicialnum = #{judicialnum,jdbcType=INTEGER},
+      courtnum = #{courtnum,jdbcType=INTEGER},
+      execupersonnum = #{execupersonnum,jdbcType=INTEGER},
+      dishonestnum = #{dishonestnum,jdbcType=INTEGER},
+      judicialsalenum = #{judicialsalenum,jdbcType=INTEGER},
+      operabnormalnum = #{operabnormalnum,jdbcType=INTEGER},
+      taxinfonum = #{taxinfonum,jdbcType=INTEGER},
+      outstocknum = #{outstocknum,jdbcType=INTEGER},
+      chattelmortnum = #{chattelmortnum,jdbcType=INTEGER},
+      announnum = #{announnum,jdbcType=INTEGER},
+      investabroadnum = #{investabroadnum,jdbcType=INTEGER},
+      beedata = #{beedata,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

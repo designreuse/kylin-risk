@@ -1,0 +1,45 @@
+package os.nut.drools.basicinfo;
+//salience:399-380
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "age2"
+    no-loop true
+    salience 399
+    when
+        $basicInfo : CustomerFactor(age<25);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setAge("age01");
+end
+
+rule "age3"
+    no-loop true
+    salience 398
+    when
+        $basicInfo : CustomerFactor( age>=25&&age<30);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setAge("age02");
+end
+
+rule "age4"
+    no-loop true
+    salience 397
+    when
+        $basicInfo : CustomerFactor(age>=30&&age<45);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setAge("age03");
+
+end
+
+rule "age5"
+    no-loop true
+    salience 396
+    when
+        $basicInfo : CustomerFactor(age>=45&&age<60);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setAge("age04");
+end

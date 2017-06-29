@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+			http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task-4.2.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+
+
+  <bean id="jsonMapper"
+      class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+    <property name="createXmlMapper" value="false"/>
+    <property name="objectMapper">
+      <bean class="com.fasterxml.jackson.datatype.joda.JodaMapper"/>
+    </property>
+    <property name="featuresToEnable">
+      <array>
+        <util:constant
+            static-field="com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES"/>
+        <util:constant
+            static-field="com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_SINGLE_QUOTES"/>
+      </array>
+    </property>
+    <property name="featuresToDisable">
+      <util:constant
+          static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
+    </property>
+    <property name="serializers">
+      <array value-type="com.fasterxml.jackson.databind.JsonSerializer">
+        <bean class="com.rkylin.risk.service.json.serialize.AmountSerializer"/>
+      </array>
+    </property>
+    <property name="deserializersByType">
+      <map key-type="java.lang.Class" value-type="com.fasterxml.jackson.databind.JsonDeserializer">
+        <entry key="com.rkylin.risk.commons.entity.Amount">
+          <bean class="com.rkylin.risk.service.json.deserialize.AmountDeserializer"/>
+        </entry>
+      </map>
+    </property>
+    <property name="indentOutput" value="true"/>
+    <property name="simpleDateFormat" value="yyyy-MM-dd HH:mm:ss"/>
+    <property name="serializationInclusion" value="NON_EMPTY"/>
+  </bean>
+
+  <!--resteasy client 配置-->
+  <bean id="resteasyWebTarget" class="com.rkylin.risk.service.resteasy.ResteasyWebTargetFactoryBean">
+    <constructor-arg index="0" name="domain" value="${mitou.domain}"/>
+    <property name="componentClass">
+      <set>
+        <value>com.rkylin.risk.service.resteasy.component.Jackson2Provider</value>
+        <value>com.rkylin.risk.service.resteasy.component.URLRequestDecodeFilter</value>
+      </set>
+    </property>
+    <property name="componentObject">
+      <set>
+        <ref bean="encryptFormDataConverterProvider"/>
+      </set>
+    </property>
+  </bean>
+
+  <bean id="mitouBiz" class="com.rkylin.risk.service.resteasy.RestClientProxyFactory">
+    <constructor-arg index="0" name="resteasyWebTarget" ref="resteasyWebTarget"/>
+    <constructor-arg index="1" name="proxyInterface" value="com.rkylin.risk.service.biz.MitouBiz"/>
+  </bean>
+
+
+
+  <!-- 供resteasy的client和server使用 -->
+  <bean id="encryptFormDataConverterProvider" class="com.rkylin.risk.service.resteasy.component.EncryptFormDataConverterProvider">
+    <constructor-arg index="0" name="rsaPublicKey" value="${mitou.publicKey}"></constructor-arg>
+    <constructor-arg index="1" name="objectMapper" ref="jsonMapper"/>
+  </bean>
+
+
+  <bean id="upaClient" class="com.rkylin.risk.service.credit.factorybean.UnionPayAdvisorsFactoryBean">
+    <property name="debugMode" value="false"/>
+    <property name="developmentId" value="${credit.unionpay.developmentId}"/>
+    <property name="privateKey" value="${credit.unionpay.privateKey}"/>
+    <property name="publicKey" value="${credit.unionpay.publicKey}"/>
+    <property name="locationApi" value="${credit.unionpay.locationApi}"/>
+  </bean>
+
+  <bean id="unionPayAdvisorsRequester" class="com.rkylin.risk.service.credit.UnionPayAdvisorsRequester">
+    <constructor-arg name="resourceId" value="${credit.unionpay.resourceId}"/>
+    <property name="unionpayInterruptNotifyMail" value="${unionpay.interrupt_notify.mail}"/>
+  </bean>
+
+  <bean id="bairongProxyServer" class="com.rkylin.risk.service.credit.factorybean.BairongFactoryBean">
+    <property name="bairongUserName" value="${credit.bairong.userName}"/>
+    <property name="bairongPassword" value="${credit.bairong.password}"/>
+    <property name="redisTemplate" ref="cacheRedisTemplate"/>
+  </bean>
+  <bean id="baiRongDasRequester" class="com.rkylin.risk.service.credit.BaiRongDasRequester"/>
+  <bean id="baiRongTerRequester" class="com.rkylin.risk.service.credit.BaiRongTerRequester"/>
+
+
+  <bean class="com.rkylin.risk.service.resteasy.component.JacksonObjectMapperFinder">
+    <constructor-arg index="0" name="objectMapper" ref="jsonMapper"/>
+  </bean>
+
+  <!--resteasy异常处理-->
+  <bean class="com.rkylin.risk.service.resteasy.component.RestEasyExceptionMapper"/>
+
+</beans>

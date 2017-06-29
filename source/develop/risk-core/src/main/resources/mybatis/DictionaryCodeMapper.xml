@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="DictionaryCode" >
+  <cache type="com.rkylin.risk.mybatis.cache.RedisCache"/>
+  <resultMap id="dictionaryCodeMap" type="DictionaryCode" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="dictcode" property="dictcode" jdbcType="VARCHAR" />
+    <result column="dictname" property="dictname" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, dictcode, dictname, code, name
+  </sql>
+  <select id="queryAll" resultMap="dictionaryCodeMap" parameterType="DictionaryCode">
+    <if test="dictcode != null and ''!=dictcode">
+      <bind name="dictcode" value="dictcode" />
+    </if>
+    <if test="dictname != null and ''!=dictname">
+      <bind name="dictname" value="dictname + '%'" />
+    </if>
+    <if test="code != null and ''!=code">
+      <bind name="code" value="code" />
+    </if>
+    <if test="name != null and ''!=name">
+      <bind name="name" value="name + '%'" />
+    </if>
+    select
+    <include refid="columnList" />
+    from risk_dictionary
+    <where>
+      <if test="dictcode != null and ''!=dictcode">
+        dictcode = #{dictcode}
+      </if>
+      <if test="dictname != null and ''!=dictname">
+        AND dictname LIKE #{dictname}
+      </if>
+      <if test="code != null and ''!=code">
+        AND code = #{code}
+      </if>
+      <if test="name != null and ''!=name">
+        AND name LIKE #{name}
+      </if>
+    </where>
+    order by dictcode
+  </select>
+  <select id="get" resultMap="dictionaryCodeMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_dictionary
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="queryFresh" resultMap="dictionaryCodeMap" flushCache="true">
+    select
+    <include refid="columnList" />
+    from risk_dictionary
+  </select>
+  <select id="queryByDictCode" resultMap="dictionaryCodeMap" parameterType="string">
+    select
+    <include refid="columnList" />
+    from risk_dictionary
+    where dictcode = #{dictcode,jdbcType=VARCHAR}
+  </select>
+  <select id="queryCodeAndName" resultType="map" parameterType="string">
+    select
+    code,
+    name
+    from risk_dictionary
+    where dictcode = #{dictcode,jdbcType=VARCHAR}
+  </select>
+  <select id="queryConnByDicAndCode" resultMap="dictionaryCodeMap" parameterType="map" resultSets="">
+    select d.* from risk_dictionary d
+    LEFT JOIN risk_dictionary d1 on d.dictcode = d1.code
+    where
+    d1.dictcode = #{dictcode,jdbcType=VARCHAR}
+    <if test="codes != null " >
+      and d.code in
+      <foreach collection="codes" index="index" item="code" open="(" separator="," close=")">
+      #{code}
+    </foreach>
+    </if>
+    <if test="codes == null " >
+      and 1!=1
+    </if>
+  </select>
+  <select id="queryByDictAndCode" resultMap="dictionaryCodeMap" parameterType="map">
+    select
+    <include refid="columnList" />
+    from risk_dictionary
+    where dictcode = #{dictcode,jdbcType=VARCHAR}
+        and code = #{code,jdbcType=VARCHAR}
+  </select>
+
+
+  <select id="queryByDictAndName" resultMap="dictionaryCodeMap" parameterType="map">
+    select
+    <include refid="columnList" />
+    from risk_dictionary
+    where dictcode = #{dictcode,jdbcType=VARCHAR}
+    and name = #{name,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="delete" parameterType="integer" >
+    delete from risk_dictionary
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="DictionaryCode" >
+    insert into risk_dictionary (dictcode, dictname, code, 
+      name)
+    values (#{dictcode,jdbcType=VARCHAR}, #{dictname,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{name,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="DictionaryCode">
+    update risk_dictionary
+    set dictcode = #{dictcode,jdbcType=VARCHAR},
+      dictname = #{dictname,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryConnDicByCode" resultMap="dictionaryCodeMap" parameterType="string">
+    select d.* from risk_dictionary d
+    LEFT JOIN risk_dictionary d1 on d.dictcode = d1.code
+    where d1.dictcode=#{code,jdbcType=VARCHAR}
+  </select>
+
+  <select id="queryByCode" resultMap="dictionaryCodeMap" parameterType="string">
+    select
+    <include refid="columnList" />
+    from risk_dictionary
+    where code = #{code,jdbcType=VARCHAR}
+  </select>
+</mapper>

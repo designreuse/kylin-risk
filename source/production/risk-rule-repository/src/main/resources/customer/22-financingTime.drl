@@ -1,0 +1,44 @@
+package os.nut.drools.ProduceSch;
+//salience:99-80
+import com.rkylin.risk.service.bean.CustomerFactor;
+   import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "financingTime2"
+    no-loop true
+    salience 99
+    when
+        $produceSch : CustomerFactor(financingTime<1);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setFinancingTime("financingTime01");
+end
+
+rule "financingTime3"
+    no-loop true
+    salience 98
+    when
+        $produceSch : CustomerFactor( financingTime>=1&&financingTime<2);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setFinancingTime("financingTime02");
+end
+
+rule "financingTime4"
+    no-loop true
+    salience 97
+    when
+        $produceSch : CustomerFactor(financingTime>=2&&financingTime<3);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setFinancingTime("financingTime03");
+end
+
+rule "financingTime5"
+    no-loop true
+    salience 96
+    when
+        $produceSch : CustomerFactor(financingTime>=3);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setFinancingTime("financingTime04");
+end

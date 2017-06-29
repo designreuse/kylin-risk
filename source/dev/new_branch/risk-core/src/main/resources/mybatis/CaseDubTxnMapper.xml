@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="CaseDubTxn" >
+  <resultMap id="caseDubTxnMap" type="CaseDubTxn" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="caseid" property="caseid" jdbcType="INTEGER" />
+    <result column="txnid" property="txnid" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, caseid, txnid, status
+  </sql>
+  <select id="queryByCaseId" resultMap="caseDubTxnMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_case_dubioustxn
+    where caseid = #{caseid,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_case_dubioustxn
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="CaseDubTxn" >
+    insert into risk_case_dubioustxn (caseid, txnid, status
+      )
+    values (#{caseid,jdbcType=INTEGER}, #{txnid,jdbcType=INTEGER}, #{status,jdbcType=CHAR}
+      )
+  </insert>
+  <update id="update" parameterType="CaseDubTxn" >
+    update risk_case_dubioustxn
+    set caseid = #{caseid,jdbcType=INTEGER},
+      txnid = #{txnid,jdbcType=INTEGER},
+      status = #{status,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

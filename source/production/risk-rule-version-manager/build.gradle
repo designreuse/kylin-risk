@@ -1,0 +1,112 @@
+ext {
+  guavaVersion = '18.0'
+  lombokVersion = '1.16.8'
+  velocityVersion = '1.7'
+
+
+
+
+  mavenVersion = '3.3.9'
+  wagonVersion = '2.10'
+  aetherVersion = '1.0.2.v20150114'
+  eclipseSisuVersion = '0.3.2'
+  plexusClassworldsVersion = '2.5.2'
+  plexusUtilsVersion = '3.0.22'
+  plexusCipherVersion = '1.7'
+
+  slf4jVersion = '1.7.21'
+
+  junitVersion = '4.12'
+  assertjVersion = '2.4.1'
+  gradleScriptDir = "${rootProject.projectDir}/gradle"
+  javaVersion = JavaVersion.VERSION_1_7
+}
+description = '风控规则管理与发布系统'
+
+assert JavaVersion.current().java7Compatible:
+        "At least Java $javaVersion is required, current JVM is ${JavaVersion.current()}"
+
+buildscript {
+  repositories {
+    maven {
+      url "http://121.40.68.238:8081/nexus/content/groups/public"
+    }
+    maven { url 'http://repo.spring.io/plugins-release' }
+    mavenCentral()
+    mavenLocal()
+  }
+
+  dependencies {
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+    classpath 'io.spring.gradle:dependency-management-plugin:0.5.7.RELEASE'
+  }
+}
+
+repositories {
+  maven { url "http://121.40.68.238:8081/nexus/content/groups/public" }
+  mavenCentral()
+}
+
+
+
+apply plugin: 'java'
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-idea'
+apply from: "${gradleScriptDir}/publish-maven.gradle"
+
+group = 'com.rkylin.risk'
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+dependencies {
+
+  //maven begin
+  compile "org.apache.maven:maven-core:${mavenVersion}"
+  compile "org.apache.maven:maven-model-builder:${mavenVersion}"
+  compile "org.apache.maven:maven-model:${mavenVersion}"
+  compile "org.apache.maven:maven-settings:${mavenVersion}"
+  compile "org.apache.maven:maven-settings-builder:${mavenVersion}"
+  compile "org.apache.maven:maven-builder-support:${mavenVersion}"
+  compile "org.apache.maven:maven-artifact:${mavenVersion}"
+  compile "org.apache.maven:maven-plugin-api:${mavenVersion}"
+  compile "org.apache.maven:maven-aether-provider:${mavenVersion}"
+  compile "org.apache.maven:maven-compat:${mavenVersion}"
+  compile "org.apache.maven:maven-embedder:${mavenVersion}"
+  compile "org.apache.maven.wagon:wagon-provider-api:${wagonVersion}"
+  compile "org.apache.maven.wagon:wagon-http:${wagonVersion}"
+  compile "org.eclipse.aether:aether-api:${aetherVersion}"
+  compile "org.eclipse.aether:aether-util:${aetherVersion}"
+  compile "org.eclipse.aether:aether-impl:${aetherVersion}"
+  compile "org.eclipse.aether:aether-connector-basic:${aetherVersion}"
+  compile "org.eclipse.aether:aether-spi:${aetherVersion}"
+  compile "org.eclipse.aether:aether-transport-wagon:${aetherVersion}"
+
+  compile "org.codehaus.plexus:plexus-classworlds:${plexusClassworldsVersion}"
+  compile "org.codehaus.plexus:plexus-utils:${plexusUtilsVersion}"
+  compile "org.sonatype.plexus:plexus-cipher:${plexusCipherVersion}"
+  compile "org.eclipse.sisu:org.eclipse.sisu.plexus:${eclipseSisuVersion}"
+
+  //maven end
+
+  compile "com.google.guava:guava:${guavaVersion}"
+
+  provided "org.projectlombok:lombok:${lombokVersion}"
+
+  compile "org.apache.velocity:velocity:${velocityVersion}"
+
+
+  //log begin
+  compile "org.slf4j:slf4j-api:${slf4jVersion}"
+  optional "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+  optional "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+  optional "org.slf4j:slf4j-simple:${slf4jVersion}"
+  //log end
+
+  testCompile "junit:junit:${junitVersion}"
+  testCompile "org.assertj:assertj-core:${assertjVersion}"
+}
+
+
+tasks.withType(JavaCompile) {
+  options.encoding = "UTF-8"
+}

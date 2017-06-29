@@ -1,0 +1,370 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.rkylin.risk</groupId>
+    <artifactId>risk</artifactId>
+    <version>1.3</version>
+  </parent>
+  <artifactId>risk-boss</artifactId>
+  <packaging>war</packaging>
+  <name>risk::risk-boss</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <risk-rule-version-manager.version>1.1.0</risk-rule-version-manager.version>
+    <risk-spring-web.version>2.0.0</risk-spring-web.version>
+    <rkylin-rop.version>1.0.2</rkylin-rop.version>
+    <risk-core.version>1.3.7-SNAPSHOT</risk-core.version>
+    <resteasy.version>3.0.19.Final</resteasy.version>
+  </properties>
+  <dependencies>
+
+    <dependency>
+      <groupId>com.rkylin.risk</groupId>
+      <artifactId>risk-core</artifactId>
+      <version>${risk-core.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.rkylin.risk</groupId>
+      <artifactId>risk-rule-version-manager</artifactId>
+      <version>${risk-rule-version-manager.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.rkylin.risk</groupId>
+      <artifactId>risk-spring-web</artifactId>
+      <version>${risk-spring-web.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.rkylin.risk</groupId>
+      <artifactId>rop</artifactId>
+      <version>${rkylin-rop.version}</version>
+    </dependency>
+
+    <!--spring begin-->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-websocket</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-messaging</artifactId>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.springframework.session</groupId>
+      <artifactId>spring-session</artifactId>
+    </dependency>
+
+    <!--spring end-->
+
+    <!--spring security begin-->
+    <!--used for CSRF protection only-->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+    </dependency>
+    <!--spring security end-->
+
+    <!--tools begin-->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+    </dependency>
+    <!--tools end-->
+
+    <!--document lib begin-->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+    </dependency>
+    <!-- 为POI支持Office Open XML -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml-schemas</artifactId>
+    </dependency>
+
+    <!--document lib end-->
+
+
+    <!--servlet&jsp api begin-->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>javax.servlet.jsp-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet.jsp.jstl</groupId>
+      <artifactId>javax.servlet.jsp.jstl-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>taglibs</groupId>
+      <artifactId>standard</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.websocket</groupId>
+      <artifactId>javax.websocket-api</artifactId>
+      <version>1.1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--servlet&jsp api end-->
+
+    <dependency>
+      <groupId>org.sitemesh</groupId>
+      <artifactId>sitemesh</artifactId>
+    </dependency>
+
+    <!--log begin-->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-web</artifactId>
+    </dependency>
+    <!--slf4j和log4j的绑定-->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+    </dependency>
+    <!--log end-->
+
+    <!--jackson begin-->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-joda</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <!--jackson end-->
+
+
+    <!--test begin-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!--spring test-->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+
+    <!--assert-->
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-guava</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-joda-time</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!--test end-->
+
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz</artifactId>
+      <version>2.2.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>c3p0</groupId>
+          <artifactId>c3p0</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-client</artifactId>
+      <version>${resteasy.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jackson2-provider</artifactId>
+      <version>${resteasy.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.rkylin.facerecognition</groupId>
+      <artifactId>rkylin-facerecognition-api</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+  <build>
+    <finalName>risk-boss</finalName>
+    <filters>
+      <filter>profiles/${build.profile}.properties</filter>
+    </filters>
+    <resources>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <warName>risk-boss</warName>
+          <!-- 激活spring profile -->
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>src/main/webapp</directory>
+              <includes>
+                <include>WEB-INF/web.xml</include>
+              </includes>
+            </resource>
+          </webResources>
+          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+          <warSourceDirectory>src/main/webapp</warSourceDirectory>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>debug</id>
+      <properties>
+        <build.profile>debug</build.profile>
+      </properties>
+    </profile>
+    <profile>
+      <id>develop</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <build.profile>develop</build.profile>
+        <sonar.language>java</sonar.language>
+        <sonar.host.url>http://123.56.85.89:9000</sonar.host.url>
+        <sonar.login>admin</sonar.login>
+        <sonar.password>admin</sonar.password>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonarsource.scanner.maven</groupId>
+            <artifactId>sonar-maven-plugin</artifactId>
+            <version>3.1.1</version>
+          </plugin>
+        </plugins>
+      </build>
+
+    </profile>
+    <profile>
+      <id>product</id>
+      <properties>
+        <build.profile>product</build.profile>
+      </properties>
+    </profile>
+    <profile>
+      <id>test</id>
+      <properties>
+        <build.profile>test</build.profile>
+      </properties>
+    </profile>
+    <profile>
+      <id>uat</id>
+      <properties>
+        <build.profile>uat</build.profile>
+      </properties>
+    </profile>
+    <profile>
+      <id>ntest</id>
+      <properties>
+        <build.profile>ntest</build.profile>
+      </properties>
+    </profile>
+  </profiles>
+</project>

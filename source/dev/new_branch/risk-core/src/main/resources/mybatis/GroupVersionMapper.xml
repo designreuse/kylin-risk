@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="GroupVersion" >
+  <resultMap id="groupVersionMap" type="GroupVersion" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="groupid" property="groupid" jdbcType="SMALLINT" />
+    <result column="groupname" property="groupname" jdbcType="VARCHAR" />
+    <result column="grouptype" property="grouptype" jdbcType="VARCHAR" />
+    <result column="createoperid" property="createoperid" jdbcType="SMALLINT" />
+    <result column="createopername" property="createopername" jdbcType="VARCHAR" />
+    <result column="issueoperid" property="issueoperid" jdbcType="SMALLINT" />
+    <result column="issueopername" property="issueopername" jdbcType="VARCHAR" />
+    <result column="issueartifactid" property="issueartifactid" jdbcType="VARCHAR" />
+    <result column="issuegroupid" property="issuegroupid" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="isissue" property="isissue" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+  <sql id="columnList" >
+    id, groupid, groupname, grouptype, createoperid, createopername, issueoperid, issueopername, 
+    issueartifactid, issuegroupid, version, isissue, createtime, updatetime
+  </sql>
+  <select id="get" resultMap="groupVersionMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_group_version
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <select id="queryById" resultMap="groupVersionMap" parameterType="short" >
+    select
+    <include refid="columnList" />
+    from risk_group_version
+    where id = #{groupversionid,jdbcType=SMALLINT}
+  </select>
+  <select id="queryGroupVersion" resultMap="groupVersionMap" parameterType="groupVersion" >
+    select
+    <include refid="columnList" />
+    from risk_group_version
+    <where>
+      <if test="groupid!='' and groupid!=null">
+        and groupid = #{groupid,jdbcType=SMALLINT}
+      </if>
+      <if test="grouptype!='' and grouptype!=null">
+        and grouptype = #{grouptype,jdbcType=VARCHAR}
+      </if>
+      <if test="version!='' and version!=null">
+        and version = #{version,jdbcType=VARCHAR}
+      </if>
+    </where>
+      order by id desc
+  </select>
+  <delete id="delete" parameterType="short" >
+    delete from risk_group_version
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="GroupVersion" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_group_version (groupid, groupname, grouptype, 
+      createoperid, createopername, issueoperid, 
+      issueopername, issueartifactid, issuegroupid, 
+      version, isissue)
+    values (#{groupid,jdbcType=SMALLINT}, #{groupname,jdbcType=VARCHAR}, #{grouptype,jdbcType=VARCHAR}, 
+      #{createoperid,jdbcType=SMALLINT}, #{createopername,jdbcType=VARCHAR}, #{issueoperid,jdbcType=SMALLINT}, 
+      #{issueopername,jdbcType=VARCHAR}, #{issueartifactid,jdbcType=VARCHAR}, #{issuegroupid,jdbcType=VARCHAR}, 
+      #{version,jdbcType=VARCHAR}, #{isissue,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="GroupVersion" >
+    update risk_group_version
+    <set>
+      <if test="issueoperid!=null">
+        issueoperid = #{issueoperid,jdbcType=SMALLINT},
+      </if>
+      <if test="issueopername!=null">
+        issueopername = #{issueopername,jdbcType=VARCHAR},
+      </if>
+      <if test="isissue!=null">
+        isissue = #{isissue,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateVersionSta" parameterType="GroupVersion" >
+    update risk_group_version
+    set isissue = #{isissue,jdbcType=VARCHAR}
+    where groupid = #{groupid,jdbcType=SMALLINT} and version != #{version,jdbcType=VARCHAR}
+  </update>
+
+  <select id="queryByGA" parameterType="map" resultMap="groupVersionMap">
+    select
+    <include refid="columnList" />
+    from risk_group_version
+    where issuegroupid = #{group,jdbcType=VARCHAR}
+    and issueartifactid = #{artifactid,jdbcType=VARCHAR}
+    and version = #{version,jdbcType=VARCHAR}
+  </select>
+</mapper>

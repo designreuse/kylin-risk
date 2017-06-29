@@ -1,0 +1,44 @@
+package os.nut.drools.basicinfo;
+//salience:359-340
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "registArea2"
+    no-loop true
+    salience 359
+    when
+        $basicInfo : CustomerFactor(registArea=="first"); //一类地区
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setRegistArea("registArea01");
+end
+
+rule "registArea3"
+    no-loop true
+    salience 358
+    when
+        $basicInfo : CustomerFactor( registArea=="second"); //二类地区
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setRegistArea("registArea02");
+end
+
+rule "registArea4"
+    no-loop true
+    salience 357
+    when
+        $basicInfo : CustomerFactor(registArea=="third"); //三类地区
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setRegistArea("registArea03");
+end
+
+rule "registArea5"
+    no-loop true
+    salience 356
+    when
+        $basicInfo : CustomerFactor(registArea=="four"); //四类地区
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setRegistArea("registArea04");
+end

@@ -1,0 +1,16 @@
+package os.nut.drools.PubRecord;
+//salience:39-20
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+
+rule "leftKey2"
+    no-loop true
+    salience 39
+    when
+        $leftKey : CustomerFactor(leftKey=="false");
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setLeftKey("leftKey01");
+
+end

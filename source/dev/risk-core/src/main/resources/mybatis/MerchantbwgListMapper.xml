@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="MerchantbwgList" >
+
+  <resultMap id="merchantbwgListMap" type="MerchantbwgList" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="merchid" property="merchid" jdbcType="INTEGER" />
+    <result column="merchantid" property="merchantid" jdbcType="VARCHAR" />
+    <result column="merchantname" property="merchantname" jdbcType="VARCHAR" />
+    <result column="source" property="source" jdbcType="CHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="effecttime" property="effecttime" jdbcType="DATE" javaType="LocalDate" />
+    <result column="failuretime" property="failuretime" jdbcType="DATE" javaType="LocalDate" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="userid" property="userid" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="checkid" jdbcType="SMALLINT" property="checkid" />
+    <result column="checkname" jdbcType="VARCHAR" property="checkname" />
+    <result column="checktime" javaType="DateTime" jdbcType="TIMESTAMP" property="checktime" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+  </resultMap>
+
+  <resultMap id="merchantbwgMap" type="MerchantbwgList" extends="merchantbwgListMap">
+    <association column="merchantid" javaType="Merchant" property="merchant" select="Merchant.merchantBWGQuery" />
+  </resultMap>
+
+  <sql id="columnList" >
+    id, merchid, merchantid, merchantname, source, type, effecttime, failuretime, status, 
+    userid, username,checkid,checkname,checktime,reason, updatetime,createtime
+  </sql>
+  <select id="get" resultMap="merchantbwgListMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_merchantbwg_list
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryMerbwgBymercId" resultMap="merchantbwgListMap" parameterType="String">
+    SELECT
+    <include refid="columnList"/>
+    from risk_merchantbwg_list
+    where status != '99'  AND status !='04' AND merchantid =#{merchantid}
+  </select>
+
+  <select id="queryMerbwgListByCondition" parameterType="MerchantbwgList" resultMap="merchantbwgMap">
+    SELECT
+    <include refid="columnList" />
+    FROM risk_merchantbwg_list
+    <where>
+      status != '99'
+      <if test="merchantid != null and ''!=merchantid">
+        AND merchantid LIKE #{merchantid}
+      </if>
+      <if test="merchantname != null and ''!=merchantname">
+        AND merchantname = #{merchantname}
+      </if>
+    </where>
+    order by id
+  </select>
+
+
+
+  <delete id="delete" parameterType="integer" >
+    delete from risk_merchantbwg_list
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="MerchantbwgList" >
+    insert into risk_merchantbwg_list (merchid, merchantid, merchantname, 
+      source, type, effecttime, failuretime, 
+      status, userid, username, 
+      updatetime,reason,createtime,checkid,checkname,checktime)
+    values (#{merchid,jdbcType=INTEGER}, #{merchantid,jdbcType=VARCHAR}, #{merchantname,jdbcType=VARCHAR},
+      #{source,jdbcType=CHAR}, #{type,jdbcType=CHAR}, #{effecttime,jdbcType=DATE}, #{failuretime,jdbcType=DATE}, 
+      #{status,jdbcType=CHAR}, #{userid,jdbcType=SMALLINT}, #{username,jdbcType=VARCHAR}, 
+      #{updatetime,jdbcType=TIMESTAMP}, #{reason,jdbcType=VARCHAR},#{createtime,jdbcType=TIMESTAMP},
+    #{checkid,jdbcType=SMALLINT}, #{checkname,jdbcType=VARCHAR}, #{checktime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="update" parameterType="MerchantbwgList" >
+    update risk_merchantbwg_list
+    set merchid = #{merchid,jdbcType=INTEGER},
+      merchantid = #{merchantid,jdbcType=VARCHAR},
+      merchantname = #{merchantname,jdbcType=VARCHAR},
+      source = #{source,jdbcType=CHAR},
+      type = #{type,jdbcType=CHAR},
+      effecttime = #{effecttime,jdbcType=DATE},
+      failuretime = #{failuretime,jdbcType=DATE},
+      status = #{status,jdbcType=CHAR},
+      userid = #{userid,jdbcType=SMALLINT},
+      username = #{username,jdbcType=VARCHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      reason = #{reason,jdbcType=VARCHAR},
+      checkid = #{checkid,jdbcType=SMALLINT},
+      checkname = #{checkname,jdbcType=VARCHAR},
+      checktime = #{checktime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

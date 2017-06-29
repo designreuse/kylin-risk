@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd
+       http://code.alibabatech.com/schema/dubbo
+	   http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+       <!--<context:component-scan base-package="com.rkylin.risk.credit.py"/>-->
+
+       <context:property-placeholder location="classpath:risk-credit.properties" file-encoding="UTF-8"/>
+
+       <dubbo:application name="rule-credit" />
+       <dubbo:registry protocol="zookeeper" address="${credit.py.registry-address}" timeout="12000"/>
+
+
+       <!--default reference options-->
+       <dubbo:consumer id="dubboCon" default="true" version="1.0" retries="2" check="false" timeout="3000"></dubbo:consumer>
+
+       <!--dubbo consumer begin-->
+       <dubbo:reference id="creditService" interface="com.rkylin.gateway.service.CreditService" group="PY_Credit" protocol="dubbo" version="1.0.0"/>
+       <!--dubbo consumer end-->
+
+       <bean id="pyBankCheckApi" class="com.rkylin.risk.credit.service.PYBankCheckApi"/>
+       <bean id="pyCreditReportApi" class="com.rkylin.risk.credit.service.PYCreditReportApi"/>
+       <bean id="pyQueryHistoryApi" class="com.rkylin.risk.credit.service.PYQueryHistoryApi"/>
+
+</beans>

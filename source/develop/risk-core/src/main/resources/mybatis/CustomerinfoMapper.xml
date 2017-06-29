@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Customerinfo" >
+  <resultMap id="customerinfoMap" type="Customerinfo" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="customerId" property="customerid" jdbcType="VARCHAR" />
+    <result column="customerName" property="customername" jdbcType="VARCHAR" />
+    <result column="certificateType" property="certificatetype" jdbcType="VARCHAR" />
+    <result column="certificateId" property="certificateid" jdbcType="VARCHAR" />
+    <result column="userrelatedid" property="userrelatedid" jdbcType="VARCHAR" />
+    <result column="channel" property="channel" jdbcType="VARCHAR" />
+    <result column="certificatestartdate" property="certificatestartdate"  jdbcType="VARCHAR"  />
+    <result column="certificateexpiredate" property="certificateexpiredate"  jdbcType="VARCHAR"  />
+    <result column="tcaccount" property="tcaccount" jdbcType="VARCHAR" />
+    <result column="mobilephone" property="mobilephone" jdbcType="VARCHAR" />
+    <result column="isauthor" property="isauthor" jdbcType="VARCHAR" />
+    <result column="occupation" property="occupation" jdbcType="VARCHAR" />
+    <result column="age" property="age" jdbcType="VARCHAR" />
+    <result column="education" property="education" jdbcType="VARCHAR" />
+    <result column="score" property="score" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="urlkey" property="urlkey" jdbcType="VARCHAR" />
+    <result column="firstman" property="firstman" jdbcType="VARCHAR" />
+    <result column="firstmobile" property="firstmobile" jdbcType="VARCHAR" />
+    <result column="secondman" property="secondman" jdbcType="VARCHAR" />
+    <result column="secondmobile" property="secondmobile" jdbcType="VARCHAR" />
+
+  </resultMap>
+  <sql id="columnList" >
+    id, customerId, customerName, certificateType, certificateId, userrelatedid, channel,
+    certificatestartdate, certificateexpiredate, tcaccount, mobilephone, isauthor, occupation,
+    age, education, score, createtime, updatetime,urlkey,firstman,firstmobile,secondman,secondmobile
+  </sql>
+  <select id="get" resultMap="customerinfoMap" parameterType="long" >
+    select
+    <include refid="columnList" />
+    from risk_customerinfo
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="delete" parameterType="long" >
+    delete from risk_customerinfo
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="Customerinfo" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_customerinfo (customerId, customerName, certificateType,
+    certificateId, userrelatedid, channel,
+    certificatestartdate, certificateexpiredate,
+    tcaccount, mobilephone, isauthor,
+    occupation, age,education, score,urlkey,
+    firstman,firstmobile,secondman,secondmobile
+    )
+    values (#{customerid,jdbcType=VARCHAR}, #{customername,jdbcType=VARCHAR}, #{certificatetype,jdbcType=VARCHAR},
+    #{certificateid,jdbcType=VARCHAR}, #{userrelatedid,jdbcType=VARCHAR}, #{channel,jdbcType=VARCHAR},
+    #{certificatestartdate,jdbcType=VARCHAR}, #{certificateexpiredate,jdbcType=VARCHAR},
+    #{tcaccount,jdbcType=VARCHAR}, #{mobilephone,jdbcType=VARCHAR}, #{isauthor,jdbcType=VARCHAR},
+    #{occupation,jdbcType=VARCHAR}, #{age,jdbcType=VARCHAR},
+    #{education,jdbcType=VARCHAR},
+    #{score,jdbcType=DECIMAL},
+    #{urlkey,jdbcType=VARCHAR},
+    #{firstman,jdbcType=VARCHAR},
+    #{firstmobile,jdbcType=VARCHAR},
+    #{secondman,jdbcType=VARCHAR},
+    #{secondmobile,jdbcType=VARCHAR}
+    )
+  </insert>
+  <update id="update" parameterType="Customerinfo" >
+    update risk_customerinfo
+    set customerId = #{customerid,jdbcType=VARCHAR},
+      customerName = #{customername,jdbcType=VARCHAR},
+      certificateType = #{certificatetype,jdbcType=VARCHAR},
+      certificateId = #{certificateid,jdbcType=VARCHAR},
+      userrelatedid = #{userrelatedid,jdbcType=VARCHAR},
+      channel = #{channel,jdbcType=VARCHAR},
+      certificatestartdate = #{certificatestartdate,jdbcType=VARCHAR},
+      certificateexpiredate = #{certificateexpiredate,jdbcType=VARCHAR},
+      tcaccount = #{tcaccount,jdbcType=VARCHAR},
+      mobilephone = #{mobilephone,jdbcType=VARCHAR},
+      isauthor = #{isauthor,jdbcType=VARCHAR},
+      occupation = #{occupation,jdbcType=VARCHAR},
+      age = #{age,jdbcType=VARCHAR},
+      education = #{education,jdbcType=VARCHAR},
+      score = #{score,jdbcType=DECIMAL},
+      urlkey= #{urlkey,jdbcType=VARCHAR},
+      firstman = #{firstman,jdbcType=VARCHAR},
+      firstmobile = #{firstmobile,jdbcType=VARCHAR},
+      secondman = #{secondman,jdbcType=VARCHAR},
+      secondmobile = #{secondmobile,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="queryOneByCustomerid" resultMap="customerinfoMap" parameterType="string">
+    select
+    <include refid="columnList" />
+    from risk_customerinfo
+    where customerId = #{customerid,jdbcType=VARCHAR}
+  </select>
+
+  <sql id="queryList" >
+    id, customerId, customerName, certificateType, certificateId,
+    channel, createtime, updatetime, score,urlkey,
+    firstman,firstmobile,secondman,secondmobile
+  </sql>
+  <select id="queryAll" resultMap="customerinfoMap" parameterType="Customerinfo">
+    select
+    <include refid="queryList" />
+    from risk_customerinfo
+    <where>
+      <if test="customerid != null and ''!=customerid">
+        customerid = #{customerid}
+      </if>
+      <if test="customername != null and ''!=customername">
+        AND customername = #{customername}
+      </if>
+      <if test="certificateid != null and ''!=certificateid">
+        AND certificateid = #{certificateid}
+      </if>
+    </where>
+  </select>
+
+  <select id="customerBWGQuery" resultMap="customerinfoMap" parameterType="String">
+    SELECT
+    <include refid="columnList"/>
+    from risk_customerinfo
+    where customerid =#{customerid}
+  </select>
+
+  <sql id="querycolumn" >
+    id, customerId, customerName, certificateType, certificateId,
+    channel, createtime, updatetime, score,urlkey,
+    firstman,firstmobile,secondman,secondmobile
+  </sql>
+
+  <select id="queryPortion" resultMap="customerinfoMap" parameterType="Customerinfo">
+    select
+    <include refid="querycolumn" />
+    from risk_customerinfo
+    <where>
+      <if test="customerid != null and ''!=customerid">
+        customerid = #{customerid}
+      </if>
+      <if test="customername != null and ''!=customername">
+        AND customername = #{customername}
+      </if>
+      <if test="certificateid != null and ''!=certificateid">
+        AND certificateid = #{certificateid}
+      </if>
+    </where>
+  </select>
+
+  <insert id="addCustomerinfoBatch" parameterType="list" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_customerinfo (customerId,customerName,certificateType,certificateId,channel,score,urlkey,
+    firstman,firstmobile,secondman,secondmobile)
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+    (#{item.customerid,jdbcType=VARCHAR},#{item.customername,jdbcType=VARCHAR},#{item.certificatetype,jdbcType=VARCHAR},
+      #{item.certificateid,jdbcType=VARCHAR},#{item.channel,jdbcType=VARCHAR},
+      #{item.score,jdbcType=DECIMAL},
+      #{item.urlkey,jdbcType=VARCHAR},#{item.firstman,jdbcType=VARCHAR},#{item.firstmobile,jdbcType=VARCHAR}
+      ,#{item.secondman,jdbcType=VARCHAR},#{item.secondmobile,jdbcType=VARCHAR})
+  </foreach>
+  </insert>
+
+  <select id="queryCusByCondition" resultMap="customerinfoMap" parameterType="Customerinfo">
+    SELECT
+    <include refid="columnList" />
+    FROM risk_customerinfo
+    <where>
+      <if test="customerId != null and ''!=customerId">
+        customerId = #{customerId}
+      </if>
+      <if test="customerName != null and ''!=customerName">
+        AND customerName = #{customerName}
+      </if>
+      <if test="certificateId != null and ''!=certificateId">
+        AND certificateId = #{certificateId}
+      </if>
+      <if test="timebegin != null and ''!=timebegin">
+        AND createtime &gt;= #{timebegin}
+      </if>
+      <if test="timeend != null and ''!=timeend">
+        AND createtime &lt;= #{timeend}
+      </if>
+
+    </where>
+    order by id
+  </select>
+</mapper>

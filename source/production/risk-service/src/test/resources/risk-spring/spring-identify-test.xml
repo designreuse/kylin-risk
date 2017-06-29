@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd
+       http://code.alibabatech.com/schema/dubbo
+	   http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+       <dubbo:application name="rule-serive-identify-test"/>
+       <dubbo:registry  file="rule-serive-test.cache"  protocol="zookeeper" address="10.172.92.57:2181" timeout="12000"/>
+<!--
+       <dubbo:registry  file="rule-serive-test.cache"  protocol="zookeeper" address="172.16.14.38:2181" timeout="12000"/>
+-->
+       <bean id="ROPUtil" class="com.rkylin.risk.service.utils.ROPUtil"></bean>
+
+
+       <dubbo:reference  id="linkFaceOCRService" interface="com.rkylin.facerecognition.api.service.LinkFaceOCRService"  protocol="dubbo" timeout="12000" version="1.0.0"/>
+       <dubbo:reference  id="faceRecognitionService" interface="com.rkylin.facerecognition.api.service.FaceRecognitionService" group="linkFace"   timeout="12000" version="1.0.0"/>
+
+       <dubbo:reference  id="creditService" interface="com.rkylin.gateway.service.CreditService"  group="PY_Credit" protocol="dubbo" timeout="12000" version="1.0.0"/>
+
+
+       <!--consumer service begin-->
+
+       <context:component-scan base-package="com.rkylin.risk.service.biz.impl" use-default-filters="true" resource-pattern="**/IdentifyBizImpl.class">
+       </context:component-scan>
+       <context:property-placeholder location="classpath:risk.properties"/>
+
+</beans>

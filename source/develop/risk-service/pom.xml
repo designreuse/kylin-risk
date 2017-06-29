@@ -1,0 +1,445 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.rkylin.risk</groupId>
+        <artifactId>risk</artifactId>
+        <version>1.1</version>
+    </parent>
+    <artifactId>risk-service</artifactId>
+    <packaging>jar</packaging>
+    <name>risk::service(external  service)</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <risk-kie-server.version>1.2.3</risk-kie-server.version>
+        <oprsystem.version>1.7.4</oprsystem.version>
+        <rkylin-rop.version>1.0.2</rkylin-rop.version>
+        <maven.version>3.3.9</maven.version>
+        <aether.version>1.0.2.v20150114</aether.version>
+        <wagon.version>2.10</wagon.version>
+      <facerecognition.version>1.0.0</facerecognition.version>
+      <PYCredit.version>1.0.1</PYCredit.version>
+        <rootDir>${project.parent.basedir}/</rootDir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+          <groupId>com.rkylin.facerecognition</groupId>
+          <artifactId>rkylin-facerecognition-api</artifactId>
+          <version>${facerecognition.version}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>com.rkylin.PYCredit</groupId>
+          <artifactId>PYCredit-api</artifactId>
+          <version>${PYCredit.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk15</classifier>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.rkylin.risk</groupId>
+            <artifactId>risk-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.rkylin.risk</groupId>
+            <artifactId>risk-order-api</artifactId>
+            <version>${risk-order-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.rkylin.risk</groupId>
+            <artifactId>risk-operation-api</artifactId>
+            <version>${risk-operation-api.version}</version>
+        </dependency>
+
+        <!-- status interface begin -->
+        <dependency>
+            <groupId>com.rkylin.wheatfield</groupId>
+            <artifactId>rsjf-oprsystem-api</artifactId>
+            <version>${oprsystem.version}</version>
+        </dependency>
+        <!-- status interface end -->
+
+        <dependency>
+            <groupId>com.rkylin.risk</groupId>
+            <artifactId>rop</artifactId>
+            <version>${rkylin-rop.version}</version>
+        </dependency>
+
+        <!--redis begin-->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+        </dependency>
+        <!--redis end-->
+
+
+        <!--tools begin-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!--tools end-->
+
+        <!--dubbo begin-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
+
+        <!--dubbo注册中心zookeeper-->
+        <dependency>
+            <groupId>com.101tec</groupId>
+            <artifactId>zkclient</artifactId>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.zookeeper</groupId>-->
+            <!--<artifactId>zookeeper</artifactId>-->
+        <!--</dependency>-->
+
+        <!--序列化-->
+        <!--<dependency>-->
+            <!--<groupId>com.esotericsoftware.kryo</groupId>-->
+            <!--<artifactId>kryo</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>de.javakaffee</groupId>-->
+            <!--<artifactId>kryo-serializers</artifactId>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>io.netty</groupId>-->
+            <!--<artifactId>netty</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jboss.netty</groupId>-->
+            <!--<artifactId>netty</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.caucho</groupId>-->
+            <!--<artifactId>hessian</artifactId>-->
+        <!--</dependency>-->
+        <!--dubbo end-->
+
+
+        <!--log begin-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+        </dependency>
+        <!--slf4j和log4j的绑定-->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+        </dependency>
+        <!--log end-->
+
+        <!--test begin-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--spring test-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--assert-->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-guava</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-joda-time</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--test end-->
+
+        <!--jackson begin-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <!--jackson end-->
+
+        <!--drools begin-->
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <scope>runtime</scope>
+            <!--<exclusions>-->
+            <!--<exclusion>-->
+            <!--<groupId>com.google.protobuf</groupId>-->
+            <!--<artifactId>protobuf-java</artifactId>-->
+            <!--</exclusion>-->
+
+            <!--</exclusions>-->
+        </dependency>
+
+        <!--<dependency>-->
+        <!--<groupId>org.drools</groupId>-->
+        <!--<artifactId>drools-templates</artifactId>-->
+        <!--<version>6.2.0.Final</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.drools</groupId>-->
+        <!--<artifactId>drools-persistence-jpa</artifactId>-->
+        <!--<version>6.2.0.Final</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.drools</groupId>-->
+        <!--<artifactId>drools-verifier</artifactId>-->
+        <!--<version>6.2.0.Final</version>-->
+        <!--</dependency>-->
+
+
+        <!--<dependency>-->
+        <!--<groupId>org.drools</groupId>-->
+        <!--<artifactId>drools-jsr94</artifactId>-->
+        <!--<version>6.2.0.Final</version>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+        <!--<groupId>org.kie</groupId>-->
+        <!--<artifactId>kie-ci</artifactId>-->
+        <!--<version>6.2.0.Final</version>-->
+        <!--</dependency>-->
+
+
+
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-internal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-ci</artifactId>
+        </dependency>
+
+        <!--kie ci 依赖-->
+        <!--maven嵌入到应用 begin-->
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model-builder</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-settings-builder</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-settings</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-aether-provider</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-connector-basic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-wagon</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-file</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-http</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-provider-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-http</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-classworlds</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.sonatype.plexus</groupId>
+            <artifactId>plexus-cipher</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.eclipse.sisu</groupId>
+            <artifactId>org.eclipse.sisu.plexus</artifactId>
+        </dependency>
+        <!--maven嵌入到应用 end-->
+
+
+
+        <!--kie-ci依赖结束-->
+
+
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mvel</groupId>
+            <artifactId>mvel2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
+        </dependency>
+
+        <!--rule default compiler-->
+        <dependency>
+            <groupId>org.eclipse.jdt.core.compiler</groupId>
+            <artifactId>ecj</artifactId>
+        </dependency>
+        <!--drools end-->
+
+        <dependency>
+            <groupId>com.rkylin.risk</groupId>
+            <artifactId>risk-kie-server</artifactId>
+            <version>${risk-kie-server.version}</version>
+        </dependency>
+
+
+    </dependencies>
+    <build>
+        <finalName>risk-service-core</finalName>
+        <filters>
+            <filter>${project.parent.relativePath}/../profiles/${build.profile}.properties</filter>
+        </filters>
+        <testResources>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
+</project>

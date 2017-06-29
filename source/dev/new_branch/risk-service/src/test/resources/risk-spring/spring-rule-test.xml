@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:risk-kie="http://www.rkylin.com/schema/risk/kie-server"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+    http://www.rkylin.com/schema/risk/kie-server
+    http://www.rkylin.com/schema/risk/kie-server.xsd">
+  <bean id="baseRedisDao" class="com.rkylin.risk.core.dao.impl.BaseRedisDaoImpl">
+    <property name="redisTemplate" ref="cacheRedisTemplate"/>
+  </bean>
+
+  <risk-kie:risk-kie-server id="kieContainerSession" setting="classpath:risk-settings.xml"
+      releaseIdSniffer="ruleReleaseIdCacheSniffer">
+    <risk-kie:releaseId groupId="com.risk.rule.develop.P000008" artifactId="P00000514"
+        version="[1,)"/>
+    <risk-kie:releaseId groupId="com.risk.rule.test.P000008" artifactId="P00000817" version="[1,)" scannerEnabled="false"/>
+    <risk-kie:releaseId groupId="com.risk.rule.test.P000008" artifactId="P00000816" version="[1,)" scannerEnabled="false"/>
+    <risk-kie:releaseId groupId="com.risk.rule.test.P000008" artifactId="P00000822" version="[1,)" scannerEnabled="false"/>
+    <risk-kie:releaseId groupId="com.risk.rule.test.P000008" artifactId="P00000823" version="[1,)" scannerEnabled="false"/>
+    <risk-kie:releaseId groupId="com.risk.rule.test.P000008" artifactId="P00000824" version="[1,)" scannerEnabled="false"/>
+    <risk-kie:releaseId groupId="com.risk.rule.test.P000008" artifactId="P00000825" version="[1,)" scannerEnabled="false"/>
+    <risk-kie:releaseId groupId="com.risk.rule.test.P000008" artifactId="P00000826" version="[1,)" scannerEnabled="false"/>
+    <risk-kie:releaseId groupId="${maven.groupPath}M000020" artifactId="P00014627" version="[1,)" scannerEnabled="false"/>
+    <risk-kie:releaseId groupId="${maven.groupPath}M000020" artifactId="P00014628" version="[1,)" scannerEnabled="false"/>
+
+    <risk-kie:releaseId groupId="com.rkylin.risk.rule" artifactId="risk-rule-repository"
+        version="2.0.0" scannerEnabled="false"/>
+  </risk-kie:risk-kie-server>
+
+</beans>

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Order" >
+  <resultMap id="orderMap" type="Order" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="orderid" property="orderid" jdbcType="VARCHAR" />
+    <result column="checkorderid" property="checkorderid" jdbcType="VARCHAR" />
+    <result column="ordertypeid" property="ordertypeid" jdbcType="VARCHAR" />
+    <result column="orderdate" property="orderdate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="ordertime" property="ordertime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="rootinstcd" property="rootinstcd" jdbcType="VARCHAR" />
+    <result column="productid" property="productid" jdbcType="VARCHAR" />
+    <result column="userid" property="userid" jdbcType="VARCHAR" />
+    <result column="providerid" property="providerid" jdbcType="VARCHAR" />
+    <result column="userorderid" property="userorderid" jdbcType="VARCHAR" />
+    <result column="userrelateid" property="userrelateid" jdbcType="VARCHAR" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="cardnum" property="cardNum" jdbcType="VARCHAR" />
+    <result column="identitycard" property="identityCard" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="ordercontrol" property="ordercontrol" jdbcType="VARCHAR" />
+    <result column="respcode" property="respcode" jdbcType="VARCHAR" />
+    <result column="statusid" property="statusid" jdbcType="VARCHAR" />
+    <result column="goodsname" property="goodsname" jdbcType="VARCHAR" />
+    <result column="goodsdetail" property="goodsdetail" jdbcType="VARCHAR" />
+    <result column="goodscnt" property="goodscnt" jdbcType="INTEGER" />
+    <result column="unitprice" property="unitprice" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="channel" property="channel" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="gradetime" property="gradetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="score" property="score" jdbcType="DECIMAL" javaType="Amount" />
+    <result column="dubioustxnid" jdbcType="INTEGER" property="dubioustxnid" />
+    <result column="riskeventid" jdbcType="INTEGER" property="riskeventid" />
+    <result column="riskstatus" jdbcType="VARCHAR" property="riskstatus"/>
+  </resultMap>
+  <sql id="columnList" >
+    id, orderid, checkorderid,ordertypeid, orderdate, ordertime, rootinstcd, productid, userid, providerid,
+    userorderid, userrelateid, amount, mobile, cardnum, identitycard, remark, ordercontrol, respcode, statusid, goodsname,
+    goodsdetail, goodscnt, unitprice, channel, createtime, updatetime, gradetime, score,dubioustxnid,riskeventid,riskstatus
+  </sql>
+  <select id="get" resultMap="orderMap" parameterType="long" >
+    select 
+    <include refid="columnList" />
+    from risk_order
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="delete" parameterType="long" >
+    delete from risk_order
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="Order" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_order (orderid,checkorderid, ordertypeid, orderdate,
+      ordertime, rootinstcd, productid, 
+      userid, providerid, userorderid, 
+      userrelateid, amount,  mobile, cardnum, identitycard, remark,
+      ordercontrol, respcode, statusid, 
+      goodsname, goodsdetail, goodscnt, 
+      unitprice, channel,  gradetime, score,dubioustxnid,riskeventid, riskstatus
+      )
+    values (#{orderid,jdbcType=VARCHAR}, #{checkorderid,jdbcType=VARCHAR},#{ordertypeid,jdbcType=VARCHAR}, #{orderdate,jdbcType=DATE},
+      #{ordertime,jdbcType=TIMESTAMP}, #{rootinstcd,jdbcType=VARCHAR}, #{productid,jdbcType=VARCHAR}, 
+      #{userid,jdbcType=VARCHAR}, #{providerid,jdbcType=VARCHAR}, #{userorderid,jdbcType=VARCHAR}, 
+      #{userrelateid,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{mobile,jdbcType=VARCHAR},
+      #{cardNum,jdbcType=VARCHAR}, #{identityCard,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+      #{ordercontrol,jdbcType=VARCHAR}, #{respcode,jdbcType=VARCHAR}, #{statusid,jdbcType=VARCHAR}, 
+      #{goodsname,jdbcType=VARCHAR}, #{goodsdetail,jdbcType=VARCHAR}, #{goodscnt,jdbcType=INTEGER}, 
+      #{unitprice,jdbcType=DECIMAL}, #{channel,jdbcType=VARCHAR},  #{gradetime,jdbcType=TIMESTAMP}, #{score,jdbcType=DECIMAL},
+      #{dubioustxnid,jdbcType=INTEGER},#{riskeventid,jdbcType=INTEGER}, #{riskstatus,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="update" parameterType="Order" >
+    update risk_order
+    <set>
+      <if test="dubioustxnid != null and ''!=dubioustxnid">
+      dubioustxnid=#{dubioustxnid,jdbcType=INTEGER},
+      </if>
+      <if test="score != null and ''!=score">
+        score=#{score,jdbcType=VARCHAR},
+      </if>
+      <if test="riskeventid != null and ''!=riskeventid">
+        riskeventid=#{riskeventid,jdbcType=INTEGER}
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="queryByAmlDub" parameterType="integer" resultMap="orderMap">
+    select
+    <include refid="columnList" />
+    from risk_order
+    where dubioustxnid = #{dubioustxnid,jdbcType=INTEGER}
+    ORDER BY id
+  </select>
+
+  <select id="queryByCusnum" parameterType="string" resultMap="orderMap">
+    select
+    <include refid="columnList" />
+    from risk_order
+    where userId=#{userid,jdbcType=VARCHAR}
+    ORDER BY id
+  </select>
+
+  <select id="queryByRespcode"  resultMap="orderMap" flushCache="false">
+    select
+    <include refid="columnList" />
+    from risk_order
+    where userid =#{customerid,jdbcType=VARCHAR} and respCode in
+    <foreach collection="respCode" item="item"  open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="querybycondition" parameterType="map" resultType="map">
+    select t.*,c.customername,d.risklevel
+    from risk_order t
+    LEFT JOIN risk_dubioustxn d on t.dubioustxnid = d.id
+    left join risk_customerinfo c on t.userid=c.customerid
+    <where>
+      1=1 and t.dubioustxnid is not null
+      <if test="order.getUserid() != null and ''!=order.getUserid()">
+        AND t.userid = #{sb.userid}
+      </if>
+      <if test="customername != null and ''!=customername">
+        AND c.customername = #{customername}
+      </if>
+      <if test="order.getOrderid() != null and ''!=order.getOrderid()">
+        AND t.txnid = #{sb.txnid}
+      </if>
+      <if test="risklevel != null and ''!=risklevel">
+        AND d.risklevel = #{risklevel}
+      </if>
+    </where>
+
+    ORDER BY id
+  </select>
+
+  <select id="queryEventOrder" parameterType="map" resultType="map">
+    select a.*,c.customername,c.id as custid
+    FROM risk_order a LEFT JOIN risk_customerinfo c ON a.userid=c.customerid
+    <where>
+      <if test="userid!=null and ''!=userid">
+        a.userid=#{userid}
+      </if>
+      <if test="txnid!=null and ''!=txnid">
+        AND a.orderid=#{txnid}
+      </if>
+      <if test="customername!=null and ''!=customername">
+        AND c.customername=#{customername}
+      </if>
+      and a.riskeventid is null
+    </where>
+
+  </select>
+
+  <select id="queryDubioustxmns" parameterType="map" resultType="map">
+    select t.id, t.userid, t.orderid, t.identitycard, t.cardnum,
+    t.ordertime, t.amount, t.productid, t.rootinstcd, t.ordertypeid,c.customername,d.risklevel
+    from risk_order t
+    LEFT JOIN risk_dubioustxn d on t.dubioustxnid = d.id
+    left join risk_customerinfo c on t.userid=c.customerid
+    <where>
+      1=1 and t.dubioustxnid is not null
+      <if test="userid != null and ''!=userid">
+        AND t.userid = #{userid}
+      </if>
+      <if test="customername != null and ''!=customername">
+        AND c.customername = #{customername}
+      </if>
+      <if test="orderid != null and ''!=orderid">
+        AND t.orderid = #{orderid}
+      </if>
+      <if test="risklevel != null and ''!=risklevel">
+        AND d.risklevel = #{risklevel}
+      </if>
+      <if test="products != null and products.length !=0">
+        AND t.productid in
+        <foreach collection="products" index="index" item="product" open="(" separator="," close=")">
+          #{product}
+        </foreach>
+      </if>
+      <if test="productall != null and ''!=productall">
+        AND t.productid = #{productall}
+      </if>
+      <if test="productnull != null and ''!=productnull">
+        AND t.productid is null
+      </if>
+      <if test="timebegin != null and ''!=timebegin">
+        AND t.ordertime &gt;= #{timebegin}
+      </if>
+      <if test="timeend != null and ''!=timeend">
+        AND t.ordertime &lt;= #{timeend}
+      </if>
+    </where>
+
+    ORDER BY id
+  </select>
+
+  <select id="recCounts" parameterType="map" resultType="int">
+    SELECT COUNT(orderid) AS RECCOUNTS FROM risk_order
+    WHERE USERID=#{customerid}
+    AND ordertime &gt;=#{timebegin,jdbcType=TIMESTAMP,javaType=DateTime}
+    AND ordertime &lt;= #{timeend,jdbcType=TIMESTAMP,javaType=DateTime}
+  </select>
+
+  <select id="rechargeExecepNum" parameterType="Order" resultType="int">
+    SELECT COUNT(1) AS RECCOUNTS FROM risk_order t
+    WHERE 1=1 and t.ordertypeid like 'B1%' and t.statusid &lt;&gt; '4'
+     and t.orderdate = #{orderdate}
+    <if test="userid != null and ''!=userid">
+      AND t.userid = #{userid}
+    </if>
+  </select>
+
+  <select id="depositExecepNum" parameterType="Order" resultType="int">
+    SELECT COUNT(1) AS RECCOUNTS FROM risk_order t
+    WHERE t.ordertypeid like 'B2%'
+    AND t.ordertime  &lt;=  #{ordertime}
+    AND t.ordertime &gt; DATE_SUB(#{ordertime}, INTERVAL 1 HOUR)
+    and t.statusid &lt;&gt; '4'
+    <if test="userid != null and ''!=userid">
+      AND t.userid = #{userid}
+    </if>
+  </select>
+
+  <update id="updateByOrderId" parameterType="Order" >
+    update risk_order
+    set respcode=#{respcode,jdbcType=VARCHAR},
+    statusid= #{statusid,jdbcType=VARCHAR}
+    where orderid = #{orderid,jdbcType=VARCHAR}
+  </update>
+
+  <select id="queryOrderCondition" parameterType="map" resultType="map">
+    select o.ordertime,o.orderid, o.ordertypeid, o.userid,o.amount,o.score,o.goodsname,
+    o.rootinstcd,o.goodscnt,o.unitprice,c.customername,l.risklevel
+    from risk_order o
+    LEFT JOIN risk_score_level l on o.score &gt; l.scoremin and o.score &lt;= l.scoremax
+    left join risk_customerinfo c on o.userid=c.customerid
+    <where>
+      1=1
+      <if test="orderid != null and ''!=orderid">
+        AND o.orderid = #{orderid}
+      </if>
+      <if test="customnum != null and ''!=customnum">
+        AND o.userid = #{customnum}
+      </if>
+      <if test="customname != null and ''!=customname">
+        AND c.customername = #{customname}
+      </if>
+      <if test="risklevel != null and ''!=risklevel">
+        AND l.risklevel = #{risklevel}
+      </if>
+      <if test="products != null and products.length !=0">
+        AND o.productid in
+        <foreach collection="products" index="index" item="product" open="(" separator="," close=")">
+          #{product}
+        </foreach>
+      </if>
+
+      <if test="productall != null and ''!=productall">
+        AND o.productid = #{productall}
+      </if>
+      <if test="productnull != null and ''!=productnull">
+        AND o.productid is null
+      </if>
+      <if test="ordertimes != null and ''!=ordertimes">
+        AND o.ordertime &gt;= #{ordertimes}
+      </if>
+      <if test="ordertimee != null and ''!=ordertimee">
+        AND o.ordertime &lt;= #{ordertimee}
+      </if>
+    </where>
+    ORDER BY o.id
+  </select>
+
+  <select id="depositTimes" parameterType="Order" resultType="int">
+    SELECT COUNT(1) AS DEPOSITTIMES FROM risk_order t
+    WHERE t.ordertypeid like 'B1%'
+    AND t.ordertime  &lt;=  #{ordertime}
+    AND t.ordertime &gt; DATE_SUB(#{ordertime}, INTERVAL 1 HOUR)
+    AND t.statusid ='4'
+    AND t.userid = #{userid}
+  </select>
+  <select id="queryByIdenAndStatus" parameterType="map" resultMap="orderMap">
+    SELECT <include refid="columnList" />
+    FROM risk_order
+    WHERE identitycard = #{identitycard,jdbcType=VARCHAR}
+    AND  ordertypeid='M20001'
+    <if test="status != null and status.length !=0">
+    AND statusid in
+    <foreach collection="status" index="index" item="sta" open="(" separator="," close=")">
+      #{sta}
+    </foreach>
+    </if>
+  </select>
+
+  <select id="queryByOrderId" parameterType="map" resultMap="orderMap">
+    SELECT
+    <include refid="columnList" />
+    FROM risk_order r
+    <where>
+      <if test="orderId != null and ''!=orderId">
+        orderid = #{orderId}
+      </if>
+    </where>
+  </select>
+
+  <select id="queryByCheckorderid" parameterType="map" resultType="Order">
+    SELECT
+    <include refid="columnList" />
+    FROM risk_order
+    WHERE checkorderid = #{checkorderid}
+  </select>
+
+  <update id="updateOrderStatus" parameterType="Order">
+    UPDATE risk_order
+    SET riskstatus = #{riskstatus}
+    WHERE orderid = #{orderid}
+  </update>
+
+  <update id="updateStatusid" parameterType="Order">
+    UPDATE risk_order
+    SET statusid = #{statusid}
+    WHERE orderid = #{orderid}
+  </update>
+
+</mapper>

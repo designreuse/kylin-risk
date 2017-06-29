@@ -1,0 +1,26 @@
+package os.nut.drools.recharge;
+
+import com.rkylin.risk.service.bean.RechargeFactor;
+
+import com.rkylin.risk.service.bean.RechargeCode;
+
+rule "div50001"
+    no-loop true
+    salience 75
+    when
+         recharge : RechargeFactor( div5000==true)
+         code:RechargeCode()
+    then
+        code.setDiv5000("recDiv500001");
+
+end
+
+rule "div50002"
+    no-loop true
+    salience 74
+    when
+         recharge : RechargeFactor( div5000 ==false )
+         code:RechargeCode()
+    then
+        code.setDiv5000("recDiv500002");
+end

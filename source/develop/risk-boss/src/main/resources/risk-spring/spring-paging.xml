@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+                  http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="pagingFilter" class="com.rkylin.risk.boss.page.PagingFilter">
+        <property name="indentOutput" value="true"/>
+        <property name="serializers">
+            <array value-type="com.fasterxml.jackson.databind.JsonSerializer">
+                <bean class="com.rkylin.risk.boss.json.serialize.AmountSerializer"/>
+                <bean class="com.rkylin.risk.boss.json.serialize.DateTimeSerializer"/>
+                <bean class="com.rkylin.risk.boss.json.serialize.LocalDateSerializer"/>
+            </array>
+        </property>
+        <property name="deserializers">
+            <map key-type="java.lang.Class" value-type="com.fasterxml.jackson.databind.JsonDeserializer">
+                <entry key="com.rkylin.risk.commons.entity.Amount">
+                    <bean class="com.rkylin.risk.boss.json.deserialize.AmountDeserializer"/>
+                </entry>
+                <entry key="org.joda.time.DateTime">
+                    <bean class="com.rkylin.risk.boss.json.deserialize.DateTimeDeserializer"/>
+                </entry>
+                <entry key="org.joda.time.LocalDate">
+                    <bean class="com.rkylin.risk.boss.json.deserialize.LocalDateDeserializer"/>
+                </entry>
+            </map>
+        </property>
+        <property name="urlSqlIdMapping">
+            <map key-type="java.lang.String" value-type="java.lang.String">
+                <entry key="/operator/queryOperator" value="Operator.queryOpersByCondition"/>
+                <entry key="/warningset/queryWarningset" value="WarningSet.queryAll"/>
+
+
+                <entry key="/abnormalarea/queryAbnormalArea" value="AbnormalArea.queryAbnormalAreaByCondition"/>
+                <entry key="/operatorLog/queryOperatorLogs" value="Operatorlog.queryByOperLog"/>
+
+                <entry key="/customer/queryCustomer" value="Customerinfo.queryAll"/>
+                <entry key="/customerbwg/queryCustomebwglist" value="CustomebwgList.queryCustbwgListByCondition"/>
+                <entry key="/merchantbwg/queryMerchantbwglist" value="MerchantbwgList.queryMerbwgListByCondition"></entry>
+
+                <entry key="/merchant/queryMercByCondition" value="Merchant.queryMerByCondition"/>
+                <entry key="/merchant/queryMerchantByAll" value="Merchant.queryAll"/>
+                <entry key="/customer/queryCusByCondition" value="Customerinfo.queryCusByCondition"/>
+                <entry key="/idcardblack/queryIdCardBlackList" value="IdCardBlackList.queryIdCardBlackByCondition"/>
+                <entry key="/amlGradeCust/queryAmlGradeCust" value="RiskGradeCust.queryPayGradeCust"/>
+
+                <entry key="/dubioustxnReport/queryDubioustxnReport" value="Order.queryDubioustxmns"/>
+
+                <entry key="/dictionary/queryDictionary" value="DictionaryCode.queryAll"/>
+                <entry key="/riskrule/queryRiskrule" value="Riskrule.queryAll"/>
+                <entry key="/function/queryFunction" value="Functions.query"/>
+                <entry key="/role/queryRole" value="Role.query"/>
+                <entry key="/abnorCountry/queryAbnorCountry" value="AbnormalCountrycode.queryAll"/>
+
+
+                <entry key="/abnorIndustry/queryAbnorIndustry" value="AbnorIndustry.queryAll"/>
+
+                <entry key="/amlDubiousTxn/queryAmlDubTxn" value="AmlDubiousTxn.queryAll"/>
+                <entry key="/dictionary/queryFreshDic" value="DictionaryCode.queryFresh"/>
+                <entry key="/riskGradeCust/queryPayGradeCust" value="RiskGradeCust.queryPayGradeCust"/>
+                <entry key="/riskEvent/queryRiskEvent" value="RiskEvent.queryRiskEventByCondition"/>
+                <entry key="/dubioustxn/queryDubioustxnCondition" value="Dubioustxn.queryByCondition"/>
+                <entry key="/case/queryCase" value="Case.queryAll"/>
+                <entry key="/riskEvent/querySimpleBillByCon" value="Order.queryEventOrder"/>
+                <entry key="/order/queryOrderCondition" value="Order.queryOrderCondition"></entry>
+                <entry key="/rule/queryRule" value="Rule.queryRule"></entry>
+                <entry key="/factorTempl/queryFactorTempl" value="FactorTempl.queryFactorTempl"></entry>
+                <entry key="/amlGradeMerc/queryAmlGradeMerc" value="RiskGradeMerc.queryAmlGradeMerc"></entry>
+                <!--<entry key="/ruleHis/queryRuleHis" value="RuleHis.queryRuleHis"></entry>-->
+                <entry key="/group/queryGroup" value="Group.queryGroup"></entry>
+                <entry key="/groupVersion/queryGroupVersion" value="GroupVersion.queryGroupVersion"></entry>
+                <entry key="/factorLibrary/queryFactorLibrary" value="FactorLibrary.queryFactorLibrary"></entry>
+                <entry key="/courseType/queryCourseType" value="CourseType.queryAll"></entry>
+                <entry key="/course/queryCourse"  value="Course.queryCourseByCondition"></entry>
+            </map>
+        </property>
+    </bean>
+</beans>

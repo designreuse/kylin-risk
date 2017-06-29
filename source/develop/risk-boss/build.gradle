@@ -1,0 +1,82 @@
+apply plugin: 'war'
+
+ext {
+  riskRuleVersionManagerVersion = '1.1.0'
+  riskSpringWebVersion = '1.0.0'
+}
+
+description = '风控的后台管理系统'
+dependencies {
+  compile project(":risk-core")
+  compile "com.rkylin.risk:risk-rule-version-manager:${riskRuleVersionManagerVersion}"
+
+  //spring web begin
+  compile "org.springframework:spring-web"
+  compile "org.springframework:spring-webmvc"
+  compile "org.springframework:spring-websocket"
+  compile "org.springframework:spring-messaging"
+  //sprin web end
+
+  compile "com.rkylin.risk:risk-spring-web:${riskSpringWebVersion}"
+
+  //spring session begin
+  compile "org.springframework.session:spring-session:${springSessionVersion}"
+  compile "org.springframework.security:spring-security-web:${springSecurityVersion}"
+  //spring session end
+
+  //utils begin
+  compile "org.apache.commons:commons-lang3"
+  compile "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
+  providedCompile "org.projectlombok:lombok"
+
+  //utils end
+
+  //documents begin
+  //poi
+  compile "org.apache.poi:poi"
+  compile "org.apache.poi:poi-ooxml"
+  compile "org.apache.poi:poi-ooxml-schemas"
+  //documents end
+
+  //log begin
+  compile "org.slf4j:slf4j-api"
+  compile "org.slf4j:log4j-over-slf4j"
+  compile "org.slf4j:jcl-over-slf4j"
+  compile "org.apache.logging.log4j:log4j-core"
+  compile "org.apache.logging.log4j:log4j-api"
+  compile "org.apache.logging.log4j:log4j-web"
+  compile "org.apache.logging.log4j:log4j-slf4j-impl"
+  //log end
+
+  //json begin
+  compile "com.fasterxml.jackson.core:jackson-core"
+  compile "com.fasterxml.jackson.core:jackson-annotations"
+  compile "com.fasterxml.jackson.core:jackson-databind"
+  //json end
+
+  //test begin
+  testCompile "junit:junit"
+  testCompile "org.mockito:mockito-all"
+  testCompile "org.springframework:spring-test"
+  testCompile "com.jayway.jsonpath:json-path"
+  testCompile "org.assertj:assertj-core"
+  testCompile "org.assertj:assertj-guava"
+  //test end
+
+  //web api begin
+  providedCompile "javax.servlet:javax.servlet-api"
+  providedCompile "javax.servlet.jsp:javax.servlet.jsp-api"
+  providedCompile "javax.websocket:javax.websocket-api"
+  compile "javax.servlet.jsp.jstl:javax.servlet.jsp.jstl-api"
+  compile "taglibs:standard"
+  //web api end
+
+  compile "org.sitemesh:sitemesh:${sitemeshVersion}"
+
+
+
+  compile("org.quartz-scheduler:quartz:${springQuartzVersion}") {
+    exclude(module: "c3p0")
+  }
+}
+

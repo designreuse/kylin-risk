@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="RiskEvent" >
+  <resultMap id="riskEventMap" type="RiskEvent" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="cusid" property="cusid" jdbcType="INTEGER" />
+    <result column="customerid" property="customerid" jdbcType="VARCHAR" />
+    <result column="eventcode" property="eventcode" jdbcType="VARCHAR" />
+    <result column="eventname" property="eventname" jdbcType="VARCHAR" />
+    <result column="eventtype" property="eventtype" jdbcType="VARCHAR" />
+    <result column="eventsource" property="eventsource" jdbcType="VARCHAR" />
+    <result column="eventdesc" property="eventdesc" jdbcType="VARCHAR" />
+    <result column="eventresult" property="eventresult" jdbcType="VARCHAR" />
+    <result column="filepath" property="filepath" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="operatorid" property="operatorid" jdbcType="SMALLINT" />
+    <result column="operatorname" property="operatorname" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, cusid, customerid, eventcode, eventname, eventtype, eventsource, eventdesc, eventresult, 
+    filepath, createtime, operatorid, operatorname, status
+  </sql>
+  <select id="get" resultMap="riskEventMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_event
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_event
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="RiskEvent" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    insert into risk_event (cusid, customerid, eventcode, 
+      eventname, eventtype, eventsource, 
+      eventdesc, eventresult, filepath, 
+      operatorid, operatorname,
+      status)
+    values (#{cusid,jdbcType=INTEGER}, #{customerid,jdbcType=VARCHAR}, #{eventcode,jdbcType=VARCHAR}, 
+      #{eventname,jdbcType=VARCHAR}, #{eventtype,jdbcType=VARCHAR}, #{eventsource,jdbcType=VARCHAR}, 
+      #{eventdesc,jdbcType=VARCHAR}, #{eventresult,jdbcType=VARCHAR}, #{filepath,jdbcType=VARCHAR}, 
+      #{operatorid,jdbcType=SMALLINT}, #{operatorname,jdbcType=VARCHAR},
+      #{status,jdbcType=CHAR})
+  </insert>
+  <update id="update" parameterType="RiskEvent" >
+    update risk_event
+    set
+      eventcode = #{eventcode,jdbcType=VARCHAR},
+      eventname = #{eventname,jdbcType=VARCHAR},
+      eventtype = #{eventtype,jdbcType=VARCHAR},
+      eventsource = #{eventsource,jdbcType=VARCHAR},
+      eventdesc = #{eventdesc,jdbcType=VARCHAR},
+      eventresult = #{eventresult,jdbcType=VARCHAR},
+      operatorid = #{operatorid,jdbcType=SMALLINT},
+      operatorname = #{operatorname,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="queryRiskEventByCondition" resultMap="riskEventMap" parameterType="RiskEvent">
+    <if test="operatorname != null">
+      <bind name="operatorname" value="operatorname + '%'" />
+    </if>
+    SELECT
+    <include refid="columnList" />
+    FROM risk_event
+    <where>
+      <if test="operatorname != null and ''!=operatorname">
+        operatorname LIKE #{operatorname}
+      </if>
+      <if test="customerid != null and ''!=customerid">
+        AND customerid = #{customerid}
+      </if>
+      <if test="id != null and ''!=id">
+        AND id = #{id}
+      </if>
+    </where>
+    order by id
+  </select>
+  <select id="queryByCaseId" resultMap="riskEventMap" parameterType="integer" >
+    select a.*
+    from risk_event a LEFT JOIN risk_case_event b ON a.id=b.eventid
+    where b.caseid = #{caseid,jdbcType=INTEGER}
+  </select>
+</mapper>

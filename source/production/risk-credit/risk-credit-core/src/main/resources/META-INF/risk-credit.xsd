@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.rkylin.com/schema/risk/risk-credit"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    targetNamespace="http://www.rkylin.com/schema/risk/risk-credit"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+  <xsd:import namespace="http://www.springframework.org/schema/beans"
+      schemaLocation="http://www.springframework.org/schema/beans/spring-beans-4.0.xsd"/>
+
+  <xsd:element name="credit">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+	    征信产品,生成com.rkylin.risk.credit.service.CreditService
+			]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="credit-product" minOccurs="1" maxOccurs="unbounded">
+          <xsd:annotation>
+            <xsd:documentation><![CDATA[
+	     TODO
+			]]></xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:string" use="required">
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

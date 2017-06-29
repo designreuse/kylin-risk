@@ -1,0 +1,34 @@
+apply plugin: 'war'
+
+description = '风控的测试接口,目前为压力测试服务'
+ext{
+  riskSpringWebVersion = '1.0.0'
+}
+dependencies {
+
+  compile project(":risk-service")
+  compile "com.rkylin.risk:risk-spring-web:${riskSpringWebVersion}"
+  compile "org.springframework:spring-web"
+  compile "org.springframework:spring-webmvc"
+  compile "org.springframework:spring-context-support"
+
+  providedCompile "javax.servlet:javax.servlet-api"
+
+  compile "org.apache.logging.log4j:log4j-web"
+
+  //json begin
+  compile "com.fasterxml.jackson.core:jackson-core"
+  compile "com.fasterxml.jackson.core:jackson-annotations"
+  compile "com.fasterxml.jackson.core:jackson-databind"
+  //json end
+
+  testCompile "junit:junit"
+  testCompile "org.mockito:mockito-all"
+  testCompile "org.springframework:spring-test"
+  testCompile "com.jayway.jsonpath:json-path"
+  testCompile "org.assertj:assertj-core"
+  testCompile "org.assertj:assertj-guava"
+
+
+  providedCompile "org.projectlombok:lombok"
+}

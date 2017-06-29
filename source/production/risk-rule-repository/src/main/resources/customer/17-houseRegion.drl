@@ -1,0 +1,44 @@
+package os.nut.drools.EstateInfo;
+//salience:199-180
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "houseRegion2"
+    no-loop true
+    salience 199
+    when
+        $estateInfo : CustomerFactor(houseRegion=="一类地区");
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseRegion("houseRegion01");
+end
+
+rule "houseRegion3"
+    no-loop true
+    salience 198
+    when
+        $estateInfo : CustomerFactor( houseRegion=="二类地区");
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseRegion("houseRegion02");
+end
+
+rule "houseRegion4"
+    no-loop true
+    salience 197
+    when
+        $estateInfo : CustomerFactor(houseRegion=="三类地区");
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseRegion("houseRegion03");
+end
+
+rule "houseRegion5"
+    no-loop true
+    salience 196
+    when
+        $estateInfo : CustomerFactor(houseRegion=="四类地区");
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setHouseRegion("houseRegion04");
+end

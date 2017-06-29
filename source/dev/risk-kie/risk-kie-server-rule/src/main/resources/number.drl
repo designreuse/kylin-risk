@@ -1,0 +1,9 @@
+package test;
+
+
+rule "number"
+    when
+    then
+    System.out.println("===================================================================");
+    System.out.println("value:"+4);
+end

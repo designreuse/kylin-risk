@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="AbnorIndustry" >
+  <resultMap id="abnorIndustryMap" type="AbnorIndustry" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="CODEID" property="codeid" jdbcType="VARCHAR" />
+    <result column="CODENM" property="codenm" jdbcType="VARCHAR" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+    <result column="LASTMTAUSER" property="lastmtauser" jdbcType="SMALLINT" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime"/>
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime"/>
+  </resultMap>
+  <sql id="columnList" >
+    id, CODEID, CODENM, TYPE, LASTMTAUSER, updatetime,createtime
+  </sql>
+  <select id="queryOne" resultMap="abnorIndustryMap" parameterType="integer" >
+    select
+    <include refid="columnList" />
+    from risk_abnor_industry
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryAll" resultMap="abnorIndustryMap" parameterType="AbnorIndustry" >
+    <if test="codenm!=null and ''!=codenm">
+      <bind name="codenm" value="codenm + '%'" />
+    </if>
+    select
+    <include refid="columnList" />
+    from risk_abnor_industry
+    <where>
+      <if test="codenm != null and ''!=codenm">
+        CODENM LIKE #{codenm}
+      </if>
+      <if test="codeid != null and ''!=codeid">
+        AND CODEID = #{codeid}
+      </if>
+    </where>
+  </select>
+
+  <delete id="delete" parameterType="integer" >
+    delete from risk_abnor_industry
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="AbnorIndustry" >
+    insert into risk_abnor_industry (CODEID, CODENM, TYPE, 
+      LASTMTAUSER
+      )
+    values (#{codeid,jdbcType=VARCHAR}, #{codenm,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{lastmtauser,jdbcType=SMALLINT}
+      )
+  </insert>
+  <update id="update" parameterType="AbnorIndustry" >
+    update risk_abnor_industry
+    set CODEID = #{codeid,jdbcType=VARCHAR},
+      CODENM = #{codenm,jdbcType=VARCHAR},
+      TYPE = #{type,jdbcType=VARCHAR},
+      LASTMTAUSER = #{lastmtauser,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

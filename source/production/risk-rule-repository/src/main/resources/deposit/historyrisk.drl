@@ -1,0 +1,25 @@
+package os.nut.drools.deposit;
+
+import com.rkylin.risk.service.bean.DepositCode;
+import com.rkylin.risk.service.bean.DepositFactor;
+
+rule "historyrisk1"
+    no-loop true
+    salience 126
+    when
+         deposit : DepositFactor( historyrisk==true)
+         code:DepositCode()
+    then
+        code.setHistoryrisk("depHistoryrisk01");
+
+end
+
+rule "historyrisk2"
+    no-loop true
+    salience 125
+    when
+         deposit : DepositFactor( historyrisk ==false )
+         code:DepositCode()
+    then
+        code.setHistoryrisk("depHistoryrisk02");
+end

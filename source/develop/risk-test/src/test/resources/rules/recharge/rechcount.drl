@@ -1,0 +1,57 @@
+package os.nut.drools.recharge;
+
+import com.rkylin.risk.service.bean.RechargeFactor;
+
+import com.rkylin.risk.service.bean.RechargeCode;
+
+rule "rechcount1"
+    no-loop true
+    salience 89
+    when
+         recharge : RechargeFactor(rechcount >=10)
+         code:RechargeCode()
+    then
+        code.setRechcount("recRechcount01");
+
+end
+
+rule "rechcount2"
+    no-loop true
+    salience 88
+    when
+         recharge : RechargeFactor(rechcount >= 7&&rechcount<10 )
+         code:RechargeCode()
+    then
+
+        code.setRechcount("recRechcount02");
+end
+
+rule "rechcount3"
+    no-loop true
+    salience 87
+    when
+         recharge : RechargeFactor(rechcount>=4 && rechcount<6)
+         code:RechargeCode()
+    then
+        code.setRechcount("recRechcount03");
+end
+
+rule "rechcount4"
+    no-loop true
+    salience 86
+    when
+         recharge : RechargeFactor(rechcount >= 1 &&rechcount<3)
+         code:RechargeCode()
+    then
+        code.setRechcount("recRechcount04");
+end
+
+rule "rechcount5"
+    no-loop true
+    salience 85
+    when
+         recharge : RechargeFactor(rechcount==0)
+         code:RechargeCode()
+    then
+        code.setRechcount("recRechcount05");
+end

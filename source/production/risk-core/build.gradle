@@ -1,0 +1,250 @@
+assert JavaVersion.current().java7Compatible:
+        "At least Java 7 is required, current JVM is ${JavaVersion.current()}"
+
+description = '风控核心模块,主要负责与DB的交互不掺杂业务逻辑'
+ext {
+  slf4jVersion = '1.7.21'
+  log4jVersion = '2.6.1'
+
+
+  springVersion = '4.2.5.RELEASE'
+  aopallianceVersion = '1.0'
+  aspectjVersion = '1.8.8'
+  cglibVersion = '3.1'
+  mailVersion = '1.5.4'
+  velocityVersion = '1.7'
+
+
+  pagehelperVersion = '4.1.6'
+  jsqlparserVersion = '0.9.5'
+  mybatisVersion = '3.4.0'
+  mybatisSpringVersion = '1.3.0'
+
+  jodaTimeVersion = '2.8.2'
+  guavaVersion = '18.0'
+
+  jedisVersion = '2.7.3'
+  commonsPoolVerion = '2.3'
+  springDataRedisVersion = '1.7.1.RELEASE'
+
+  commonsLang3Version = '3.4'
+  commonsLang2Version = '2.6'
+  commonsFileuploadVersion = '1.3.1'
+  commonsIoVersion = '2.2'
+  commonsCodecVersion = '1.10'
+  modelmapperVersion = '0.7.6'
+  lombokVersion = '1.16.8'
+
+
+  hibernateValidatorVersion = '4.3.2.Final'
+  validationApiVersion = '1.0.0.GA'
+
+  hikariCPVersion = '2.4.7'
+  javassistVersion = '3.20.0-GA'
+  mysqlDriverVersion = '5.1.39'
+  metricsVersion = '3.1.2'
+
+  jacksonVersion = "2.6.5"
+
+
+  riskCommonsEntityVersion = '2.0.0'
+  riskMybatisRedisVersion = '1.0.0'
+
+
+  junitVersion = '4.12'
+  mockitoVersion = '1.10.19'
+  jsonpathVersion = '2.0.0'
+  assertjVersion = '2.4.1'
+  assertGuavaVersion = '2.0.0'
+
+  profile=defaultProperty('profile','develop')
+  profileFile="${rootDir}/profiles/${profile}.properties"
+
+
+  gradleCheckstyleVersion='6.17'
+
+  p6spyVersion = '2.1.4'
+  gradleScriptDir = "${rootProject.projectDir}/gradle"
+}
+
+buildscript {
+  repositories {
+    maven {
+      url "http://121.40.68.238:8081/nexus/content/groups/public"
+    }
+    maven { url 'http://repo.spring.io/plugins-release' }
+    mavenCentral()
+    mavenLocal()
+  }
+
+  dependencies {
+    classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+    classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.0.1"
+  }
+}
+
+def defaultProperty(propertyName, defaultValue) {
+  return hasProperty(propertyName) ? project[propertyName] : defaultValue
+}
+
+def loadProperties(){
+  def props = new Properties()
+  new File(profileFile)
+          .withInputStream {
+    stream -> props.load(stream)
+  }
+  def currentProfile="$projectDir.absolutePath/src/main/resources/profiles/$profile"
+  def currentProfileFile=new File(currentProfile)
+  if(currentProfileFile.exists()){
+    currentProfileFile.withInputStream {
+      stream -> props.load(stream)
+    }
+  }
+  props
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-idea'
+apply from: "${gradleScriptDir}/publish-maven.gradle"
+
+apply plugin: 'checkstyle'
+apply plugin: "org.sonarqube"
+
+group = 'com.rkylin.risk'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+
+repositories {
+  maven { url "http://121.40.68.238:8081/nexus/content/groups/public" }
+  mavenCentral()
+}
+
+dependencies {
+  compile "com.rkylin.risk:risk-commons-entity:${riskCommonsEntityVersion}"
+  compile "com.rkylin.risk.mybatis.cache:risk-mybatis-redis:${riskMybatisRedisVersion}"
+
+  //log begin
+  compile "org.slf4j:slf4j-api:${slf4jVersion}"
+  compile "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+  compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+  optional "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+  optional "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+  optional "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+  //log end
+
+  //spring begin
+  compile("org.springframework:spring-core:${springVersion}") {
+    exclude(module: "commons-logging")
+  }
+  compile "org.springframework:spring-context:${springVersion}"
+  compile "org.springframework:spring-expression:${springVersion}"
+  compile "org.springframework:spring-beans:${springVersion}"
+  compile "org.springframework:spring-aop:${springVersion}"
+  compile "org.springframework:spring-tx:${springVersion}"
+  compile "org.springframework:spring-jdbc:${springVersion}"
+  compile "org.springframework:spring-context-support:${springVersion}"
+  //spring end
+
+  //spring dependencied begin
+  compile "aopalliance:aopalliance:${aopallianceVersion}"
+  compile "org.aspectj:aspectjweaver:${aspectjVersion}"
+  compile "cglib:cglib-nodep:${cglibVersion}"
+  //spring dependencied end
+
+  //java mail begin
+  compile "javax.mail:javax.mail-api:${mailVersion}"
+  compile "com.sun.mail:javax.mail:${mailVersion}"
+  //java mail end
+
+  compile "org.apache.velocity:velocity:${velocityVersion}"
+
+
+
+
+  //mybatis begin
+  compile "org.mybatis:mybatis-spring:${mybatisSpringVersion}"
+  compile "org.mybatis:mybatis:${mybatisVersion}"
+  compile "com.github.pagehelper:pagehelper:${pagehelperVersion}"
+  compile "com.github.jsqlparser:jsqlparser:${jsqlparserVersion}"
+  //mybatis end
+
+  compile "com.google.guava:guava:${guavaVersion}"
+  compile "joda-time:joda-time:${jodaTimeVersion}"
+  compile "org.apache.commons:commons-lang3:${commonsLang3Version}"
+  compile "commons-lang:commons-lang:${commonsLang2Version}"
+  compile "commons-io:commons-io:${commonsIoVersion}"
+  compile "commons-codec:commons-codec:${commonsCodecVersion}"
+
+
+  compile "org.modelmapper:modelmapper:${modelmapperVersion}"
+
+
+
+  //database pool begin
+  compile "com.zaxxer:HikariCP:${hikariCPVersion}"
+  compile "org.javassist:javassist:${javassistVersion}"
+  compile "mysql:mysql-connector-java:${mysqlDriverVersion}"
+  compile "io.dropwizard.metrics:metrics-core:${metricsVersion}"
+  compile "io.dropwizard.metrics:metrics-healthchecks:${metricsVersion}"
+  //database pool end
+
+  //redis begin
+  compile "redis.clients:jedis:${jedisVersion}"
+  compile "org.apache.commons:commons-pool2:${commonsPoolVerion}"
+  compile("org.springframework.data:spring-data-redis:${springDataRedisVersion}") {
+    exclude(module: "spring-context")
+    exclude(module: "spring-aop")
+    exclude(module: "spring-beans")
+    exclude(module: "spring-tx")
+    exclude(module: "spring-core")
+    exclude(module: "jcl-over-slf4j")
+    exclude(module: "slf4j-api")
+  }
+  //redis end
+
+  compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+
+  //validation begin
+  compile "org.hibernate:hibernate-validator:${hibernateValidatorVersion}"
+  compile "javax.validation:validation-api:${validationApiVersion}"
+  //validation end
+
+  //test begin
+  testCompile "junit:junit:${junitVersion}"
+  testCompile "org.mockito:mockito-all:${mockitoVersion}"
+  testCompile "org.springframework:spring-test:${springVersion}"
+  testCompile "com.jayway.jsonpath:json-path:${jsonpathVersion}"
+  testCompile "org.assertj:assertj-core:${assertjVersion}"
+  testCompile "org.assertj:assertj-guava:${assertGuavaVersion}"
+  //test end
+
+  provided "org.projectlombok:lombok:${lombokVersion}"
+
+  testCompile "p6spy:p6spy:${p6spyVersion}"
+}
+
+processTestResources{
+  from(sourceSets.test.resources.srcDirs) {
+    include '**/*.properties'
+    include 'log4j2.xml'
+    filter(org.apache.tools.ant.filters.ReplaceTokens,
+            tokens: loadProperties()
+    )
+  }
+}
+
+tasks.withType(JavaCompile) {
+  options.encoding = "UTF-8"
+}
+
+checkstyle{
+  toolVersion=gradleCheckstyleVersion
+  configFile=file("dev-tools/checkstyle/checkstyle.xml")
+  configProperties.checkstyleSuppressionsFile=file("dev-tools/checkstyle/suppressions.xml").absolutePath
+}
+  
+  

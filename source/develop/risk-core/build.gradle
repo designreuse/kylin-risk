@@ -1,0 +1,96 @@
+
+description = '风控核心模块,主要负责与DB的交互不掺杂业务逻辑'
+ext{
+  riskCommonsEntityVersion='1.0.0'
+  riskMybatisRedisVersion='1.0.0'
+}
+dependencies {
+  compile "com.rkylin.risk:risk-commons-entity:${riskCommonsEntityVersion}"
+  compile "com.rkylin.risk.mybatis.cache:risk-mybatis-redis:${riskMybatisRedisVersion}"
+
+  //log begin
+  compile "org.slf4j:slf4j-api"
+  compile "org.slf4j:log4j-over-slf4j"
+  compile "org.slf4j:jcl-over-slf4j"
+  optional "org.apache.logging.log4j:log4j-core"
+  optional "org.apache.logging.log4j:log4j-api"
+  optional "org.apache.logging.log4j:log4j-slf4j-impl"
+  //log end
+
+  //spring begin
+  compile "org.springframework:spring-core"
+  compile "org.springframework:spring-context"
+  compile "org.springframework:spring-expression"
+  compile "org.springframework:spring-beans"
+  compile "org.springframework:spring-aop"
+  compile "org.springframework:spring-tx"
+  compile "org.springframework:spring-jdbc"
+  compile "org.springframework:spring-context-support"
+  //spring end
+
+  //spring dependencied begin
+  compile "aopalliance:aopalliance"
+  compile "org.aspectj:aspectjweaver"
+  compile "cglib:cglib-nodep"
+  //spring dependencied end
+
+  //java mail begin
+  compile "javax.mail:javax.mail-api"
+  compile "com.sun.mail:javax.mail"
+  //java mail end
+
+  compile "org.apache.velocity:velocity"
+
+
+  compile "org.mybatis:mybatis-spring"
+  compile "org.mybatis:mybatis"
+  compile "com.github.pagehelper:pagehelper"
+  compile "com.github.jsqlparser:jsqlparser"
+
+
+  compile "com.google.guava:guava"
+  compile "joda-time:joda-time"
+  compile "org.apache.commons:commons-lang3"
+  compile "commons-io:commons-io"
+  compile "commons-codec:commons-codec"
+
+  compile "org.modelmapper:modelmapper"
+
+
+  //validation begin
+  compile "org.hibernate:hibernate-validator"
+  compile "javax.validation:validation-api"
+  //validation end
+
+
+  compile "com.zaxxer:HikariCP"
+  compile "org.javassist:javassist"
+  compile "mysql:mysql-connector-java"
+  compile "io.dropwizard.metrics:metrics-core"
+  compile "io.dropwizard.metrics:metrics-healthchecks"
+
+  //redis begin
+  compile "redis.clients:jedis"
+  compile "org.apache.commons:commons-pool2"
+  compile "org.springframework.data:spring-data-redis"
+  //redis end
+
+  //test begin
+  testCompile "junit:junit"
+  testCompile "org.mockito:mockito-all"
+  testCompile "org.springframework:spring-test"
+  testCompile "com.jayway.jsonpath:json-path"
+  testCompile "org.assertj:assertj-core"
+  testCompile "org.assertj:assertj-guava"
+  //test end
+
+
+  provided "org.projectlombok:lombok"
+
+  if(profile=="debug"){
+    println "="*50
+    println "profile=debug时,加入运行时sql debug依赖:p6spy"
+    println "="*50
+    runtime "p6spy:p6spy:${p6spyVersion}"
+  }
+}

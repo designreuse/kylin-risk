@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:credit="http://www.rkylin.com/schema/risk/risk-credit"
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.2.xsd
+	http://code.alibabatech.com/schema/dubbo
+	   http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	   http://www.rkylin.com/schema/risk/risk-credit
+	       http://www.rkylin.com/schema/risk/risk-credit.xsd">
+
+  <!--<credit:credit id="q">-->
+    <!--<credit:credit-product>-->
+      <!---->
+    <!--</credit:credit-product>-->
+  <!--</credit:credit>-->
+  <bean class="com.rkylin.risk.core.common.CustomPropertyPlaceHoderConfigurer">
+    <property name="ignoreResourceNotFound" value="true"/>
+    <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    <property name="locations">
+      <array>
+        <value>classpath:/risk.properties</value>
+        <value>classpath:/risk-credit.properties</value>
+      </array>
+    </property>
+    <property name="fileEncoding" value="UTF-8"/>
+    <property name="secretKeys">
+      <set value-type="java.lang.String">
+        <value>template.mail.password</value>
+        <value>redis.password</value>
+        <value>maven.password</value>
+      </set>
+    </property>
+  </bean>
+
+  <import resource="classpath:risk-spring/spring-config.xml" />
+  <import resource="classpath:risk-spring/spring-redis.xml" />
+
+
+  <bean id="creditResultPersistent" class="com.rkylin.risk.credit.biz.impl.ExternalCreditResultBizImpl"/>
+
+</beans>

@@ -1,0 +1,36 @@
+package os.nut.drools.PubRecord;
+//salience:439-420 最长逾期天数
+import com.rkylin.risk.service.bean.CustomerFactor;
+import com.rkylin.risk.service.bean.CustomerCode;
+
+rule "maxOverdue2"
+    no-loop true
+    salience 438
+    when
+        $estateInfo : CustomerFactor(maxOverdue>=30&&maxOverdue<=59);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMaxOverdue("maxOverdue01");
+end
+
+rule "maxOverdue3"
+    no-loop true
+    salience 437
+    when
+        $estateInfo : CustomerFactor( maxOverdue>=60&&maxOverdue<=89);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMaxOverdue("maxOverdue02");
+end
+
+
+rule "maxOverdue4"
+    no-loop true
+    salience 439
+    when
+        $estateInfo : CustomerFactor( maxOverdue>=90);
+        $customerCode : CustomerCode();
+    then
+        $customerCode.setMsg("最长逾期天数90天以上");
+        retract($estateInfo);
+end

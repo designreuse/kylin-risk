@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Case" >
+  <resultMap id="caseMap" type="Case" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="casename" property="casename" jdbcType="VARCHAR" />
+    <result column="casetype" property="casetype" jdbcType="VARCHAR" />
+    <result column="casedesc" property="casedesc" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="operatorid" property="operatorid" jdbcType="SMALLINT" />
+    <result column="operatorname" property="operatorname" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, casename, casetype, casedesc, createtime, operatorid, operatorname, status
+  </sql>
+  <select id="queryAll" resultMap="caseMap" parameterType="Case" >
+    <if test="casename != null and ''!=casename">
+      <bind name="casename" value="casename + '%'" />
+    </if>
+    select
+    <include refid="columnList" />
+    from risk_case
+    <where>
+      <if test="casetype != null and ''!=casetype">
+        casetype = #{casetype}
+      </if>
+      <if test="casename != null and ''!=casename">
+        AND casename LIKE #{casename}
+      </if>
+      <if test="status != null and ''!=status">
+        AND status = #{status}
+      </if>
+      <if test="createtimebeg != null and ''!=createtimebeg" >
+        AND createtime &gt;= #{createtimebeg}
+      </if>
+      <if test="createtimeend != null and ''!=createtimeend">
+        AND createtime &lt;= #{createtimeend}
+      </if>
+    </where>
+  </select>
+
+  <select id="queryOne" resultMap="caseMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_case
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_case
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="Case" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    insert into risk_case (casename, casetype, casedesc, 
+       operatorid, operatorname,
+      status)
+    values (#{casename,jdbcType=VARCHAR}, #{casetype,jdbcType=VARCHAR}, #{casedesc,jdbcType=VARCHAR}, 
+      #{operatorid,jdbcType=SMALLINT}, #{operatorname,jdbcType=VARCHAR},
+      #{status,jdbcType=CHAR})
+  </insert>
+  <update id="update" parameterType="Case" >
+    update risk_case
+    set casename = #{casename,jdbcType=VARCHAR},
+      casetype = #{casetype,jdbcType=VARCHAR},
+      casedesc = #{casedesc,jdbcType=VARCHAR},
+      operatorid = #{operatorid,jdbcType=SMALLINT},
+      operatorname = #{operatorname,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <sql id="exportColumnList" >
+     casename, casetype, casedesc, createtime, operatorname, status,id
+  </sql>
+  <select id="exportCaseExcel" resultMap="caseMap" parameterType="map" >
+    <if test="casename != null and ''!=casename">
+      <bind name="casename" value="casename + '%'" />
+    </if>
+    select
+    <include refid="exportColumnList" />
+    from risk_case
+    <where>
+      <if test="casetype != null and ''!=casetype">
+        casetype = #{casetype}
+      </if>
+      <if test="casename != null and ''!=casename">
+        AND casename LIKE #{casename}
+      </if>
+      <if test="status != null and ''!=status">
+        AND status = #{status}
+      </if>
+      <if test="createtimebeg != null and ''!=createtimebeg" >
+        AND createtime &gt;= #{createtimebeg}
+      </if>
+      <if test="createtimeend != null and ''!=createtimeend">
+        AND createtime &lt;= #{createtimeend}
+      </if>
+    </where>
+  </select>
+</mapper>

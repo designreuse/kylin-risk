@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="OperatorRole" >
+  <cache type="com.rkylin.risk.mybatis.cache.RedisCache"/>
+  <resultMap id="operatorRoleMap" type="OperatorRole" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="operatorid" property="operatorid" jdbcType="SMALLINT" />
+    <result column="roleid" property="roleid" jdbcType="SMALLINT" />
+  </resultMap>
+  <sql id="columnList" >
+    id, operatorid, roleid
+  </sql>
+  <select id="get" resultMap="operatorRoleMap" parameterType="short" >
+    select 
+    <include refid="columnList" />
+    from risk_operator_role
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+
+  <select id="queryByOperid" resultMap="operatorRoleMap" parameterType="short" >
+    select
+    <include refid="columnList" />
+    from risk_operator_role
+    where operatorid = #{operatorid,jdbcType=SMALLINT}
+  </select>
+
+  <delete id="delete" parameterType="short" >
+    delete from risk_operator_role
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+
+  <delete id="delByOperId" parameterType="short" >
+    delete from risk_operator_role
+    where operatorid = #{operatorid,jdbcType=SMALLINT}
+  </delete>
+  <insert id="insert" parameterType="OperatorRole" >
+    insert into risk_operator_role (operatorid, roleid)
+    values (#{operatorid,jdbcType=SMALLINT}, #{roleid,jdbcType=SMALLINT})
+  </insert>
+  <update id="update" parameterType="OperatorRole" >
+    update risk_operator_role
+    set operatorid = #{operatorid,jdbcType=SMALLINT},
+      roleid = #{roleid,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+</mapper>

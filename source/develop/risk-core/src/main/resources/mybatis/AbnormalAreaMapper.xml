@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="AbnormalArea" >
+  <resultMap id="abnormalAreaMap" type="AbnormalArea" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="PROVNM" property="provnm" jdbcType="VARCHAR" />
+    <result column="CITYNM" property="citynm" jdbcType="VARCHAR" />
+    <result column="COUNTYNM" property="countynm" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" javaType="DateTime" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, CODE, PROVNM, CITYNM, COUNTYNM, NAME, updatetime,createtime, TYPE
+  </sql>
+  <select id="get" resultMap="abnormalAreaMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_abnormal_area
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryAll" resultMap="abnormalAreaMap"  >
+    select
+    <include refid="columnList" />
+    from risk_abnormal_area
+  </select>
+
+  <select id="queryAbnormalAreaByCondition" resultMap="abnormalAreaMap" parameterType="AbnormalArea">
+    SELECT
+    <include refid="columnList" />
+    FROM risk_abnormal_area
+    <where>
+      <if test="code != null and ''!=code">
+        AND CODE = #{code}
+      </if>
+      <if test="name != null and ''!=name">
+        AND NAME = #{name}
+      </if>
+    </where>
+    order by id
+  </select>
+
+  <delete id="delete" parameterType="integer" >
+    delete from risk_abnormal_area
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="AbnormalArea" >
+    insert into risk_abnormal_area (CODE, PROVNM, CITYNM, 
+      COUNTYNM, NAME,
+      TYPE)
+    values (#{code,jdbcType=VARCHAR}, #{provnm,jdbcType=VARCHAR}, #{citynm,jdbcType=VARCHAR}, 
+      #{countynm,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+      #{type,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="AbnormalArea" >
+    update risk_abnormal_area
+    set CODE = #{code,jdbcType=VARCHAR},
+      PROVNM = #{provnm,jdbcType=VARCHAR},
+      CITYNM = #{citynm,jdbcType=VARCHAR},
+      COUNTYNM = #{countynm,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      TYPE = #{type,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

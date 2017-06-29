@@ -1,0 +1,8 @@
+
+
+rootProject.name = 'risk-commons'
+
+include 'risk-commons-entity'
+include 'risk-mybatis-redis'
+include 'risk-spring-web'
+include 'risk-springmvc-view-extras'

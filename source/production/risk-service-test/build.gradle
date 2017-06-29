@@ -1,0 +1,105 @@
+assert JavaVersion.current().java7Compatible:
+        "At least Java 7 is required, current JVM is ${JavaVersion.current()}"
+
+
+
+ext {
+  riskSpringWebVersion = '1.0.0'
+  riskOrderApiVersion = "1.4"
+  riskOperationApiVersion = "1.5"
+
+  springVersion = '4.2.5.RELEASE'
+
+  servletApiVersion = '3.1.0'
+
+  jacksonVersion = '2.6.5'
+
+  slf4jVersion = '1.7.21'
+  log4jVersion = '2.6.1'
+
+  dubboVersion = '2.5.3'
+  zkclientVersion = '0.4'
+  commonsCodecVersion = '1.10'
+
+  lombokVersion = '1.16.8'
+
+  junitVersion = '4.12'
+  mockitoVersion = '1.10.19'
+  jsonpathVersion = '2.0.0'
+  assertjVersion = '2.4.1'
+}
+
+buildscript {
+  repositories {
+    maven {
+      url "http://121.40.68.238:8081/nexus/content/repositories/public"
+    }
+    mavenCentral()
+    mavenLocal()
+  }
+}
+
+repositories {
+  maven { url "http://121.40.68.238:8081/nexus/content/repositories/public" }
+  mavenCentral()
+}
+
+
+apply plugin: 'war'
+
+
+description = '风控的测试接口,目前为压力测试服务'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+tasks.withType(JavaCompile) {
+  options.encoding = "UTF-8"
+}
+
+dependencies {
+
+  compile "com.rkylin.risk:risk-operation-api:${riskOperationApiVersion}"
+  compile "com.rkylin.risk:risk-order-api:${riskOrderApiVersion}"
+  compile "org.springframework:spring-webmvc:${springVersion}"
+
+  providedCompile "javax.servlet:javax.servlet-api:${servletApiVersion}"
+
+
+  //log begin
+  compile "org.slf4j:slf4j-api:${slf4jVersion}"
+  compile "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+  compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+  compile "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+  compile "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+  compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+  compile "org.apache.logging.log4j:log4j-web:${log4jVersion}"
+  //log end
+
+  compile("com.alibaba:dubbo:${dubboVersion}") {
+    exclude(module: "spring")
+  }
+  compile("com.101tec:zkclient:${zkclientVersion}") {
+    exclude(module: "slf4j-api")
+    exclude(module: "slf4j-log4j12")
+    exclude(module: "log4j")
+    exclude(module: "junit")
+  }
+
+  compile "commons-codec:commons-codec:${commonsCodecVersion}"
+
+  //json begin
+  compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+  compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+  compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+  //json end
+
+  testCompile "junit:junit:${junitVersion}"
+  testCompile "org.mockito:mockito-all:${mockitoVersion}"
+  testCompile "org.springframework:spring-test:${springVersion}"
+  testCompile "com.jayway.jsonpath:json-path:${jsonpathVersion}"
+  testCompile "org.assertj:assertj-core:${assertjVersion}"
+
+
+  providedCompile "org.projectlombok:lombok:${lombokVersion}"
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="FactorBillRelation" >
+  <resultMap id="factorBillRelationMap" type="FactorBillRelation" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="billid" property="billid" jdbcType="VARCHAR" />
+    <result column="factorid" property="factorid" jdbcType="INTEGER" />
+    <result column="factorscore" property="factorscore" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, billid, factorid, factorscore
+  </sql>
+  <select id="get" resultMap="factorBillRelationMap" parameterType="integer" >
+    select
+    <include refid="columnList" />
+    from risk_factor_bill_relation
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="delete" parameterType="integer" >
+    delete from risk_factor_bill_relation
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="FactorBillRelation" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into risk_factor_bill_relation (billid, factorid, factorscore
+    )
+    values (#{billid,jdbcType=VARCHAR}, #{factorid,jdbcType=INTEGER}, #{factorscore,jdbcType=VARCHAR}
+    )
+  </insert>
+  <insert id="insertBatch" parameterType="list">
+    insert into risk_factor_bill_relation (billid, factorid, factorscore)
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+      (#{item.billid,jdbcType=VARCHAR}, #{item.factorid,jdbcType=INTEGER}, #{item.factorscore,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  <update id="update" parameterType="FactorBillRelation" >
+    update risk_factor_bill_relation
+    set billid = #{billid,jdbcType=VARCHAR},
+    factorid = #{factorid,jdbcType=INTEGER},
+    factorscore = #{factorscore,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

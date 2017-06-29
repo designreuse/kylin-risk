@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="WarningSet" >
+  <resultMap id="warningSetMap" type="WarningSet" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="operatorid" property="operatorid" jdbcType="SMALLINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="effdate" property="effdate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="expdate" property="expdate" jdbcType="DATE" javaType="LocalDate" />
+    <result column="risklevel" property="risklevel" jdbcType="VARCHAR" />
+    <result column="warntype" property="warntype" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="columnList" >
+    id, operatorid, username, effdate, expdate, risklevel, warntype, status
+  </sql>
+  <select id="get" resultMap="warningSetMap" parameterType="integer" >
+    select 
+    <include refid="columnList" />
+    from risk_warningset
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryAll" resultMap="warningSetMap"  >
+    select
+    <include refid="columnList" />
+    from risk_warningset
+  </select>
+
+  <delete id="delete" parameterType="integer" >
+    delete from risk_warningset
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="WarningSet" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into risk_warningset (operatorid, username, effdate, 
+      expdate, risklevel, warntype, 
+      status)
+    values (#{operatorid,jdbcType=SMALLINT}, #{username,jdbcType=VARCHAR}, #{effdate,jdbcType=DATE}, 
+      #{expdate,jdbcType=DATE}, #{risklevel,jdbcType=VARCHAR}, #{warntype,jdbcType=VARCHAR}, 
+      #{status,jdbcType=CHAR})
+  </insert>
+  <update id="update" parameterType="WarningSet" >
+    update risk_warningset
+    set operatorid = #{operatorid,jdbcType=SMALLINT},
+      username = #{username,jdbcType=VARCHAR},
+      effdate = #{effdate,jdbcType=DATE},
+      expdate = #{expdate,jdbcType=DATE},
+      risklevel = #{risklevel,jdbcType=VARCHAR},
+      warntype = #{warntype,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="queryIsSendMails" resultMap="warningSetMap" parameterType="map" >
+    SELECT  <include refid="columnList" />
+    FROM risk_warningset t
+    WHERE t.effdate &lt;=  #{localDate}
+    AND t.risklevel = #{riskLevel,jdbcType=VARCHAR}
+    AND t.warntype = #{warnType,jdbcType=VARCHAR}
+    AND t.`status` = '00';
+  </select>
+
+</mapper>
