@@ -1,0 +1,2412 @@
+首页 资讯 精华 论坛 问答 博客 专栏 群组 更多 ▼ 您还未登录 ! 登录 注册
+
+herman-liu76
+博客微博相册收藏留言关于我
+
+  
+某个第三方支付平台数据库的分析、学习与总结
+
+博客分类： 支付平台
+ 
+   之前一直从事一般的WEB系统的开发，做过很多的项目了，现在主要做的一项工作就是与客户沟通需求后，设计出数据模型出来，并设计出主要的功能页面。 
+   从来没做过金融方面的业务，于是从百度文库中找来一个第三方支付平台的数据库结构，进行分析，用通俗的语言总结出来，以掌握金融系统的业务设计。 
+
+   百度文库的地址是：http://wenku.baidu.com/view/48f79722964bcf84b9d57bf1 
+
+   一、基础平台核心库 
+   1.账户：首先无论个人、企业在你平台上都有一个账户表，必须的。记录账记的基本信息，想想你的银行活期存折上的信息吧。当然5个金额要注意到，总的，可提现的，冻结的....但是有几个字段我不懂，计算积数，上期总金额等等。是的，我从来没注意过银行的活期是怎么计息的，利率在变，金额在变，怎么计？查了一下 
+   银行按季结息，每季度末月的20日为结息日。 
+   每次变动以头计算*持续天数=计算积数，当然从上期总金额开始算。 
+   当季利息就是积数*计息日的日利率（年利/360，不是365是因为银行规定） 
+   表上还有一个安全控制值，是MD5+BASE64，这个就是散列值，防止重要数据发生变化，摘要信息嘛。BASE64就是字符都变成基本的，这都可以理解。 
+   这个，这张表就理解清楚了！！！ 
+
+   2.冻结、注销流水表：没啥好讲的，就是对某个账户的这种操作的日志一样的信息。 
+
+   3.账户资金变动流水与冻结流水表：类似于每一次存钱，取钱的记录一样，当然实现上变动类型比较多。记录下每笔变动前后的总金额之类的。特别要注意有一个关联流水ID。比如我们充值，总金额发生了变化，但到底是怎么充的，哪个银行卡充的，成功没有，等等详细的信息这个表里都没有，却是记录在后面的充值交易流水表中。 
+     似乎这样会有很多冗余，但这么设计是正确的，记录的角度不同，具体的每一笔变动的情况当然非常重要，但账户角度关注总金额变化。 
+
+   4.交易流水相关表：这里的9张表就是9种交易的详细信息，每一笔交易都会在相关的表中记录下来。里面的详细情况如果有需要分析的后面再补了。 
+
+   5.会计账务：说到会计，可能我们做软件的就不太清楚了，感觉有点专业。我也没学过，但我们分析下这几张表，同样也可以掌握基本的业务。 
+    先说说后面两张表：科目明细与凭证明细，这个名字就知道是具体的一项业务的信息了。 
+（后面有备注：每种具体的业务，只操作凭证表，并设置业务关联。然后自动登记2个科目，2个金额到科目明细表。日终，汇总科目明细表到到科目日记账表。） 
+    说的比较明确了，业务中只操作凭证，凭证会关联交易流水的ID的。比如一笔资金的变化，对于交易双方一增一减，必然产业两个科目的变化记录，记录在科目明细表中。 
+    另外的科目类型、凭证类型、科目凭证对应关系都可以认为是维护的字典项目。科目从名称上理解就是一种分类方式。凭证理解为凭据、证件之类的单据吧。正好我手头上有前几天取钱的单据：中国邮储银行的通用凭证，一般是打印出来给客户签字的，可能有几联，大家都留一份，为啥要有纸质的东西？因为要有人工签名的纸头证据啊，全都电子化还不现实。 
+    至于科目日记账：就是每天的产生的科目的统计啊，为什么每天？这个是要求吧。 
+    至于试算平衡表：就是账户变化与科目两个不同维度变动的对比，两个角度的数据应该是一致的，应该是同一个事务产生的不同的记录方式数据的平衡。有对比才能及时发现问题，所以也应该是标准的做法。金融平台容不得半点马虎。 
+
+    6.系统参数：这里就是记录各流水表的流水号的，当天不断累加的纯数字。因为当天从头开始，不能用Oracle的seq，不多讲了。 
+
+    7.渠道：这个渠道从名称上来说就是一个个交易的通道，具体指啥呢，要搞搞清楚？我发现后面3.11有渠道类型与渠道管理，比如有 网银、同城、银企等5个类型。更重要的表是：渠道管理表，里面重要的字段是“支付渠道为本平台分配的商户号”，还有URL,IP,队列,类名等信息。 
+    后面还有一个渠道账户对应表，渠道与交易类型共同PK，而且还有一个帐号，那么渠道就是本平台在其它银行之类的平台上的商户号，我平台是人家某银行的一个商户。而且还可以开几个帐号。类似于我个人是某银行一个客户，我名下有几个银行账号，有借记卡，有信用卡等，以前还可以开几个信用卡。而对平台来说，开的帐号与交易类型是相关的。 
+    继续在网上【知乎】查了些资料： 
+“银行接口指的是银行等提供的技术接口。 
+银行通道是对银行接口的封装，并包含了诸如具体合作银行及通道的详细信息。例如同为某家商业银行的某个支付接口，非总对总的情况，支付公司可能同时在北京分行、上海分行接入。 
+支付渠道是对银行通道的业务封装，包含了诸如通道成本、最低商户费率等信息。 
+支付产品是第三方支付对外提供的产品，例如快捷支付。 
+支付渠道路由的设计，一般采用规则引擎或类似方案（例如基于groovy），如果单纯只是满足企业当前的业务需要，用最丑陋的If-Else方式也能搞定。” 
+    再找到一些资料： 
+    备付金又称为沉淀资金或准备金，第三方支付备付金是指存在第三方支付平台，为即将产生的支付交易，在银行储备的准备金。买家付款到确认收货、卖家收款总隔着几个交易日，那些“沉淀”在第三方支付机构账户上的资金就是“备付金”。后来又查到备付金只能有一个监管银行，多个合作银行，貌似政策还在微调，因为为了备付金的安全。备付金分存管（跨行）、收付（同行内收付）、汇缴（汇总一下，每日清0，转到收付账户）账户，银行渠道路由系统是所有第三方支付核心的系统之一。 
+   （这里有https://www.zhihu.com/question/34352468，灰色细胞的解释清楚） 
+    比如小明在网上看中了一款产品，使用了支付宝进行付款，在使用支付宝付款的时候，选择的是小明的招商银行卡，付款成功后，小明的招行账户会扣除资金，同时支付宝会将支付成功的信息告诉卖家，卖家发货。在第二天，招商银行会将小明被扣除的资金结算给支付宝，这个时候这笔钱是由银行结算给支付宝在招商银行开设的对公账户。而小明由于还没有确认收货，或者可能一周之后才会确认收货，那么在这段时间，这笔钱会一直停留在支付宝的对公账户中。（后面本人发挥：）等确认收货了，收货的方如果只到其支付宝账号，那只要记账就行了，都是在备付金中，但如果收货方要现金，就从最做优的路由方案结果中，转给对方银行账号上，一般是与对方相同的同行内的收付账号转收货方账号，支付宝此行的收付账号有头寸的话。） 
+
+    好了，到这里渠道概念差不多了。有些交易的过程也非常清楚了。另外一些概念，如清分clearing,清算settlement,结算Settlement of Accounts轧差neting,头寸position也简单知道一下，英文也许更好理解。 
+    上面写那很多，下面真正来分析表的设计： 
+    252，253的渠道参数、返回码就是一些配置项，不多说了。251是清算指令，就是发起一个渠道的清算任务，就是一个渠道的某业务的支付场次基本情况记录，一个命令的执行情况，不涉及金额。254是渠道交易流水，既然是流水，就是具体的一个个渠道的交易信息了，一般是与支付交易流水密切相关的，只要不是平台内部的交易，就要和渠道打交道，反正信息是非常全，字段也非常的多。255是批量交易的渠道的批次表，批量交易时是很多笔的情况。里面有个settleDate居然叫轧差日期，我反正很注重命名问题，名字准确可减少了大脑中的运算，可以更好的考虑更复杂的事情。257，258渠道对账表与不平明细表，是指渠道双方对账，借贷是不是正确，从字段看不出是不是天天对账的，不过是通过文件来对账的。明细就是发现不平，要记录是哪一个交易，如果是批量的，记录下批次，可能要人工处理。我在实际中知道有人报名马拉松，出现支付成功，却网站说不成功，是系统没做好，这个可以看成是事务，不过要人工回滚或者人工补正确。 
+    2.5.（12.13.14）分别是同城对账指令、对账表与对账明细。指令中PK是流水，那就是每一次对账都是有一个指令的。对账表与明细中都有笔数与金额数，差别从PK中可以看出。对账表对应每一个对账报文，一天内可以多个报文。明细中多了业务编号，就是按业务产生成明细，并不是细到每一个业务。15/16的下载回应与回应明细，貌似是给企业查看一天内的情况的，总的和明细的情况。应该不复杂，没有数据与页面说明也就不细究了。 
+
+   （写到这里，家里网络崩溃，已经在写基金了，ITEYE页面刷新了，居然不是后台提交，也没恢复自动保存的内容，晕死....另外保存后会回到查看页面，一般应该是继续编辑吧，或者用不同的按钮...） 
+
+
+   二、系统管理数据库 
+   这里的系统维护、权限等与其它平台的设计差别不大，就不多研究了。 
+   重点是账户： 
+   结算账户余额表，就是我平台的结算账户在各个合作银行的账户上的钱数情况。 
+   子账户类型，前面有提到平台客户可以有多个子账户，有类型就有可能互转，另外子账户会与客户的银行卡绑定，那么客户银行卡的信息有一个表，绑定有一个表；绑定变化也有一个流水表。客户的银行账号也要进行验证，验证就有一个记录，还可能一天多次验证，都记录在一个表中。 
+   3.4.8是代付绑定收款账户，某个平台的客户根据与平台的协议，由平台代付水电煤，付到公用事业公司的相关银行账户上去。就要有一个记录。当然具体的一笔业务是另外记录的。 
+   客户信息：这个就是平台上的客户的情况，当然客户有个人，还有企业。文章中说是不是考虑两个分开的表，因为字段差别比较大，也是有可能的。 
+   商户信息也是要记录的。 
+   其它的客户级别，开通的业务，相关的协议等、手续费、限额啥的就不说了，比较简单。 
+   看一下3.11.7（记录快付通结算户之间的资金调拨指令）与3.12.3/4这三个表，结算户就是前面提到的平台在各合作银行开的收付账号，监管户就是备付金分存管账号。头寸不足时就要调拨。 
+  
+   三、基金相关数据库 
+   先看一个概念：赎回是从理财产品或者基金转入你的帐户余额 提现是从帐户余额转到你的银行卡。 
+   开户信息：在基金业务平台开立的只能是基金子账户。 
+   业务表：申购、撤销与赎回是三个核心的业务，所以有三个相关交易的表，都与基金定单有关，说明是真正的基金购买行为了。 
+   还有一个充提交易表，是有关子账户与银行账户之间的关系，应该只是指基金业务子账户吧。这个与基金本身操作关系不大。 
+   基金交易一般有个T+*的问题，当日15点交易所下班的问题。 
+  【基金赎回资金过户是T+2，也就是说，今天（T日）你申请赎回，今天收市后（就是今天晚上）基金管理公司把所有的赎回申请进行统计计算，再经过托管人的复核之后，上报至[中登公司]；在明天白天（T+1日），中登公司那帮犊子们上班之后，就会把头一天（T日）接收到的申购赎回申请统计，然后进行资金过帐，说白了就钱该给谁就给谁，基金份额该给谁给谁；然后等后天（T+2日），如果你是赎回，那这天钱都到你帐户了；如果你是申购，那基金份额就到你帐户了。】 
+   其实基金这边也比较简单的，客户有一个基金子账户。基金管理公司能支取的是自有资金，不能支取客户受托的资金用于其他用途。客户受托的资金存放于专户，只能用于股票、债券买卖。这个与第三方支付公司的备付金一样被严格监管的。 
+   另外指指令表，显示是与监管银行之间的交易指令、包括成功笔数，成功金额等信息，莫非基金的申购就是直接由平台打到监管银行中的基金公司的专用托管账户上？这个也不难，有人告诉一下就知道了。刚才顺便查了一下：监管、托管、存管银行的关系。有一个说监管是监督机构，存管保证的客户的信息与监管的账户之前的资金流动，而不会被基金公司挪用。 
+
+    四、总结： 
+    从网上的一个数据库设计，基本上可以学习到上面相当多的金融相关业务及其关系，配合网上的其它一些文章，差不多理解了支付业务。不过一些文章看的出政策变化是很多的，必然影响业务系统。 
+    
+    因为以前从没了解过相关的系统，所以分析难免有出错与不足的地方，欢迎指正！！
+
+ 
+分享到：    
+研究一些复杂java开源软件代码的体会 | 一次处理项目中工作流问题的过程记录
+2016-10-23 00:33浏览 1782评论(0)分类:行业应用查看更多
+相关资源推荐
+Delphi7高级应用开发随书源码 windchill API 聊天机器人2002 WIndchill开发文档 Windchill二次开发资料 Windchill开发大全 windchill和eclipse的debug集成实现远程debug以及Log4J使用 Windchill 10.0 API chm文档 MySQL 经典入门教程 mysql5.5免安装版（自带配置工具） 第三方支付平台的可行性分析 游戏第三方支付平台源码 第三方支付平台支付牌照公司名单 基于云平台的NFC巡检系统+行业应用 高性能分布式数据库在装备制造和政府行业的应用方案优势 云计算大数据智能交通行业应用论坛—大数据时代城市交通的思考分析决策—杨东援 国内CA技术应用与行业分析 RFID在零售行业的应用分析 Android应用开发盈利及行业趋势分析 云计算在典型行业中的应用分析
+参考知识库
+
+Android知识库
+37714  关注 | 3152  收录
+
+React知识库
+3592  关注 | 393  收录
+
+人工智能基础知识库
+16621  关注 | 212  收录
+
+Java 知识库
+35022  关注 | 3748  收录
+评论
+发表评论
+  您还没有登录,请您登录后再发表评论
+herman_liu76的博客
+herman_liu76
+浏览: 15726 次
+性别: Icon_minigender_1
+来自: 上海
+
+最近访客 更多访客>>
+zhoupuyue的博客zhoupuyuexiaotutu365的博客xiaotutu365simon518的博客simon518Mr_TwoHappy的博客Mr_TwoHappy
+文章分类
+全部博客 (25)
+druid (1)
+java (5)
+database (1)
+源码 (5)
+dubbo (3)
+jetty (1)
+protocol (1)
+工作流 (3)
+电商 (1)
+支付平台 (1)
+大数据 (0)
+微信小程序 (1)
+短信平台 (1)
+jms (1)
+jndi (1)
+spi (1)
+FileUpload (0)
+concurrent (1)
+统计业务 (0)
+业务 (3)
+sql (2)
+andriod (1)
+maven (1)
+OAuth (1)
+ws (1)
+spring (1)
+社区版块
+我的资讯 (0)
+我的论坛 (0)
+我的问答 (0)
+存档分类
+2017-09 (2)
+2017-08 (2)
+2017-07 (1)
+更多存档...
+评论排行榜
+代码快看哭了-吐槽与感悟汇总
+最新评论
+herman_liu76： ZHENFENGSHISAN 写道太累了啊，哥唉~ 我也觉得很 ...
+代码快看哭了-吐槽与感悟汇总
+ZHENFENGSHISAN： 太累了啊，哥
+代码快看哭了-吐槽与感悟汇总
+herman_liu76： 1126481146 写道厉害啊，有联系方式吗，学习学习，我现 ...
+druid 源码分析与学习（含详细监控设计思路的彩蛋）
+1126481146： 厉害啊，有联系方式吗，学习学习，我现在被druid的sql日志 ...
+druid 源码分析与学习（含详细监控设计思路的彩蛋）
+herman_liu76： 最近一个同事设计的流程，由于开始用户介绍的简单，没有考虑各环节 ...
+项目中的流程及类似业务的设计模式总结（已配图）
+
+
+声明：ITeye文章版权属于作者，受法律保护。没有作者书面许可不得转载。若作者同意转载，必须以超链接形式标明文章原始出处和作者。
+? 2003-2017 ITeye.com. All rights reserved. [ 京ICP证110151号 京公网安备110105010620 ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+登录 | 注册
+朱培(知浅_ZLH)
+勿以浮沙筑高台,才学浅薄,低调做人-----sdksdk0
+目录视图摘要视图订阅
+异步赠书：9月重磅新书升级，本本经典           程序员9月书讯      每周荐书：ES6、虚拟现实、物联网（评论送书）
+ 在线支付功能的设计及其实现
+标签： 在线支付书店
+2016-08-08 19:56 6809人阅读 评论(8) 收藏 举报
+ 分类： Java项目（6）  
+版权声明：文章版权归作者所有，未经同意严禁转载！
+目录(?)[+]
+----------------------------------------------------------------------------------------------
+[版权申明：本文系作者原创，转载请注明出处] 
+文章出处：http://blog.csdn.net/sdksdk0/article/details/52154672
+作者：朱培      ID：sdksdk0      邮箱： zhupei@tianfang1314.cn   
+--------------------------------------------------------------------------------------------
+
+我们都知道，在现在的网站中，基本上都会有支付功能，在线支付作为一个潮流已是现代化网站的必备功能模块，那么几天我就分享一下如果来做这个在线支付功能。
+在线支付一般来说有两种实现方式，一种是调用各个银行提供的接口，另一种是使用第三方集成好的支付功能。两种方式各有优劣，这个相信行内人士都是非常了解的了。对于第三方支付来说会需要提交企业5证来验证，还会有部分手续费，但是实现起来就非常方便了。对于直接使用银联接口的话就是使用起来必来麻烦，要为各个银行写接口实现，但是相比起来就更加安全了。
+
+本文主要讲的是使用第三方支付平台来整合到我们的项目中，实现实际的支付功能。本文使用的例程是一个真实的支付过程，请注意，不要再测试中支付过多金额，否则后果自负。以前文说到的一个网上书店系统来说明，这里接入的是易宝支付的测试指纹和接口。如实际企业开发者可以使用企业牌照申请接口，如是普通开发者用来测试在线支付功能的可以直接使用。
+
+我们先来说应该如何生成订单。
+一、数据库设计
+我们需要来一个订单表，订单详情表，以及订单的自动化序列表
+[sql] view plain copy print?
+--订单表  
+create table orders(  
+    ordernum varchar(100) primary key,  
+    price float(8,2),  
+    number int,  
+    status int,   --支付成功状态位会改变  
+    customerId VARCHAR(100),  
+    CONSTRAINT customerId_fk FOREIGN KEY (customerId) REFERENCES customers(id)    
+)  
+)  
+  
+--订单详情表  
+create table orderitems(  
+    id varchar(100) primary key,  
+    number int,  
+    price float(8,2),  
+    ordernum varchar(100),  
+    bookid varchar(100),  
+    CONSTRAINT ordernum_fk FOREIGN KEY (ordernum) REFERENCES orders(ordernum),  
+    CONSTRAINT bookid_fk FOREIGN KEY (bookid) REFERENCES books(id)      
+)  
+  
+--订单编号表  
+create table ordernum(  
+    prefix date,  
+    num int   
+)  
+
+二、bean设计
+生成其get,set方法，并且记得要序列化Serializable
+[java] view plain copy print?
+private String ordernum;  
+    private float price;  
+    private int number;  
+    private int status;  
+
+
+三、接口设计
+设计订单的实体类
+[java] view plain copy print?
+public interface OrderDao {  
+  
+    void save(Order order);  
+  
+    Order findByNum(String ordernum);  
+  
+    void update(Order order);  
+  
+    //订单号降序排序  
+    List<Order> findByCustomerId(String customerId);  
+  
+      
+    List<OrderItem> findOrderItem(String ordernum);  
+  
+}  
+
+接口的实现
+[java] view plain copy print?
+public class OrderDaoImpl implements OrderDao {  
+  
+    private QueryRunner qr=new QueryRunner(C3P0Util.getDataSource());  
+      
+    //保存订单  
+    @Override  
+    public void save(Order order) {  
+          
+        try {  
+            qr.update("insert into orders (ordernum,price,number,status,customerId) values (?,?,?,?,?)",   
+                    order.getOrdernum(),order.getPrice(),order.getNumber(),order.getStatus(),  
+                    order.getCustomer()==null?null:order.getCustomer().getId());  
+            List<OrderItem> items = order.getItems();  
+            for(OrderItem item:items){  
+                qr.update("insert into orderitems (id,number,price,ordernum,bookid) values (?,?,?,?,?)",   
+                        item.getId(),item.getNumber(),item.getPrice(),order.getOrdernum(),item.getBook()==null?null:item.getBook().getId());  
+            }  
+        } catch (SQLException e) {  
+            throw new RuntimeException(e);  
+        }  
+    }  
+  
+  
+    public Order findByNum(String ordernum) {  
+        try {  
+            Order order = qr.query("select * from orders where ordernum=?", new BeanHandler<Order>(Order.class), ordernum);  
+            if(order!=null){  
+                Customer customer = qr.query("select * from customers where id=(select customerId from orders where ordernum=?)", new BeanHandler<Customer>(Customer.class), ordernum);  
+                order.setCustomer(customer);  
+            }  
+            return order;  
+        } catch (SQLException e) {  
+            throw new RuntimeException(e);  
+        }  
+    }  
+    public void update(Order order) {  
+        try {  
+            qr.update("update orders set price=?,number=?,status=? where ordernum=?", order.getPrice(),order.getNumber(),order.getStatus(),order.getOrdernum());  
+        } catch (SQLException e) {  
+            throw new RuntimeException(e);  
+        }  
+    }  
+  
+  
+    @Override  
+    public List<Order> findByCustomerId(String customerId) {  
+        try {  
+            List<Order> orders=qr.query("select * from orders where customerId=?  order by ordernum desc ", new BeanListHandler<Order>(Order.class),customerId);  
+            if(orders!=null){  
+                Customer customer=qr.query("select * from customers where id=? ",new BeanHandler<Customer>(Customer.class),customerId);  
+                for (Order order : orders) {  
+                    order.setCustomer(customer);  
+                }  
+            }  
+            return orders;  
+        } catch (SQLException e) {  
+            throw new RuntimeException(e);  
+        }  
+    }  
+  
+  
+    @Override  
+    public List<OrderItem> findOrderItem(String ordernum) {  
+          
+        try {  
+            List<OrderItem> items = qr.query("select * from orderitems where ordernum=?", new BeanListHandler<OrderItem>(OrderItem.class), ordernum);  
+            if(items!=null){  
+                for(OrderItem o:items){  
+                    Book book = qr.query("select * from books where id=(select bookId from orderitems where id=?)", new BeanHandler<Book>(Book.class), o.getId());  
+                    o.setBook(book);  
+                }  
+            }  
+            return items;  
+        } catch (SQLException e) {  
+            throw new RuntimeException(e);  
+        }  
+    }  
+}  
+
+四、Service的设计
+
+[java] view plain copy print?
+//生成订单  
+    void genOrder(Order order);  
+  
+    //根据订单号查找订单  
+    Order findOrderByNum(String ordernum);  
+  
+    //更新订单信息  
+    void updateOrder(Order order);  
+      
+    //更新订单状态  
+    void changeOrderStatus(int status,String ordernum);  
+  
+    //  
+    List<Order> findOrdersByCustomerId(String customerId);  
+      
+    List<OrderItem> findOrderItemByCustomerId(String ordernum);  
+
+
+实现其接口
+[java] view plain copy print?
+//生成订单  
+    @Override  
+    public void genOrder(Order order) {  
+        if(order==null)  
+                throw new RuntimeException("订单不能为空");  
+        if(order.getCustomer()==null)  
+            throw new RuntimeException("订单的客户不能为空");  
+        orderDao.save(order);  
+          
+    }  
+  
+    @Override  
+    public Order findOrderByNum(String ordernum) {  
+          
+        return orderDao.findByNum(ordernum);  
+    }  
+  
+    @Override  
+    public void updateOrder(Order order) {  
+        orderDao.update(order);  
+          
+    }  
+  
+    @Override  
+    public void changeOrderStatus(int status, String ordernum) {  
+        Order order=findOrderByNum(ordernum);  
+        order.setStatus(status);  
+        updateOrder(order);  
+    }  
+  
+    @Override  
+    public List<Order> findOrdersByCustomerId(String customerId) {  
+          
+        return orderDao.findByCustomerId(customerId);  
+    }  
+  
+    @Override  
+    public List<OrderItem> findOrderItemByCustomerId(String ordernum) {  
+      
+        return orderDao.findOrderItem(ordernum);  
+    }  
+
+
+生成订单
+
+[java] view plain copy print?
+//订单详情  
+    private void showOrders(HttpServletRequest request,  
+            HttpServletResponse response) throws IOException, ServletException {  
+        //检测是否登录；   
+                HttpSession session=request.getSession();  
+                Customer customer=(Customer) session.getAttribute("customer");  
+                if(customer==null){  
+                    response.getWriter().write("请先登录");  
+                    response.setHeader("Refresh", "2;URL="+request.getContextPath());  
+                    return ;  
+                }  
+            List<Order>  orders=s.findOrdersByCustomerId(customer.getId());  
+            request.setAttribute("orders", orders);  
+              
+            request.getRequestDispatcher("/listOrders.jsp").forward(request, response);  
+                  
+                  
+          
+    }  
+  
+  
+    //生成订单  
+    private void genOrder(HttpServletRequest request,  
+            HttpServletResponse response) throws IOException, ServletException  {  
+        //检测是否登录；   
+        HttpSession session=request.getSession();  
+        Customer customer=(Customer) session.getAttribute("customer");  
+        if(customer==null){  
+            response.getWriter().write("请先登录");  
+            response.setHeader("Refresh", "2;URL="+request.getContextPath());  
+            return ;  
+        }  
+          
+        Cart cart=(Cart) request.getSession().getAttribute("cart");  
+          
+        Order order=new Order();  
+        order.setOrdernum(OrderNumUtil.genOrderNum());  
+        order.setPrice(cart.getPrice());  
+        order.setNumber(cart.getNumber());  
+        order.setCustomer(customer);  
+          
+          
+        List<OrderItem>  oItems=new ArrayList<OrderItem>();  
+        //设置订单项  
+        for(Map.Entry<String, CartItem>  me:cart.getItems().entrySet()){  
+            OrderItem item=new OrderItem();  
+            item.setId(UUID.randomUUID().toString());  
+            item.setNumber(me.getValue().getNumber());  
+            item.setPrice(me.getValue().getPrice());  
+            item.setBook(me.getValue().getBook());  
+            oItems.add(item);  
+        }  
+        //建立和订单的关系  
+        order.setItems(oItems);  
+        s.genOrder(order);  
+        request.setAttribute("order", order);  
+        request.getRequestDispatcher("/pay.jsp").forward(request, response);  
+          
+          
+    }  
+
+
+
+
+接下来就是支付功能的实现了。我们要为上面生成的订单来支付。
+五、界面设计。
+订单生成后腰跳转过去支付，这个支付界面我们可以使用一个表单。pay.jsp。并且将内容提交到PayServlet中。
+
+
+[java] view plain copy print?
+<form action="${pageContext.request.contextPath}/servlet/PayServlet" method="post">  
+        <table width="60%">  
+            <tr>  
+                <td bgcolor="#F7FEFF" colspan="4">  
+                订单号：<INPUT TYPE="text" NAME="ordernum" value="${order.ordernum}${param.ordernum}"  readonly="readonly">   
+                支付金额：<INPUT TYPE="text" NAME="money" size="6" value="${order.price }"  readonly="readonly">元</td>  
+            </tr>  
+            <tr>  
+                <td><br />  
+                </td>  
+            </tr>  
+            <tr>  
+                <td>请您选择在线支付银行</td>  
+            </tr>  
+            <tr>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="CMBCHINA-NET">招商银行  
+                </td>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="ICBC-NET">工商银行</td>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="ABC-NET">农业银行</td>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="CCB-NET">建设银行  
+                </td>  
+            </tr>  
+            <tr>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="CMBC-NET">中国民生银行总行</td>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="CEB-NET">光大银行  
+                </td>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="BOCO-NET">交通银行</td>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="SDB-NET">深圳发展银行</td>  
+            </tr>  
+            <tr>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="BCCB-NET">北京银行</td>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="CIB-NET">兴业银行  
+                </td>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="SPDB-NET">上海浦东发展银行  
+                </td>  
+                <td><INPUT TYPE="radio" NAME="pd_FrpId" value="ECITIC-NET">中信银行</td>  
+            </tr>  
+            <tr>  
+                <td><br />  
+                </td>  
+            </tr>  
+            <tr>  
+                <td><INPUT TYPE="submit" value="确定支付">  
+                </td>  
+            </tr>  
+        </table>  
+    </form>  
+
+
+六、servletc逻辑处理
+对于使用易宝支付我们无需导入jar包，我们直接使用其接口即可。下面这张图片是易宝支付的接口说明。
+
+
+
+PayServlet的内容。
+这里值得说一下的就是  p8_Url ，也就是支付成功后悔返回的商家界面地址。我这里写的是自己工程的地址。
+[java] view plain copy print?
+public void doGet(HttpServletRequest request, HttpServletResponse response)  
+            throws ServletException, IOException {  
+  
+        request.setCharacterEncoding("UTF-8");  
+        String ordernum=request.getParameter("ordernum");  
+        String money=request.getParameter("money");  
+        String pd_FrpId=request.getParameter("pd_FrpId");  
+          
+          
+          
+        String p0_Cmd = "Buy";  
+        String p1_MerId = "10001126856";  
+        String p2_Order = ordernum;  
+        String p3_Amt = money;  
+        String p4_Cur = "CNY";  
+        String p5_Pid = "books";  //商品名称  
+        String p6_Pcat = "unknown";  
+        String p7_Pdesc = "descrition";  
+        String p8_Url = "http://localhost:8080"+request.getContextPath()+"/servlet/ResponsePayServlet";  
+        String p9_SAF = "1";  
+        String pa_MP = "unknown";  
+        String pr_NeedResponse="1";   
+        String hmac = PaymentUtil.buildHmac(p0_Cmd, p1_MerId, p2_Order, p3_Amt, p4_Cur, p5_Pid, p6_Pcat, p7_Pdesc, p8_Url, p9_SAF, pa_MP, pd_FrpId, pr_NeedResponse, "69cl522AV6q613Ii4W6u8K6XuW8vM1N6bFgyv769220IuYe9u37N4y7rI4Pl");  
+          
+        request.setAttribute("p0_Cmd",p0_Cmd );  
+        request.setAttribute("p1_MerId",p1_MerId );  
+        request.setAttribute("p2_Order", p2_Order);  
+        request.setAttribute("p3_Amt", p3_Amt);  
+        request.setAttribute("p4_Cur",p4_Cur );  
+        request.setAttribute("p5_Pid",p5_Pid );  
+        request.setAttribute("p6_Pcat",p6_Pcat );  
+        request.setAttribute("p7_Pdesc",p7_Pdesc );  
+        request.setAttribute("p8_Url",p8_Url );  
+        request.setAttribute("pa_MP",pa_MP );  
+        request.setAttribute("pr_NeedResponse",pr_NeedResponse );  
+        request.setAttribute("hmac",hmac );  
+        request.setAttribute("p9_SAF",p9_SAF );  
+        request.setAttribute("pd_FrpId", pd_FrpId);  
+          
+        request.getRequestDispatcher("/sure.jsp").forward(request, response);  
+      
+    }  
+
+PayUtil.java是一个工具类，这里我们直接使用官方的即可。
+[java] view plain copy print?
+public class PaymentUtil {  
+  
+private static String encodingCharset = "UTF-8";  
+      
+    /** 
+     * 生成hmac方法 
+     *  
+     * @param p0_Cmd 业务类型 
+     * @param p1_MerId 商户编号 
+     * @param p2_Order 商户订单号 
+     * @param p3_Amt 支付金额 
+     * @param p4_Cur 交易币种 
+     * @param p5_Pid 商品名称 
+     * @param p6_Pcat 商品种类 
+     * @param p7_Pdesc 商品描述 
+     * @param p8_Url 商户接收支付成功数据的地址 
+     * @param p9_SAF 送货地址 
+     * @param pa_MP 商户扩展信息 
+     * @param pd_FrpId 银行编码 
+     * @param pr_NeedResponse 应答机制 
+     * @param keyValue 商户密钥 
+     * @return 
+     */  
+    public static String buildHmac(String p0_Cmd,String p1_MerId,  
+            String p2_Order, String p3_Amt, String p4_Cur,String p5_Pid, String p6_Pcat,  
+            String p7_Pdesc,String p8_Url, String p9_SAF,String pa_MP,String pd_FrpId,  
+            String pr_NeedResponse,String keyValue) {  
+        StringBuilder sValue = new StringBuilder();  
+        // 业务类型  
+        sValue.append(p0_Cmd);  
+        // 商户编号  
+        sValue.append(p1_MerId);  
+        // 商户订单号  
+        sValue.append(p2_Order);  
+        // 支付金额  
+        sValue.append(p3_Amt);  
+        // 交易币种  
+        sValue.append(p4_Cur);  
+        // 商品名称  
+        sValue.append(p5_Pid);  
+        // 商品种类  
+        sValue.append(p6_Pcat);  
+        // 商品描述  
+        sValue.append(p7_Pdesc);  
+        // 商户接收支付成功数据的地址  
+        sValue.append(p8_Url);  
+        // 送货地址  
+        sValue.append(p9_SAF);  
+        // 商户扩展信息  
+        sValue.append(pa_MP);  
+        // 银行编码  
+        sValue.append(pd_FrpId);  
+        // 应答机制  
+        sValue.append(pr_NeedResponse);  
+          
+        return PaymentUtil.hmacSign(sValue.toString(), keyValue);  
+    }  
+      
+    /** 
+     * 返回校验hmac方法 
+     *  
+     * @param hmac 支付网关发来的加密验证码 
+     * @param p1_MerId 商户编号 
+     * @param r0_Cmd 业务类型 
+     * @param r1_Code 支付结果 
+     * @param r2_TrxId 易宝支付交易流水号 
+     * @param r3_Amt 支付金额 
+     * @param r4_Cur 交易币种 
+     * @param r5_Pid 商品名称 
+     * @param r6_Order 商户订单号 
+     * @param r7_Uid 易宝支付会员ID 
+     * @param r8_MP 商户扩展信息 
+     * @param r9_BType 交易结果返回类型 
+     * @param keyValue 密钥 
+     * @return 
+     */  
+    public static boolean verifyCallback(String hmac, String p1_MerId,  
+            String r0_Cmd, String r1_Code, String r2_TrxId, String r3_Amt,  
+            String r4_Cur, String r5_Pid, String r6_Order, String r7_Uid,  
+            String r8_MP, String r9_BType, String keyValue) {  
+        StringBuilder sValue = new StringBuilder();  
+        // 商户编号  
+        sValue.append(p1_MerId);  
+        // 业务类型  
+        sValue.append(r0_Cmd);  
+        // 支付结果  
+        sValue.append(r1_Code);  
+        // 易宝支付交易流水号  
+        sValue.append(r2_TrxId);  
+        // 支付金额  
+        sValue.append(r3_Amt);  
+        // 交易币种  
+        sValue.append(r4_Cur);  
+        // 商品名称  
+        sValue.append(r5_Pid);  
+        // 商户订单号  
+        sValue.append(r6_Order);  
+        // 易宝支付会员ID  
+        sValue.append(r7_Uid);  
+        // 商户扩展信息  
+        sValue.append(r8_MP);  
+        // 交易结果返回类型  
+        sValue.append(r9_BType);  
+        String sNewString = PaymentUtil.hmacSign(sValue.toString(), keyValue);  
+        return sNewString.equals(hmac);  
+    }  
+      
+    /** 
+     * @param aValue 
+     * @param aKey 
+     * @return 
+     */  
+    public static String hmacSign(String aValue, String aKey) {  
+        byte k_ipad[] = new byte[64];  
+        byte k_opad[] = new byte[64];  
+        byte keyb[];  
+        byte value[];  
+        try {  
+            keyb = aKey.getBytes(encodingCharset);  
+            value = aValue.getBytes(encodingCharset);  
+        } catch (UnsupportedEncodingException e) {  
+            keyb = aKey.getBytes();  
+            value = aValue.getBytes();  
+        }  
+  
+        Arrays.fill(k_ipad, keyb.length, 64, (byte) 54);  
+        Arrays.fill(k_opad, keyb.length, 64, (byte) 92);  
+        for (int i = 0; i < keyb.length; i++) {  
+            k_ipad[i] = (byte) (keyb[i] ^ 0x36);  
+            k_opad[i] = (byte) (keyb[i] ^ 0x5c);  
+        }  
+  
+        MessageDigest md = null;  
+        try {  
+            md = MessageDigest.getInstance("MD5");  
+        } catch (NoSuchAlgorithmException e) {  
+  
+            return null;  
+        }  
+        md.update(k_ipad);  
+        md.update(value);  
+        byte dg[] = md.digest();  
+        md.reset();  
+        md.update(k_opad);  
+        md.update(dg, 0, 16);  
+        dg = md.digest();  
+        return toHex(dg);  
+    }  
+  
+    public static String toHex(byte input[]) {  
+        if (input == null)  
+            return null;  
+        StringBuffer output = new StringBuffer(input.length * 2);  
+        for (int i = 0; i < input.length; i++) {  
+            int current = input[i] & 0xff;  
+            if (current < 16)  
+                output.append("0");  
+            output.append(Integer.toString(current, 16));  
+        }  
+  
+        return output.toString();  
+    }  
+  
+    /** 
+     *  
+     * @param args 
+     * @param key 
+     * @return 
+     */  
+    public static String getHmac(String[] args, String key) {  
+        if (args == null || args.length == 0) {  
+            return (null);  
+        }  
+        StringBuffer str = new StringBuffer();  
+        for (int i = 0; i < args.length; i++) {  
+            str.append(args[i]);  
+        }  
+        return (hmacSign(str.toString(), key));  
+    }  
+  
+    /** 
+     * @param aValue 
+     * @return 
+     */  
+    public static String digest(String aValue) {  
+        aValue = aValue.trim();  
+        byte value[];  
+        try {  
+            value = aValue.getBytes(encodingCharset);  
+        } catch (UnsupportedEncodingException e) {  
+            value = aValue.getBytes();  
+        }  
+        MessageDigest md = null;  
+        try {  
+            md = MessageDigest.getInstance("SHA");  
+        } catch (NoSuchAlgorithmException e) {  
+            e.printStackTrace();  
+            return null;  
+        }  
+        return toHex(md.digest(value));  
+  
+    }  
+  
+      
+}  
+
+
+对于支付成功之后，我们需要修改我们的订单状态，改为已付款，所以我们需要一个响应的servlet
+[java] view plain copy print?
+public class ResponsePayServlet extends HttpServlet {  
+  
+  
+    private BusinessService s=new BusinessServiceImpl();  
+      
+    public void doGet(HttpServletRequest request, HttpServletResponse response)  
+            throws ServletException, IOException {  
+        response.setContentType("text/html;charset=UTF-8");  
+        PrintWriter out = response.getWriter();  
+        String p1_MerId = request.getParameter("p1_MerId");  
+        String r0_Cmd = request.getParameter("r0_Cmd");  
+        String r1_Code = request.getParameter("r1_Code");//支付结果。1代表成功  
+        String r2_TrxId = request.getParameter("r2_TrxId");  
+        String r3_Amt = request.getParameter("r3_Amt");  
+        String r4_Cur= request.getParameter("r4_Cur");  
+        String r5_Pid= request.getParameter("r5_Pid");  
+        String r6_Order = request.getParameter("r6_Order");//订单编号  
+        String r7_Uid = request.getParameter("r7_Uid");  
+        String r8_MP = request.getParameter("r8_MP");  
+        String r9_BType = request.getParameter("r9_BType");//1浏览器访问的。2点对点  
+        String hmac = request.getParameter("hmac");  
+          
+        //数据校验  
+        boolean ok = PaymentUtil.verifyCallback(hmac, p1_MerId, r0_Cmd, r1_Code, r2_TrxId, r3_Amt, r4_Cur, r5_Pid, r6_Order, r7_Uid, r8_MP, r9_BType, "69cl522AV6q613Ii4W6u8K6XuW8vM1N6bFgyv769220IuYe9u37N4y7rI4Pl");  
+        if(!ok){  
+            out.write("数据有可能被篡改，请联系网站");  
+        }else{  
+            if("1".equals(r1_Code)){  
+                //支付成功：根据订单号更改订单状态。  点卡或充值时注意表单的重复提交问题。  
+                if("2".equals(r9_BType)){  
+                    out.write("success");  
+                }  
+                  
+                //更改订单的状态  
+                /*Order order=s.findOrderByNum(r6_Order); 
+                order.setStatus(1);  //1表示已付款，0表示未付款 
+                s.updateOrder(order);*/  
+                s.changeOrderStatus(1, r6_Order);  
+                request.getSession().removeAttribute("cart");  
+                response.setHeader("Refresh", "2;URL="+request.getContextPath());  
+            }  
+        }  
+    }  
+  
+  
+    public void doPost(HttpServletRequest request, HttpServletResponse response)  
+            throws ServletException, IOException {  
+          
+        doGet(request,response);  
+          
+      
+    }  
+  
+}  
+
+
+在这个网上书店的支付中，我们可以看到这样的效果：这里以支付1分钱为例，来演示在线支付功能。
+用户在浏览商品后加入购物车并生成订单了。
+
+
+先是跳转我们自己写的这个选择银行的表单中。
+
+支付的过程我们会先跳转到易宝支付的页面。
+
+
+我这里选择建设银行来支付。所以点击确定后就会跳转到建设银行的界面。
+
+
+
+
+支付成功之后就返回。
+
+
+
+然后就会跳转回我们自己的项目中，这个时候来查看一个订单的状态，会发现已经支付成功了。
+
+
+总结：在线支付功能是个非常实用的功能，我们都应该需要掌握其基本的开发流程，并亲自动手进行测试才会更加清楚了了解。这里的话呢，额界面比较丑，唉，将就着看吧！
+
+
+
+源码地址：https://github.com/sdksdk0/BookStore（整个网上书店项目，含生成订单在线支付）
+		支付案例：https://github.com/sdksdk0/PayDemo  （只实现在线支付功能)
+
+
+
+
+
+
+
+
+
+顶
+13
+踩
+1
+ 
+ 
+上一篇用户注册的邮箱激活模块的设计与实现
+下一篇使用nexus搭建Maven私服
+  相关文章推荐
+? 支付业务的数据库表的设计
+? 自然语言处理在“天猫精灵”的实践应用--姜飞俊
+? 在线支付设计
+? 蚂蜂窝大数据平台架构及Druid引擎实践--汪木铃
+? 在线支付功能
+? Retrofit 从入门封装到源码解析
+? java实现在线支付
+? 程序员如何转型AI工程师
+? mysql订单表如何设计？
+? 深入探究Linux/VxWorks的设备树
+? 企业人事管理系统项目拾金
+? 使用QEMU搭建u-boot+Linux+NFS嵌入式开发环境
+? Java web文件上传下载
+? Elasticsearch+Hbase实现海量数据秒回查询
+? 文件一键上传、汉字转拼音、excel文件上传下载功能模块的实现
+? 终生学习者，永远劳苦命！
+查看评论
+5楼 weixin_37907180 2017-03-16 16:14发表 [回复]
+
+打开页面看看
+4楼 wenying2010 2017-03-09 10:39发表 [回复]
+
+膜拜一下
+3楼 BestEden 2016-08-10 12:29发表 [回复]
+
+膜拜大神
+Re: 朱培 2016-08-10 23:05发表 [回复]
+
+回复BestEden：徐大神这样让我很尴尬啊！
+2楼 付博瀚 2016-08-09 14:50发表 [回复]
+
+mark
+Re: 朱培 2016-08-10 23:06发表 [回复]
+
+回复付博瀚：谢谢哦！
+1楼 SugaryoTT 2016-08-09 09:19发表 [回复]
+
+收藏了！谢谢楼主赐教！
+Re: 朱培 2016-08-09 12:51发表 [回复]
+
+回复SugaryoTT：啊哈，互相学习了哦！
+您还没有登录,请[登录]或[注册]
+* 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场
+个人资料
+ 访问我的空间 
+朱培
+ 
+ 5  1
+访问：384593次
+积分：5065
+等级： 
+排名：第5783名
+原创：116篇转载：15篇译文：0篇评论：128条
+博客专栏
+	大数据实践
+文章：16篇
+阅读：113942
+	Java高级进阶
+文章：35篇
+阅读：125542
+	java/android朝圣之路
+文章：33篇
+阅读：77254
+个人网站
+https://www.tianfang1314.cn/
+GitHub
+https://github.com/sdksdk0
+联系我
+zhupei@tianfang1314.cn
+文章分类
+综合技术(23)
+安卓开发(24)
+前端开发(9)
+大数据云计算(19)
+Java(27)
+Java项目(7)
+数据库(3)
+安卓项目(9)
+Linux(1)
+服务器(1)
+随笔(6)
+Cocos2d(2)
+文章存档
+2017年08月(1)
+2017年07月(1)
+2017年06月(1)
+2017年03月(1)
+2017年02月(2)
+展开
+评论排行
+商业级项目——基金客户端的架构设计与开发（上）(11)
+谈一谈CloudBlog的系统架构(9)
+Elasticsearch+Hbase实现海量数据秒回查询(8)
+SSM实现秒杀系统案例(8)
+在线支付功能的设计及其实现(8)
+基于Web在线考试系统的设计与实现(7)
+用户注册的邮箱激活模块的设计与实现(7)
+新闻客户端案例开发(7)
+深入解读XML解析(5)
+企业人事管理系统项目拾金(5)
+阅读排行
+Hadoop开发环境搭建(15067)
+深入解读XML解析(14838)
+Eclipse的Debug调试技巧(14578)
+基于Web在线考试系统的设计与实现(14499)
+Hive的HQL语句及数据倾斜解决方案(11057)
+AJAX编程实践(10374)
+海量数据挖掘之中移动流量运营系统(9703)
+HBase的环境配置及其应用(9026)
+MongoDB实用教程(8714)
+Hive基本原理及环境搭建(7994)
+最新评论
+项目分享:通过使用SSH框架的公司-学员关系管理系统（CRM）
+kay523393: 这是传智的项目？
+基于Web在线考试系统的设计与实现
+tutu_ranran: 你好 请问一下 你下面列出的那些参考文献有没有什么书详细的教编写在线考试系统的？
+Hive的HQL语句及数据倾斜解决方案
+boychenwl_star: 最后一个 sql 语句。 coalease(t1.loc, t2.loc), 应该是 coalesc...
+新闻客户端案例开发
+qq_32894871: 楼主你好，我在AS里导入了代码，但是只有框架没有显示的新闻内容是是什么问题呢？谢谢
+日志监控告警系统的设计与实现
+qq_26703355: 给您点赞，很不错
+Elasticsearch+Hbase实现海量数据秒回查询
+染指那年华: @m0_37739193:您好，请问您是如何使用es索引hbase的数据啊
+Elasticsearch+Hbase实现海量数据秒回查询
+染指那年华: 博主您好，我是刚学习es，我想请教下，es通过什么方式索引hbase中的数据呢，我看到有人用elas...
+新闻客户端案例开发
+weixin_36336029: 谁有可以导入的文件源码？很急3553519753@QQ.com万分感谢
+新闻客户端案例开发
+qq_37971047: 导入的library是什么
+基于Web在线考试系统的设计与实现
+朱培: @weixin_39354322:文章开头提供了下载地址的。http://download.csdn...
+Hello Time!
+
+公司简介|招贤纳士|广告服务|联系方式|版权声明|法律顾问|问题报告|合作伙伴|论坛反馈
+网站客服杂志客服微博客服webmaster@csdn.net400-660-0108|北京创新乐知信息技术有限公司 版权所有|江苏知之为计算机有限公司|江苏乐知网络技术有限公司
+京 ICP 证 09002463 号|Copyright ? 1999-2017, CSDN.NET, All Rights Reserved GongshangLogo
+
+CSDN首页
+学院
+下载
+更多
+下载 CSDN APP
+写博客
+登录|注册
+csdn首页移动开发架构云计算/大数据互联网运维数据库前端编程语言研发管理综合全部 
+支付业务的数据库表的设计
+原创 2015年12月03日 15:48:39 566700
+一、数据表
+数据库中的数据表是整个核心逻辑的载体说在，所有的记账逻辑、以及与支付前台交互的数据都是在这里 进行记录。现就主要的表进行简要说明。不同的第三方支付其数据表名称肯定也不同，这里的表名称仅作参考
+
+gTransLog表： 支付网关交易流水表，所有通过网关的交易全部都会在此表中写入数据。
+tAccounts表： 用户的账户数据记录表，在第三方系统中其记录着用户的账上资金。
+tAccountLog表： 用于记录账户的自己流水情况，所有对tAccounts表的资金变动都会在流水表中进行记录
+tBankPaymentInfo表： 上传对账文件后，解析对账文件生成的表
+tBankcardInfo表： 用于存储用户或者商户所绑定银行卡的信息，包括银行名称、卡号等
+tChannelConfig表： 渠道配置表，用于配置商户与不同渠道的对应关系，比如接入支付宝或者招商银行
+tFreeze表： 冻结表，当tAccounts表中的资金有事先冻结的情况下，比如说基金赎回等会向tFreezes表中插入数据
+tPayments表： 付款表，记录账户付款相关信息
+tReceivables表： 收款表，记录收款信息
+tPaymentChannel表: 商户付款渠道的相关信息
+tRefundChannel表： 商户退款屠刀的相关信息
+tRollLog表： 业务流水表
+tTrans表: 交易表,只要是交易，资金有变化，是商户与用户交互的过程
+tTransLog表： 交易流水表，记录交易流水的相关信息
+tTransCashBack： 记录银行账号退款的相关信息
+tBankPayReconFile表：上传对账文件后，解析对账文件生成的表
+tReconcilationPaySucc表：对账成功后写入的表
+tReconcilationPayFail表：对账失败后写入的表
+tAccountSystemayPaymentInfo表：付款内部数据收集表
+二、数据表分析
+在第一部分对其中后台记账系统的数据表中大致进行了一下说明，但是其中也会有一些需要注意的点， 这才测试中分出关键。现在就每一个表进行详细的分析一下。
+
+1、gTransLog表：该表是所有网关交易都要登记的表，从支付前台传入的数据首先经过gTransLog表进行 网关登记和注册，然后再进行其他记账。在表中有内部交易单号，用于查取交易数据；有returnCode用户存放银行返回 的数据；有状态标志用于查询交易的最终状态。很多时候，支付前端的请求都是直接查取网关表来进行某些交易逻辑判断。
+
+2、tAccounts表：该表是账户数据记录表，记录着用户账上的资金。可以联系一下支付宝，就相当于个人的支付宝账户 里面的余额。不同的记账系统对账户的区分也不一样，可能有的账户系统中只用商户账户存在，有的则允许个人和商户都存在。该 表中的账户除了较为重要的Balance Amount外，还有几点需要注意：
+
+账户的冻结金额
+账户的子类型，有些时候需要关注是主账户还是次级账户
+账户的科目类型，是资产账户还是负债账户，这在记录账户流水的时候很有用
+账户的状态，可用还是失效
+3、tAccountLog表: 该表是用来记录资金账户流水变化，并记录相关交易单号以及金额。在表中会有标志记录这次的资金流动情况 是借记还是贷记，这在核对账户的资金流动上很重要，难免出错。
+
+4、tBankPaymentInfo表：这个表在对账的时候使用，关于对账相关逻辑在下一章情景支付中进行讲述。这个表是付款对账表，当然与之 相对的是收款对账表，在此仅以付款对账表进行讲述。将对账文件进行解析，获取文件中数据，来成生成此表。将在外部对账时使用。
+
+5、tChannelConfig表：该表是渠道配置表，主要是商户使用。该表中配置了商户以及此商户所接入的渠道，比如支付宝或者某银行。可以 从现实生活中去理解此逻辑，在某商户进行购物时并不是每一个商户都对某家银行支持，说的也是这个道理。
+
+6、tFreezes表：该表为冻结表，当有交易发生资金冻结的情况时，都会向这个表中写入数据；而当这个某些资金解冻后，也将该冻结表中的 状态改为解冻。并不是所有的交易在金额变动之前都会去事先冻结金额，对于实时性交易来说，账户的钱是会被实时扣除。账户资金出现冻结的情况 出现在基金申购、优惠券消费等为数不多的场景中。
+
+7、tPayments表: 该表为付款表，这里的付款是从商户的角度来说的，对于用户来说就是收款。初次涉及账户逻辑时很容易将这逻辑搞混，这个表使用 再向用户打钱的时候才会被用到。比如在基金赎回的场景中，就会向这个表中插入数据，通过表中的状态，就可以判断其向用户打钱有没有成功，对于没有成功、 的情形又会涉及到退票的情形，这在下一章讨论。
+
+8、tReceivables表: 该表为收款表。这里的收款也是对商户而言，对用户而言则是付款。比如用户在进行购物的时候，用户是付款，商户是收款，那么此时 就会向此表中插入数据，其表中也存有state字段用来表示用户付款有没有成功。只要是涉及用户的资金进入第三方系统，此表都会有收款数据写入。
+
+9、tPaymentChannel表:此表为付款渠道表，如果从字面意思进行理解便可知道，这个是付款时的渠道。不管是商户还是用户其相关的付款渠道信息都是在此 配置，如果在这个表中将渠道置为无效，则在支付前端看不到此渠道。
+
+10、tRefundChannel表：此表是退款渠道配置表，可以类比付款渠道配置表进行理解。
+
+11、tTrans表：该表是交易表，核心点在与交易，交易必须有买和卖，只有这样才能完成交易。此时就涉及一个易被忽视的问题，比如向用户向自己钱包充值， 这个阶段只是收钱，并没有存在交易，所以在这个场景下并不会向该表中写入数据。在一般的交易中，可查看表中的状态来判断此交易的状态，是等待付款、付款完成 、付款失败、已清算。支付前端也时刻通过这个表来进行其他联接查询操作。
+
+12、tTransLog表：该表为交易流水表，对tTans表的变化都会在tTransLog中进行记录，这在后续查询交易异常情况下，比较有帮助作用
+
+13、tTransCashBack表：该表为现金退款表，当用户通过银行卡支付并成功扣款后，这个时候如果发起退款那么要这个表中插入数据。有一个情况要注意，这个表中的 数据只涉及银行退款，比如在组合消费的时候，可能有优惠券的金额。那么由于优惠券过期而发生退款时，银行卡退款部分写入tTransCashBack表中。
+
+14、tBankPayReconFile表：这个表中的数据为解析银行付款对账文件而来，其数据来源于银行。这个数据表为付款文件对账表，与之相对的是收款银行文件对账表，虽然 在这里没有将其列出，但是其业务逻辑思想是相通的。
+
+15、tReconcilationPaySucc表：对账数据的结果存放处，对账的结果又对平和对差的区别。具体在这里不做讲解，对平的数据放入此表中，而对差的数据放入Fail表中。
+
+16、tAccountSystemayPaymentInfo：这个表为付款信息收集表，也是内部对账后的结果表。与之相对的是收款信息收集表。
+
+
+阅读全文
+版权声明：本文为博主原创文章，未经博主允许不得转载。 举报
+标签：支付 /数据库 /设计
+目前您尚未登录，请 登录 或 注册 后进行评论
+相关文章推荐
+充值系列—充值系统数据库设计（一）
+
+在我们的游戏充值模块中，接入了支付宝，苹果，Paypal, googleplay , mycard, mol, 360,机锋，91等各种充值渠道。这篇文章(包括接下来的几篇文章)将对充值系统的需求，构...
+a23456789zxcvbnma23456789zxcvbnm2013-11-25 15:365485
+关于电子支付系统的数据库设计
+
+现在，大到银行等金额机构，小到城市一卡通，直到餐馆等路边小店的会员系统都在使用电子支付进行结算。 根据系统应用的用户规模和交易量，系统的数据库设计也是不同的。 那种账户一年才几个，交易量不...
+coderabbitcoderabbit2011-03-31 00:285559
+ 
+《程序员看天下》实战：揭秘携程大数据的应用处理
+
+一直以来，携程拥有海量数据，如何存储、分析和应用这些数据一直是部门痛点所在！携程大数据团队将会给出什么样的解决方案呢？开源产品的选型和运维又该如何抉择呢....
+在线支付功能的设计及其实现
+
+在现在的网站中，基本上都会有支付功能，在线支付作为一个潮流已是现代化网站的必备功能模块，那么几天我就分享一下如果来做这个在线支付功能。 在线支付一般来说有两种实现方式，一种是调用各个银行提供的接口，另...
+sdksdk0sdksdk02016-08-08 19:566810
+微信红包体系设计分析
+
+1 需求分析 一个字：钱；两个字：消遣 1.1用户为什么要发红包？ （1）逗别人玩自己开心 有些人发一些1分钱的红包，看到大家哄抢，自己觉得很爽；有些人自己发1个0.01的自己抢和别人比拼速度...
+zhuhengvzhuhengv2015-12-07 15:112226
+新手必须知道的数据库设计经验
+
+数据库是一个项目的骨架，一个好的数据库
+programmer_angelprogrammer_angel2014-10-26 18:10913
+充值系列——充值系统的架构（二）
+
+转载于：http://blog.csdn.net/looksunli/article/details/16945501 上一篇文章主要介绍了充值系统的基本概要说明和数据库设计。 这篇文...
+luckmmmluckmmm2014-03-31 21:591095
+第三方支付架构设计之—帐户体系
+
+第三方支付架构设计之—帐户体系 一，      什么是第三方支付？         什么是第三方支付？相信很多人对这个名字很熟悉，不管是从各种媒体等都经常听到，可以说是耳熟能熟。但，如果非得给这个...
+tenfyguotenfyguo2014-12-01 23:2967124
+数据库设计之总账与流水账设计
+
+在业务系统中我们常会遇到账务系统设计。 无论是财务账，库存帐，积分账，原理都是一样的。账务系统一般来说包括：流水账和总账。 总账表设计 1，简单的账务系统，一般会把总账直接放到用户表里面。 例...
+david136796david1367962016-03-16 17:11727
+支付业务的数据库表的设计
+
+原文地址：http://blog.csdn.net/burpee/article/details/52430270 一、数据表 数据库中的数据表是整个核心逻辑的载体说在，所...
+xiyang_1990xiyang_19902017-04-25 21:53391
+支付业务的数据库表的设计
+
+一、数据表 数据库中的数据表是整个核心逻辑的载体说在，所有的记账逻辑、以及与支付前台交互的数据都是在这里 进行记录。现就主要的表进行简要说明。不同的第三方支付其数据表名称肯定也不同，这里的表名称...
+burpeeburpee2016-09-04 07:591937
+
+杨廷琨 - 从分区到Sharding：数据库核心业务表的分区设计
+
+2015-11-27 14:4816.28MB
+下载
+
+数据库设计，讲解业务实体对象到数据库表的映射关系。
+
+2010-02-09 08:58505KB
+下载
+《自己动手设计数据库》第11章 定义和建立业务规则
+
+根据业务需要定义和建立业务规则，并将其体现在数据库中
+YQXLLWYYQXLLWY2016-10-28 10:53372
+用三层架构与设计模式思想部署企业级数据库业务系统开发
+
+用三层架构与设计模式思想部署企业级数据库业务系统开发 1. 三层架构介绍 1.1关于架构 架构这个词从它的出现后,就有许许多多的程序员、架构师们激烈地讨论着它的发展，但是架构一词的出现，...
+sunningPigsunningPig2011-11-10 09:54554
+业务系统中用户权限数据库表格的设计2
+
+业务系统中用户权限数据库表格的设计 (2012-06-02 15:12:40) 转载▼ 标签： 杂谈 分类：数据库分析 实现业务系统中的用户...
+myqq_myqq_2015-05-20 00:15229
+android第三方登录数据库设计以及业务数据流向说明
+
+最近公司开发android项目，用户可以通过注册的手机帐号登录，也可以通过第三方登录（QQ、新浪微博、微信），手机帐号可以绑定第三方帐号，第三方帐号也可以绑定手机帐号。 这里设计两张数据库表，一张是...
+ZhangZuoMianZhangZuoMian2016-02-28 22:391946
+
+结合业务的数据库设计文档
+
+2013-06-15 22:254.96MB
+下载
+
+数据库应用设计实例 - 商业银行业务系统
+
+2013-10-09 10:57944KB
+下载
+ 
+hanghang886
+
+＋关注
+原创
+1
+ 
+粉丝
+0
+ 
+喜欢
+0
+ 
+码云
+未开通
+他的最新文章更多文章
+
+编辑推荐
+最热专栏
+充值系列—充值系统数据库设计（一）
+关于电子支付系统的数据库设计
+在线支付功能的设计及其实现
+在线课程
+
+自然语言处理在“天猫精灵”的实践应用
+自然语言处理在“天猫精灵”的实践应用
+讲师：姜飞俊
+蚂蜂窝大数据平台架构及Druid引擎实践
+蚂蜂窝大数据平台架构及Druid引擎实践
+讲师：汪木铃
+
+
+目录
+ 
+喜欢
+ 
+收藏
+ 
+评论
+ 
+分享
+返回顶部
+
+CSDN首页
+学院
+下载
+更多
+下载 CSDN APP
+写博客
+登录|注册
+csdn首页移动开发架构云计算/大数据互联网运维数据库前端编程语言研发管理综合全部 
+关于电子支付系统的数据库设计
+原创 2011年03月31日 00:28:00 555920
+ 
+现在，大到银行等金额机构，小到城市一卡通，直到餐馆等路边小店的会员系统都在使用电子支付进行结算。
+ 
+根据系统应用的用户规模和交易量，系统的数据库设计也是不同的。
+ 
+那种账户一年才几个，交易量不到一万笔，交易额在10万以下的小系统，用个access就能解决，感觉不用特别去研究。
+ 
+那种超大规模的应用，如股票交易、信用卡结算，涉及到问题太多，一两句说不清楚。
+ 
+这里主要说说，我们平时接触到的大多是一些中小型的结算系统，如连锁商场的会员卡储值系统，校园餐卡系统，加油站，网站在线交易等。
+ 
+ 
+1. 数据库设计的原则
+1) 准确记录账户基本信息，特别是状态。
+2) 交易时要正确记录下交易信息和账户状态。
+3) 交易记录是历史性的，不可篡改。
+4) 交易是连续的，对时间要求准确。
+5) 交易记录要完整，对安全性有要求。
+ 
+ 
+ 
+2.主要数据表
+1) 账户基本信息表
+    记录账户的持有人姓名、联络方式、余额、有效期、密码、流通范围等。为了安全，该表还应该由账户、姓名、有效期和余额组成的检验串，防止有人恶意修改余额或账号。
+2) 交易记录表
+    记录每一笔交易信息，除了记录交易账户、交易时间、交易金额、交易后余额和交易内容（充值或消费购物）外，还应该记录下账户的其它基本信息，如账户持有人姓名、交易地点等。这也许会增加数据的存储量，但这是有必要的。如在银行储藏点存下钱，这个储藏点若干年后，可能更名、关闭等，在此之后要查当初在这个点的交易时，就可能会用到初交易时的信息。
+     另外，交易记录不建立使用太多的代码表示特定意思，一是时间太久了会看不明白代码是什么意思，二是代码可能被重复使用。
+     所有交易必须有数据完整性校验，即一行记录一旦生成后其校验串也就固定了，防止有人恶意修改记录行的值。
+3) 账户变更记录表
+    由于账户基本信息是可变更的，基于交易系统的交易记录的历史性和档案性，所以对账户基本信息的任何变更都必须有记录，由什么变更为什么，一定要有记录，否则以后一旦查历史，找不到当初变更的信息就麻烦了。
+4) 操作日志明细表
+    所有的操作必须有详细的日志记录。
+ 
+3.技巧
+1) 应当根据应用的规模进行合理设计，如交易量非常大（每天超过10万笔）那就需要考虑创建分区表，如果更大，就要考虑建立历史交易表或交易库，即把一年或几年前的数据独立出来，仅供特殊需要时查询。
+2) 建立索引，如按日期、账户建立索引，可以加快查询速度。
+3) 建立报表数据存储表，即在报表生成之后，就把生成的结果数据保存下来，以后再要进直接进行查询，不要每次都根据原始表进行统计。
+4) 适当提高硬件配置是比较划算的。
+ 
+ 
+4.其它
+1) 一定要考虑扩展性，主要在应用地区范围、时间范围、用户（消费者）、客户（商家）方面。
+2) 应急的处理，如备份、分布式（不同地方设立数据库）的独立运行、离线等。
+3) 要有开放的思想，想想在未来如何方便其它系统、成员、合作伙伴也可以加入进来。
+4) 安全是非常重要的，即使是数据库管理员也不要留给其作恶的机会。
+5) 数据库建立自我监测机制，发现异常发出警示和锁定账户。
+ 
+ 
+仅个人想法，请多指点。
+阅读全文
+版权声明：本文为博主原创文章，未经博主允许不得转载。 举报
+标签：数据库 /报表 /存储 /access /扩展
+目前您尚未登录，请 登录 或 注册 后进行评论
+wuxiupeng
+wuxiupeng2011-07-11 15:211楼
+你这个是从哪抄袭的？
+回复  1条回复
+相关文章推荐
+交易记录表设计注意点
+
+欢迎使用Markdown编辑器写博客本Markdown编辑器使用StackEdit修改而来，用它写博客，将会带来全新的体验哦： Markdown和扩展Markdown简洁的语法 代码块高亮 图片链接和...
+u010981786u0109817862017-02-28 16:33140
+支付业务的数据库表的设计
+
+支付业务
+hanghang886hanghang8862015-12-03 15:485668
+ 
+零基础的学习心路：12个机器学习案例实战！
+
+都说今年是AI开发元年，为了转型AI技术程序员，这小半年来看了几本书，总结了一些学习的方法和踩过的坑儿，今天我想谈谈关于机器学习该如何入门以及学习方法....
+充值系列——充值系统的架构（二）
+
+转载于：http://blog.csdn.net/looksunli/article/details/16945501 上一篇文章主要介绍了充值系统的基本概要说明和数据库设计。 这篇文...
+luckmmmluckmmm2014-03-31 21:591095
+第三方支付架构设计之—帐户体系
+
+第三方支付架构设计之—帐户体系 一，      什么是第三方支付？         什么是第三方支付？相信很多人对这个名字很熟悉，不管是从各种媒体等都经常听到，可以说是耳熟能熟。但，如果非得给这个...
+tenfyguotenfyguo2014-12-01 23:2967124
+数据库设计之总账与流水账设计
+
+在业务系统中我们常会遇到账务系统设计。 无论是财务账，库存帐，积分账，原理都是一样的。账务系统一般来说包括：流水账和总账。 总账表设计 1，简单的账务系统，一般会把总账直接放到用户表里面。 例...
+david136796david1367962016-03-16 17:11727
+转：充值系列—充值系统数据库设计（一）
+
+转载于：http://blog.csdn.net/looksunli/article/details/16872467 在我们的游戏充值模块中，接入了支付宝，苹果，Paypal, googl...
+luckmmmluckmmm2014-03-31 21:571428
+支付业务的数据库表的设计
+
+一、数据表 数据库中的数据表是整个核心逻辑的载体说在，所有的记账逻辑、以及与支付前台交互的数据都是在这里 进行记录。现就主要的表进行简要说明。不同的第三方支付其数据表名称肯定也不同，这里的表名称...
+burpeeburpee2016-09-04 07:591937
+第三方支付架构设计之—自有账户支付
+
+笔者在上一篇blog>中已经稍微全面的阐述了第三方支付架构设计中的账户体系，在该体系中，其实涉及了各种各样的账户：银行侧账户（包括用户在银行侧的账户：用户借记卡，信用卡，商户在银行侧的清算账户，结算账...
+tenfyguotenfyguo2015-01-31 23:2216245
+电子商务系统的设计与实现(十一)：数据库设计
+
+用户相关   malling_user：前端商城系统的用户，用户名、密码等   malling_user_delivery_address，用户的收获地址，一个用户可以有多个收获地址 ...
+qq_36617521qq_366175212017-02-25 17:3493
+
+电子支付系统.doc
+
+2010-11-15 20:3032KB
+下载
+
+电子支付系统 ppt
+
+2011-08-17 13:362.33MB
+下载
+电子商务系统的设计与实现(十一)：数据库设计
+
+用户相关   malling_user：前端商城系统的用户，用户名、密码等   malling_user_delivery_address，用户的收获地址，一个用户可以有多个收获地址 ...
+qq_36617521qq_366175212017-02-20 14:57482
+
+电子支付系统
+
+2007-04-12 13:3282KB
+下载
+
+电子商务课件电子支付系统
+
+2014-06-06 18:501.53MB
+下载
+电子商务系统的设计与实现(十一)：数据库设计
+
+用户相关  malling_user：前端商城系统的用户，用户名、密码等  malling_user_delivery_address，用户的收获地址，一个用户可以有多个收获地址  malling_a...
+FansUnionFansUnion2015-01-02 19:3625313
+
+电子商务交易支付系统设计分析
+
+2010-03-21 15:192.47MB
+下载
+
+基于电子支付密码的支票自动容错识别系统研究
+
+2014-04-11 08:53285KB
+下载
+java系列之J2ME的移动支付系统的设计与实现
+
+移动支付是移动电子商务中的最重要的部分之一。安全性、私密性、易用性是移动支付的最重要的几个问题。目前有许多不同种类的技术能够实现移动支付，其中J2ME凭借其多种显著的优势成为了佼佼者。移动支付系统也有...
+qqxinxiqqxinxi2011-02-20 09:46583
+ 
+代码兔
+
+＋关注
+原创
+23
+ 
+粉丝
+0
+ 
+喜欢
+0
+ 
+码云
+未开通
+他的最新文章更多文章
+API设计的十大最差和五大最佳实践
+支付宝玉伯：我心目中的优秀API
+程序员心髓：移动应用API设计10大技巧
+逐步改善，设计优秀的API
+
+编辑推荐
+最热专栏
+交易记录表设计注意点
+支付业务的数据库表的设计
+充值系列——充值系统的架构（二）
+第三方支付架构设计之—帐户体系
+数据库设计之总账与流水账设计
+在线课程
+
+自然语言处理在“天猫精灵”的实践应用
+自然语言处理在“天猫精灵”的实践应用
+讲师：姜飞俊
+蚂蜂窝大数据平台架构及Druid引擎实践
+蚂蜂窝大数据平台架构及Druid引擎实践
+讲师：汪木铃
+
+
+喜欢
+ 
+收藏
+ 
+评论
+ 
+分享
+ 
+CSDN首页
+学院
+下载
+更多
+下载 CSDN APP
+写博客
+登录|注册
+csdn首页移动开发架构云计算/大数据互联网运维数据库前端编程语言研发管理综合全部 
+数据库设计之总账与流水账设计
+原创 2016年03月16日 17:11:10 72700
+在业务系统中我们常会遇到账务系统设计。
+无论是财务账，库存帐，积分账，原理都是一样的。账务系统一般来说包括：流水账和总账。
+总账表设计
+1，简单的账务系统，一般会把总账直接放到用户表里面。
+例如：用户表（......用户信息，总积分，消费积分，剩余积分.....）
+    用户表（......用户信息，总金额，消费金额，剩余金额，冻结金额，可用金额.....）
+   等等......
+2，当然某系系统也会把财务信息单独出来作为一张表，用用户id关联用户表。
+例如： 用户表（用户id，......）财务表（用户id，总金额，消费金额，剩余金额，冻结金额，可用金额）
+流水账表设计
+1，常见的流水账表
+2，流水账表的扩展
+3，月账表，季度账设计
+3，账期结账
+（不好意思，有点事，先暂时不写，如果有需要咨询的可以直接加我qq：361058057）
+版权声明：本文为博主原创文章，未经博主允许不得转载。 举报
+目前您尚未登录，请 登录 或 注册 后进行评论
+相关文章推荐
+数据库表结构设计方法
+
+数据库表结构设计方法
+wyzxgwyzxg2011-02-12 20:467097
+支付业务的数据库表的设计
+
+支付业务
+hanghang886hanghang8862015-12-03 15:485668
+ 
+重磅！CSDN自主举办：人工智能峰会来袭！
+
+2017年下旬 AI先行者们正在关注哪些关键技术？ 又如何从理论跨越到企业创新实践？CSDN邀请阿里巴巴、微软、商汤科技、微博大咖...
+互联网后台服务器流水日志系统设计
+
+在互联网后台服务器中常需要记录互联网软件的流水日志，日志服务器和入库工具则是处理此类功能。 日志服务器会接受逻辑服务器发送的日志消息，将其写入本地日志文件。每隔一段时间，再由日志入库服务器将日志文件...
+jiayichenddddjiayichendddd2016-03-14 15:061738
+充值系列——充值系统的架构（二）
+
+转载于：http://blog.csdn.net/looksunli/article/details/16945501 上一篇文章主要介绍了充值系统的基本概要说明和数据库设计。 这篇文...
+luckmmmluckmmm2014-03-31 21:591095
+第三方支付架构设计之—帐户体系
+
+第三方支付架构设计之—帐户体系 一，      什么是第三方支付？         什么是第三方支付？相信很多人对这个名字很熟悉，不管是从各种媒体等都经常听到，可以说是耳熟能熟。但，如果非得给这个...
+tenfyguotenfyguo2014-12-01 23:2967126
+关于电子支付系统的数据库设计
+
+现在，大到银行等金额机构，小到城市一卡通，直到餐馆等路边小店的会员系统都在使用电子支付进行结算。 根据系统应用的用户规模和交易量，系统的数据库设计也是不同的。 那种账户一年才几个，交易量不...
+coderabbitcoderabbit2011-03-31 00:285560
+转：充值系列—充值系统数据库设计（一）
+
+转载于：http://blog.csdn.net/looksunli/article/details/16872467 在我们的游戏充值模块中，接入了支付宝，苹果，Paypal, googl...
+luckmmmluckmmm2014-03-31 21:571428
+支付业务的数据库表的设计
+
+一、数据表 数据库中的数据表是整个核心逻辑的载体说在，所有的记账逻辑、以及与支付前台交互的数据都是在这里 进行记录。现就主要的表进行简要说明。不同的第三方支付其数据表名称肯定也不同，这里的表名称...
+burpeeburpee2016-09-04 07:591937
+第三方支付架构设计之—自有账户支付
+
+笔者在上一篇blog>中已经稍微全面的阐述了第三方支付架构设计中的账户体系，在该体系中，其实涉及了各种各样的账户：银行侧账户（包括用户在银行侧的账户：用户借记卡，信用卡，商户在银行侧的清算账户，结算账...
+tenfyguotenfyguo2015-01-31 23:2216245
+数据库设计规范
+
+数据库表命名规范  此规范包括表名命名规范，索引命名规范，外键命名规范和字段名命名规范。  表名命名规则     1. 数据库表的命名以是名词的复数形式且都为小写，如cities, categor...
+Jerry_1126Jerry_11262014-02-26 15:322210
+数据库设计原则
+
+1. 原始单据与实体之间的关系 　　可以是一对一、一对多、多对多的关系。在一般情况下，它们是一对一的关系：即一张原始单据对应且只对应一个实体。 在特殊情况下，它们可能是一对多或多对一的关系，即...
+liuli3345liuli33452012-09-28 14:54813
+jQuery EasyUI-异步树后台代码与数据库设计
+
+easyui的异步树创建很简单,只需要指定一个获取树的JSON数据的URL地址就可以了,API是这样写的：异步树后台代码设计方式有很多种,我说下我的设计。数据库表设计Tree表 先来解释下每个字段的...
+qq_32588349qq_325883492016-06-12 22:242990
+数据库设计中的12个技巧
+
+数据库设计中的12个技巧 1.原始单据与实体之间的关系 可以是一对一、一对多、多对多的关系。在一般情况下，它们是一对一的关系：即一张 原始单据对应且只对应一个实体。在特殊情况下，它们可能...
+Li_sosoLi_soso2013-01-30 11:48256
+SQL Server 数据库设计
+
+一、数据库设计的必要性          在实际的软件项目中，如果系统中需要存储的数据量比较大，需要设计的表比较多，表与表之间的关系比较复杂，那我们就需要进行规范的数据库设置。如果不经过数据库的...
+ycl295644ycl2956442015-05-08 12:29262
+数据库设计规范
+
+数据库设计规范 一 命名规范 说明：指数据库中表（TABLE），字段（COLUMN），视图（VIEW），存储过程（PROCEDURE），函数（FUNCTION），触发器（TRIGGER）等的命...
+xiongwenwuxiongwenwu2014-10-31 14:36569
+MYSQL数据库设计的一些小技巧
+
+选表类型：mysql的myisam表适合读操作大，写操作少;表级锁表innodb表正好相反；行级锁表互联网服务，不算支付性的服务外，互动产品，新闻系统等等一般都是读多，写少。用myisam表比较合适。...
+m13666368773m136663687732012-09-20 16:042639
+数据库设计中的14个常用技巧
+
+下述十四个技巧，是许多人在大量的数据库分析与设计实践中，逐步总结出来的。对于这些经验的运用，读者不能生帮硬套，死记硬背，而要消化理解，实事求是，灵活掌握。并逐步做到：在应用中发展，在发展中应用。 　...
+pyq228pyq2282011-10-20 19:49184
+Sql Server数据库设计和高级查询
+
+1,数据库设计步骤： (1)收集信息 (2)标识对象(确定数据库中有哪些表) (3)标识对象的属性(确定每个表中的例) (4)标识对象的关系(两个表的关系) 4种关系: 1对1 ...
+it_XuChaoit_XuChao2015-04-26 23:44330
+数据库设计时字段类型的选择原则
+
+mysql数据库对应的数据类型存储空间：
+xueer767xueer7672015-04-24 11:33218
+ 
+张勇刚
+
+＋关注
+原创
+5
+ 
+粉丝
+3
+ 
+喜欢
+0
+ 
+码云
+0
+他的最新文章更多文章
+php 关闭跨域ajax限制
+thinkphp，oracle，支持事务
+js调试的常用五种方式
+php连接sqlserver的方法
+
+编辑推荐
+最热专栏
+数据库表结构设计方法
+支付业务的数据库表的设计
+互联网后台服务器流水日志系统设计
+充值系列——充值系统的架构（二）
+在线课程
+
+自然语言处理在“天猫精灵”的实践应用
+自然语言处理在“天猫精灵”的实践应用
+讲师：姜飞俊
+蚂蜂窝大数据平台架构及Druid引擎实践
+蚂蜂窝大数据平台架构及Druid引擎实践
+讲师：汪木铃
+
+
+喜欢
+ 
+收藏
+ 
+评论
+ 
+分享
+ 
+首页
+发现
+话题
+
+搜索你感兴趣的内容…
+
+登录加入知乎
+交易系统和风控系统的架构怎么设计？
+关注问题写回答
+架构
+支付
+系统架构
+交易系统
+交易系统和风控系统的架构怎么设计？
+从系统的维护和开发(低耦合，重用性)的角度来说，交易系统和风控系统 设计成了2个单独的系统。
+但是实际中的一些需求
+比如：
+1 我交易的时候需要验证下用户的交易地区，是否和用户注册的交易地区相同。
+2 交易限额也需要和用户的级别关联。
+3 用户可能把某类交易的额度主动提高了，那么风控系统也需要知道这些信息，因为交易验证的时候可能会用到
+等等。
+
+这样的话，风控系统在验证交易的时候就需要很多本身风控系统没有的数据，需要从用户系统中取得，但是又是实时交易。所以会造成以下问题：
+1 以后可能会影响交易造成延时。
+2 如果不同系统的交易系统都走风控中心的话，照这样的话，每接入一个系统风控中心都面临这修改的问题。
+
+请教各位，多谢.
+关注者
+1566
+被浏览
+72261
+添加评论
+分享
+邀请回答
+
+收起
+关注问题写回答
+13 个回答
+默认排序
+知乎用户
+知乎用户
+收录于 编辑推荐 · 98 人赞同了该回答
+曾任某公司风控架构师。设计风控系统能力
+单机TPS200~2000(接入实时统计系统）
+响应时间小于200ms
+任意业务规则情况下。
+下面是我曾做的风控系统架构设计PPT 
+
+关键几点总结
+1，业务系统必须和风控系统分开。
+2，必须有一个风控引擎
+     业务上的好处是业务扩展能力强，数据和表达能力强
+     技术上的好处下面说
+3，必须规则和数据分离。形成规则.规则元素.元素数据获取器的模型结构
+     利用风控引擎，解析规则。将规则和数据的关系解耦，从而可以更有效的优化规则。提升数据接入能力。以及优化线程利用率。实现高性能、高效率
+
+
+编辑于 2015-12-11
+98
+10 条评论
+分享
+收藏感谢收起
+omeweb
+omeweb
+我只会google。
+46 人赞同了该回答
+本人是阿里集团安全部的风控架构师和设计师。我们系统每天处理实时消息60+亿，双11和双12完全不降级。
+
+前面的同学已经说的很多了，说的很对。
+
+我yy几点看法：
+
+1，交易和风控系统要分开，低耦合
+2，业务系统很多环节都有埋点，或者是hook
+3，风控系统会用到非常多的接口和数据，一些数据要自己计算和沉淀，一些则要业务系统提供服务化接口
+4，风险识别是一块，决策又是一块。比如决策的时候，看你爸是不是李刚，如果是则释放，不是的话，嗯哼。。。
+5，风控处理分同步和异步，异步也是实时，一般延迟在100ms以内。同步的话，肯定消耗rt的，必须要快
+6，保障可降级，除非特别的场合，比如转账，不能降级。也不是所有的策略都耗时，可以降级高耗时低产出的策略
+7，策略必须立即生效，且可灰度和回滚，且都是运营人员自行配置，可调试，不依赖开发
+8，业务系统接入，应该要很快，比如传入5w1h，风控系统返回一个结果，比如说false，则阻止下单并提示text
+9，很多业务系统都要接入风控系统
+10，完全不用drools，扩展性和性能太差，服务集成能力和维护成本都非常高
+
+随便说的，有问题了再说吧。
+发布于 2015-03-25
+46
+41 条评论
+分享
+收藏感谢
+梁川
+梁川
+互联网金融 话题的优秀回答者
+收录于 编辑推荐 · 75 人赞同了该回答
+交易系统和风控系统从架构角度设计，是应该设计成两个单独的系统，题主提到的问题，本质在于交易系统和风控系统之间数据共享及服务调用的问题。
+
+一般通过如下几个层面来降低交易系统、风控系统的耦合度，提升系统性能和扩展性：读写分离、缓存/内存数据库、SOA架构、复合事件处理
+
+数据库读写分离机制：在初期，风控系统一般都极为简单，此时侯一般通过数据库主从复制/读写分离/Sharding等机制来保证交易系统的数据库和风控系统数据的同步及读写分离。风控系统对所需要的客户/账户数据、交易数据一般都只进行读操作。
+
+缓存/内存数据库机制：不管是交易系统还是风控系统，高效的缓存系统是提升性能的大杀器，一般会把频繁使用的数据存放到Redis等缓存系统中。例如对风控系统，包括诸如风控规则、风控案例库、中间结果集、黑白名单、预处理结果等数据；对交易系统而言，包括诸如交易参数、计费模板、清结算规则、分润规则、银行路由策略等。对一些高频交易中，基于性能考虑，会采用内存数据库（一般会结合SSD硬盘）。
+
+RPC/SOA架构：要降低交易系统和风控系统的耦合度，在初期系统服务较少的情况下，一般直接采用RabbitMQ/ActiveMQ之类的消息中间件或RPC方式来实现系统间服务的调用。如果系统服务较多，存在服务治理问题，会采用Dubbo之类的SOA中间件来实现系统服务调用。
+
+复合事件处理（CEP）：对实时/准实时交易风险控制，相对于纯基于规则的处理模式，采用复合事件处理（CEP）模式，性能及扩展性更好，开源的方案包括Esper、Storm、Spark等。
+
+从风控系统构建角度，对应所谓的事前、事中、事后风险控制，作为风控系统最核心的风控引擎分为实时风控引擎、准实时风控引擎、定时风控引擎三种：
+1、实时风控引擎&准实时风控引擎
+    实时风控主要在交易过程对交易过程进行实时监控，一个典型应用场景是甄别钓鱼、盗卡风险。
+    准实时风控典型应用场景是在T+1结算时候，对商户洗钱、跑路进行甄别。
+    实时/准实时风控引擎一般采用规则引擎+复杂事件处理（CEP）。
+
+2、定时风控引擎
+    主要定时对支付/交易/账务等数据进行定时ETL、深度挖掘等处理，建立对应的风控模型，一个典型应用场景是商户的信用等级模型。此时侯一般采用Hadoop、ML等技术进行大数据建模
+
+以前写过两篇关于第三方支付风控系统建设的文章，供参考
+支付系统风控系统建设思考
+复杂事件处理(Complex Event Processing)入门1
+发布于 2015-01-02
+75
+6 条评论
+分享
+收藏感谢收起
+Mr Mistake
+Mr Mistake
+Algo high frequency trading, London
+5 人赞同了该回答
+你说的风控是指pre trade circuit breaker 还是post trade risk analysis （用来对冲）？两种应用会用不同的架构。
+
+如果pre trade系统的话我们是直接写在trading applicztion 里面。用event driven 写。如果post trade一般分开。模型可复杂可简单，复杂的话用分布式，简单的话用excel 
+发布于 2015-01-02
+5
+1 条评论
+分享
+收藏感谢
+旭纳
+旭纳
+聚汇堂外汇套利EA发明者|百万美金级操盘手
+13 人赞同了该回答
+每个交易员的交易系统都是基于其所认知的这个世界：
+
+有人认为价格围绕价值上下波动，研究价值本质自然能得到价格体现，于是出现了基本派；有人认为基本面最终要以技术面的走势来反映，就出现了技术派；也有人认为基本面与技术面相互结合，将为价格走势更有指导意义。
+
+      光从技术派角度讲：
+
+有人认为市场是不可预测的，下一秒的价格可以涨可以跌，其比率是各占50%。于是出现了一批专做仓位管理的交易系统，不计较涨跌，不计较交易品种。利用类似网格交易等方式，不断加仓减仓得以实现盈利。
+
+有人用四个字就可以一夜暴富——“物及必反”，《大时代》中的郑少秋就是典型，全世界都在做多恒指时，他满仓做空。反映到技术面时，这些人就利用了KDJ/RSI等超买超卖指标，也能在这个市场中成为神话。
+
+有人认为市场中80%的行情是震荡的，只要不断把握震荡行情中的利润，将足以弥补剩余20%的趋势行情所带来的亏损。他们开始不断建立完善自己基于震荡行情下的交易系统。里面带有了很多震荡指标。并可能利用均线等趋势指标以“指标共振”来筛选出真正的震荡行情。
+
+有人认为市场中在一定时期可能是振荡，而在较小时间期间却是趋势。就开始出现了多重时间周期的交易系统。找到长周期的振荡行情中的某一段，在小期间找到顶或底，以支持做多或做空。
+
+有人只愿意做趋势，觉得只有这种行情可以让利润奔跑，而趋势行情尊重波浪的走势进行运行，就开始出现了波浪理论，斐波娜奇（黄金分割）理论。
+
+有人认为人是有弱点的，是有情绪，有喜怒哀乐的，他们相信人在短期内是有可能获利的，但在长周期下，或大资金下，或在特定的环境中是没有办法保证获利的，于是出现了一批研究智能交易系统（EA）的人，包括著名的索罗斯的量子基金都有此配置。再细分下去，就产生了全自动EA与半自动EA。很多都能实现一定期间与环境中的盈利。至少克服了“人”的弱点。
+
+等等等等
+
+究其原因，每个人认同的思想不同，说大了是人生观的不同，导致了其所建立的交易系统的不同。
+
+而建立的交易系统是否赚钱只需不断地复盘与实盘验证。
+
+最终，你恍然大悟，你会发现大部分交易系统都是能够赚钱的。最终亏钱的人只是信念不够。与做人一致。人生观、价值观坚定的人不多，这或多或少构成了这个交易市场的2、8定律。
+
+所以，交易系统很简单，问自己，你的信念是什么？只要你愿意坚持她，执行她，不怀疑她，不离不弃，相互进步，相互成长。稳定盈利又有何难。
+
+发布于 2016-08-21
+13
+8 条评论
+分享
+收藏感谢收起
+神宗
+神宗
+http://cyan.ly
+3 人赞同了该回答
+风控系统必须是独立的并且使用客观数据源。具体如何接入你们的交易流程要取决于你们所选用的messaging bus。架构我想除了SOA没有别的更好方案。
+
+我们风控系统分为pre trade，trade life cycle和post trade三个模块直接接驳tibco主题: 
+
+前者用以检查计算密集类规则，比如交易及交易组合对现有投资组合产生的各种风险检查。我们还做到了某些不合规结果可以直达合规部门前端系统请求索取批准口令
+
+交易产生时是各种额度以及权限检查，除了short selling以外基本不会涉及P&L的查询所以相当快速。对于某些自动高频交易组合(basket)，在pre trade已经做好了reservation，风控的延迟几乎可以忽略（乌龙指的检查是必须的）。
+
+post trade检查应对其他不可预测的交易结果。
+
+风控系统需要有高效的rule based engine，需要一个高效的服务内repository(cache)。
+编辑于 2013-08-20
+3
+添加评论
+分享
+收藏感谢
+维辰美
+维辰美
+1 人赞同了该回答
+一个好的交易系统，应当有能力捕捉到突发事件的影响。
+从投资哲学的角度讲，市场上没有任何突发事件是突然发生的。
+突发事件本身只相当一个“导火索”。
+如果它真正能够对市场产生爆炸性的影响，必须在市场上有“炸药包”本身的存在，即某种市场供求状态的积累和发展。突发事件只能对这种已经存在的市场关系起到某种催化剂的作用。
+市场永远只选择它愿意选择的突发事件。突发事件永远不能使市场作180度的大转弯。
+突发事件永远只能使市场在原先已决定的轨道上加速或减速行进。
+发布于 2016-10-23
+1
+添加评论
+分享
+收藏感谢
+知乎用户
+知乎用户
+2 人赞同了该回答
+很多大神已经回答得很好了，主要是可用性，误拦，漏拦等指标。
+我补充下自己的几点看法，
+一是低耦合，业务和风控隔离;
+二是分类处理，要根据业务风险大小去指定风控问询的逻辑深度，不要一概而论，有些风险高的要做多层，不要为了性能而降级;
+三是数据要落地，部分常用数据要加kv，尽量减少外部数据依赖;
+四是不断迭代优化系统和风控策略，包括一些可用性上的柔性策略，灰度，自动降级，异地多活方案，机器学习等。
+编辑于 2016-08-21
+2
+添加评论
+分享
+收藏感谢
+盼盼
+盼盼
+金融科技
+要是事前控制都能转化为事后控制，交易系统的实时性会大幅提高！啊哈哈~
+发布于 2016-09-30
+0
+添加评论
+分享
+收藏感谢
+Ethan Liu
+Ethan Liu
+Liberty is not license
+我们的系统碰到一样的问题，你可以尝试EDA(Event-driven architecture)的架构处理。当然，还是具体分析你的需求对数据一致性的要求
+发布于 2013-12-19
+0
+添加评论
+分享
+收藏感谢
+赵云涛
+赵云涛
+资深技术人
+你这个需求是比较典型的soa应用场景，大致思路是风控系统开放内部服务，供其他交易系统查询调用。
+具体开放方式可以是webservice,jsonrpc等方式
+发布于 2013-03-18
+0
+1 条评论
+分享
+收藏感谢
+gaven wei
+gaven wei
+coder
+你问的问题就是我曾经思考的，也是现在做的工作。
+
+从架构的角度看,一定会将风控系统独立设计。原因是交易业务和风控业务不一样。
+
+1,延时的问题,看你对风控系统的要求,
+  如果要求是10毫秒以内,可以参考高频交易系统的设计,或者证卷交易所的系统设计
+  如果20毫秒以内,可以参考银联的实时风控系统,
+  如果要求100毫秒以内可以参考支付宝的风控系统
+2,需要调用服务一定面临修改的问题,关键是轻重缓急,推进步骤等
+编辑于 2016-05-30
+0
+1 条评论
+分享
+收藏感谢
+陈曦
+陈曦
+我要自由 & 为人民服务
+业务系统不太敢说，风控系统其实可大可小，除非是类似蚂蚁，宜信这种重量级选手，一般中小型公司建议Python技术栈，一是方面是维护升级方便，另一方面方便与风控模型结合。
+
+
+大概需要1-6人左右的工程团队就能撑起业务来。
+
+风控系统算是比较敏感的内容了，太具体的也不方便说
+
+
+但有几个重要的点可以分享一下：
+
+风控，业务系统，数据系统，三方要解耦
+
+贷前，贷后的等功能考虑全，但不超过10个接口，降低维护成本和沟通成本
+
+最重要的是高度自动化，数据监控+数据分析+异常处理+模型迭代
+
+
+模型自动化迭代是最前沿的，AI系统如果真的能替代工程师的工作，第一个替代的一定是机器学习工程师的工作。。。
+
+编辑于 2017-05-11
+0
+添加评论
+分享
+收藏感谢
+1 个回答被折叠（为什么？）
+QR Code of Downloading Zhihu App
+下载知乎客户端
+与世界分享知识、经验和见解
+相关问题
+以C++为核心语言的高频交易系统是如何做到低延迟的？ 31 个回答
+目前国内的高频交易业务对研发人员的需求如何？ 20 个回答
+iPhone 5s 配备的 A7 处理器是 64 位，意味着什么？ 25 个回答
+如何设计一个证券期货撮合竞价引擎？ 5 个回答
+12306 系统在 2015 年春运高峰期的稳定运行，采用了哪些具体技术？ 30 个回答
+私家课 · Live 推荐
+live
+10 大社会学经典破解职场难题
+共 11 节课试听
+live
+大话移动互联网软件测试
+Monkey 等
+5 场 live, 328 次参与
+live
+量化交易职业发展
+babyquant
+1254 人参与
+刘看山知乎指南知乎协议应用工作
+侵权举报网上有害信息举报专区
+违法和不良信息举报：010-82716601
+儿童色情信息举报专区
+联系我们 ? 2017 知乎
+
+
+
+
+
+
+
+
+
+风控是一个让人爱恨交加的话题。 对支付来说风控是必不可少的功能。只要老板不想把底裤都赔掉，那就必须上风控。可对互联网公司来说，风控是一个谜一般的话题，无论是对风控专家还是IT工程师而言。随着互联网和大数据技术的引入，风控变成了一个跨学科的领域，可这无疑是互联网公司里面最同床异梦的跨学科。
+
+机器学习、深度学习、规则推理、随机森林……光这些名词就足以让人风控专家望而怯步；而风险事件、尽职调查、巴塞尔协议……这些名词，一提起来IT人员就头大。这个系列的文章将试图从这两个领域简单梳理下支付风控面临的问题，以及如何从技术角度来解决这些问题。
+
+概念定义
+
+按照教科书的说法， 风险是指在特定场景下，特定时间内某个损失发生的可能性，或者说是在某一个特定时间段里，人们所期望达到的目标与实际出现的结果之间的差距。金融领域自从诞生以来，就一直伴随着风险。风险控制是指风险管理者采取各种措施和方法，消灭或减少风险事件发生的各种可能性，或风险控制者减少风险事件发生时造成的损失。这里又引入了一个词，风险事件， 它和风险因素经常容易混淆。 风险事件指造成风险的直接原因，风险因素则是间接原因。 如下雨天路滑导致发生车祸造成人员伤亡。 则车祸是人员伤亡的直接原因，是风险事件。而下雨天是间接原因，属于风险因素。 先看一条小道消息惊悚下：
+
+risk-baidu
+
+风控做不好，一个晚上2个亿就出去了。饶是该公司财大气粗，也扛不住几次折腾。一个漏洞搞垮一个小公司也是常有的事。对支付系统来说，安全是第一考虑的问题，特别是资金安全，这需要风控系统来保驾护航。那一般来说，支付系统会面临哪些风险？ 不同文献有不同的风险分类，本文试图从账户、资金、交易、操作、信用风险角度来详细描述。
+
+账户风险
+
+支付系统最常见的，也是在黑产圈中最为成熟的，那就得算账户的风险，即俗话说的“盗号”。近几年来，各大型互联网网站的账户泄露事故层出不穷，携程，京东，CSDN等都中过招，每一次都能引起轩然大波。而在黑产圈，账号窃取都形成了一套完整成熟的产业链。
+
+risk-attack
+
+这是目前在黑产圈中账户攻击的主要流程，以下分析在这个过程中每个阶段的具体操作，为风险系统设计提供依据。
+
+拖库
+
+拖库是实施账户攻击的第一步。考虑到大型网站一般防守比较严密，黑客一般选择从小型网站入手，入侵到一些防守薄弱或有漏洞的网站，将注册用户的资料窃取出来。常见手法包括：
+
+1. 利用操作系统和系统组件漏洞
+
+比如近年来杀伤力最大的漏洞之一Heartlbleed 漏洞。这个漏洞，在2012年OpenSSL软件发布时带有这个bug，而正式公开时间是2014年。Heartbleed漏洞使得黑客有可能通过memory dump的手段来获取到服务器上接受的用户请求、密码、甚至是服务器的私钥。只要持续不断的攻击，任何被加载到内存中且不幸被加载到和OpenSSL在同一个区块内存中的数据，都会被黑客所获取。 这两年期间，有多少黑客使用了这个漏洞来窃取网站信息，就不得而知了。 由于此类漏洞的发现和修复往往有一定的时间差，这也给黑客利用漏洞窃取信息带来了便利。
+
+2. 利用网站所使用的第三方组件漏洞
+
+如臭名昭著的Apache Struts系列漏洞。从2010年开始， 不断地有漏洞暴露出来， 这些漏洞直奔struts所使用的OGNL表达式，通过构建各种匪夷所思的表达式， 可以远程执行任意命令，包括访问根目录。由于SSH（Springframework + Apache Struts + Hibernate）架构入门简单、上手容易，再加上各种IT培训机构不遗余力的推广，在国内电商、银行、运营商网站上被大量使用。每次Apache Struts 漏洞的发布，都能够掀起一番血雨腥风。 而Apache组织对这些漏洞响应不及时，修复慢，更让这些机构雪上加霜。远离Apache Struts更是支付系统的基本要求。
+
+3. SQL注入攻击
+
+基本上所有网站都会用到数据库。而一些新手在写代码的时候，对用户输入数据不做验证或者验证不到位，就把这些数据直接通过拼接SQL语句写入到数据库中，这就很容易导致SQL注入攻击。 比如系统在判断用户名和密码是否正确时，会使用这个SQL语句来查询数据库：
+
+1
+
+攻击者可以尝试修改密码为 ‘ OR ‘a’ = ‘a ， 拼接成SQL语句：
+
+2
+
+由此执行成功，获取管理后台的权限。
+
+这三个是常见的攻击方式。 当然还有其他的方式，如木马，钓鱼网站等等，不再详细描述。
+
+洗库
+
+在攻入服务器，获取到资料，特别是数据库的信息后， 需要对信息进行分析。 不是所有的信息都可以直接使用，部分信息，如密码，身份证等，一般都会加密存储。 通过暴力、字典或者彩虹表的方式来破解，获取到破解后的信息，就拿到用户名，密码等资料。
+
+暴力破解：如果知道用户名或者密码的范围，可以通过枚举的方法逐个尝试。 对密码来说，会受限于密码的长度，如果长度在8位以上，那可枚举项就太多了，需要几天甚至几年的计算才能破解。
+字典表：其实也是暴力破解的一种，区别是可以预先计算出来一些常见的组合，比如生日之类的，然后使用这些组合来进行破解。
+彩虹表：这是一种破解哈希算法的技术，是黑客必备的跨平台密码破解方法，可以破解MD5进行哈希处理的密码。它的性能优异，在一台普通PC上辅以NVidia CUDA技术，对于Microsoft Windows操作系统使用的NTLM密码加密算法，可以达到最高超过1千亿次每秒的明文尝试。对于广泛使用的MD5也接近一千亿次。
+撞库
+
+第三步是撞库，就开始进攻真正的目标网站了。 把拿到的账户信息去尝试登陆大型网站。因为大部分用户，习惯于在多个网站使用同一套账户和密码。如果登录成功，则可以进一步窃取更多的用户信息，比如信用卡信息等。 由此可见， 撞库攻击本质上是利用用户相同的注册习惯，以大量的用户数据为基础，尝试登陆目标网站，从而窃取更多的用户资料。 这也使得黑客无需进行系统攻击的情况下，即可轻易获取目标用户信息。
+
+更进一步，黑客们会把这些资料整理后，形成社工库。这个库也日益壮大， 目前有千万规模。除了用户名密码，还有大量的个人隐私也被挖掘出来。比如如家2000万数据泄露，其中包含开房信息；QQ群用户信息泄露、京东2015年初用户信息泄露。这都导致大量的个人隐私被窃取甚至出售。
+
+由此可见，账户被窃取，往往是网站防护薄弱和用户安全意识薄弱两种因素导致。
+
+交易风险
+
+支付的交易风险主要是交易过程中的各种恶意行为，而这些行为在电商系统中表现特别突出，包括 自动刷单、人工批量下单以及异常大额订单等场景。在秒杀的时候， 由于其价格有很大的优惠力度， 黄牛会采用机器批量注册账号、机器抢购等方式来争取秒杀商品，普通消费者很难享受到秒杀的实惠，使得秒杀活动效果大打折扣。此外，在商家侧，主要的风险在于刷单。不少商家使用刷单、刷评价的方式来以非正常途径提升销量，积分，信誉等。甚至通过刷单的方式来套取补贴，帮助套现。 从阿里公司发布的《互联网信任环境调查报告》来看，大部分用户在购买的时候，会看中商家的资质和诚信，商品的销量、评论也往往会成为购买的一个参考。 在这种情况下， 刷单就成为一个提升店铺交易量的重要手段。而刷单和反刷的猫鼠游戏，也推高了刷单识别的难度。 以电商为例，一般刷单行为有如下特征：
+
+小号刷单。谁也不会用自己的注册账号来刷单，这样被封的代价就太大了。 小号的来源，可能是商家自己组织注册的，但大部分还是从专业刷单机构手中获取的。
+使用虚拟机。大部分网站都会为访问设备植入识别码。通过虚拟机，可以在一个物理机上模拟多台机器访问，随用随建。一般使用VMWare来建立虚拟机。而对手机设备，则会采用手机模拟器。
+使用VPN。 这样可以伪装使用全国任何一个地区的IP，甚至可以使用国外的VPN。
+使用手机IP：移动和联通的IP出口少，所以大部分手机端的出口IP并不多。 这些IP是电商的白名单，把某个IP封了，那会有大量的手机无法正常访问。 所以刷单人员会选择使用这些IP。
+刷虚拟物品：虚拟物品不涉及到物流环节，交易流程简单，很容易就可以把量刷上去。
+低价刷单：为了降低成本，往往会将单品价格调低，或者成交金额调低来支持刷单。
+交易商品少：刷单时，仅选择少量几个商品进行。
+互刷： 一些商家会勾结起来，相互刷单。
+这些是从刷单行为的角度来分析的结果。看来简单，可对支付系统来说，如何交易记录中识别出小号、互刷、低价等这些特征，都需要使用大量的数据进行分析才能搞定。
+
+资金风险
+
+2016年11月份的时候， 网上突然出现了大量怀疑支付宝沉淀资金用途的帖子，这些帖子在有意无意地引导一个观点： 支付宝将沉淀资金用于恒生HOMS系统的场外配资，用户将资金投放到余额宝有巨大资金风险。 毫无疑问，从监管的角度来看，这是不可能的事情。 但这谣传也揭示了支付系统的另一个风险：资金风险。 发展沉淀资金成为支付系统，特别是第三方支付系统的一个公开的秘密。
+
+沉淀资金主要有两种形式：
+
+在途资金 ：指买卖双方在确认交易后，完成结算前尚未到达卖方账户的资金。在买方没有最终确认收货之前，资金暂时交由第三方支付进行保管。这样在买卖双 方从开始交易到最终完成货款两清的这段时间差内，这些存在于第三方支付平台内部的资金，被称为在途资金。
+留存资金：对采用交易担保型账户的支付机构，客户需要开立虚拟账户来完 成交易。机构也会吸引客户进行充值操作，即留存一些资金用于交易。比如微信支付和支付宝的钱包。 当有交易需求时，可以直接从这里进行扣款。这些留存于虚拟账户中的资金也是沉淀资金的一部分。
+沉淀资金对支付来说是必要的， 通过这个资金来帮助买卖双方解决信任的问题，有利于提升用户体验。但这个资金也带来不少风险。2013 年 央行出台了《支付机构客户备付金存管办法》，其中明确要求第三方支付机 构对于客户的备付金要进行严格的区分管理，这一定程度上限制了沉淀资金风险的发生。也就是说，沉淀资金是客户的钱，支付公司不能挪用。支付公司可以获得沉淀资金的利息收益，但是不能够用这个资金来进行投资或者公司内部的消费。对这笔资金进行合理监控避免出现风险，也是支付系统需要考虑的问题。
+
+套现风险
+
+我国法律明确禁止使用信用卡套现，使用信用卡套现是违法的。但是在线支付系统中，使用信用卡进行套现，几乎是不需要成本的。 信用卡套现的手段也很多，一般是通过客户和商家的勾结来完成，比如：
+
+虚假购买，客户通过信用卡购买某商品后，商品并未实际发货，商家将购买的款项打回给客户，完成套现。
+退货套现：或者通过信用卡来购买商品，然后退货，将退款返回到借记卡或者其他可提现的渠道，也能完成套现。
+自买自卖：商家通过信用卡购买自己的商品，将货款打入到借记卡中，完成套现。
+上述的套现手段，很难识别。套现很难完全杜绝，除了要求退款资金必须原路返回外，还可以通过数据分析手段来减少发生的频率。
+
+操作风险
+
+按照巴塞尔委员会《操作风险管理》的定义， 操作风险主要是指那些由于用户支付终端操作失误、工作人员违规操作、内控机制失灵等人员操作上的原因引致损失的风险，或者说是外部风险、员工风险和流程风险。
+
+流程风险指由公司的规章制度管理、业务流程不完善而引发的风险。对一些支付公司而言，作为新兴的经济形式，不像银行那样有一套成熟、规范的流程以及完善的培训机制，这就容易触发流程风险。在以“快”为特征的互联网公司，功能创新非常重要，但往往也容易忽视了风险管理相关配套制度的建设和落实，从而为线上运行的新功能带来隐患。当新的支付方式上线后，配套的清结算、记账、对账等功能，未必能够及时地跟上，更不用说相关的内控制度建设、岗位人员配备的工作。
+
+员工风险指的是支付机构的员工不遵守职业道德，违法违规或违章操作，单独或参与骗取、盗用机构资产和客户资金，工作疏忽等行为导致的损失。在缺乏成熟培训机制的互联网公司中，这类问题往往更加突出。
+
+欺诈行为：员工同外部人员相勾结，通过挪用资金、职务侵占等方式非法占有公司财产或者泄露出卖公司商业秘密的行为。
+越权行为：员工未经授权、或超越工作权限导致的损失，比如开发人员私自修改数据库给人送优惠券。
+错误操作：员工在具体业务操作过程中的失误造成的错误操作。
+合规风险
+
+合规风险指机构因未能遵守相关的法律法规从而导致机构可能受到处罚、声誉受损的风险。从2004年的电子签名法开始，和支付相关的法律法规：
+
+3
+
+其中2010年的《非金融机构支付服务管理办法实施细则》是一个标志性的法规，标识国家开始认可第三方支付的地位并开始执行监管。 之后，央行又陆续出台一系列法规来规范支付行业的发展。可以说，支付行业的业务创新，是一个不断地由乱而治的过程。而对支付公司来说，滞后的法规建设，也给业务发展带来了巨大的风险。 2013年支付宝推出互联网理财产品余额宝，在短期内迅速发展成为国内最大的基金。随后多家支付机构也开始开展这个业务，后续央行出台了《支付机构网络支付业务管理办法》，对支付公司的业务范围、资金转移金额进行限制，避免了该业务的过度发展。 2014年央行也相继叫停了虚拟信用卡、二维码支付等业务。
+
+合规风险是国内第三方公司一个无法规避的风险，在企业发展过程中，需要密切关注央行的动向，减少合规带来的负面影响。
+
+洗钱风险
+
+第三方支付目前成为洗钱的重灾区。 2016年8月，18家支付机构被公安部列为重点整改对象。 这些支付机构提供的服务，存在未落实实名制、风控措施不严格等问题，被犯罪分子所利用，沦为咋骗和洗钱的工具。主要手段包括：通过一些第三方支付平台发行的商户POS机虚构交易套现；将诈骗得手的资金转移到第三方支付平台账户，在线购买游戏点卡、比特币、手机充值卡等物品，再转卖套现；利用第三方支付平台转账功能，将赃款在银行账户和第三方支付平台之间多次切换，使得公安机关无法及时查询资金流向，逃避打击。2012年央行发布的《支付机构反洗钱和反恐怖融资管理办法》，对支付机构如何防范洗钱风险做了明确的规范和要求，需要支付公司严格遵守。
+
+以上是支付系统可能面临的风险分析。支付风控系统是通过采集交易、渠道、商品、账户、用户等信息，对这些数据进行实时和定时的挖掘分析，识别出各种风险，采取各种措施降低损失。这是支付风控系列的第一篇文章，这个系列将包括如下内容：
+
+支付风控场景分析（本文）；
+支付风控数据仓库建设；
+支付风控模型和流程分析；
+支付风控系统架构。
+作者：凤凰牌老熊，程序员 & 架构师
+
+本文由@凤凰牌老熊（微信公众号：shamphone） 原创发布于人人都是产品经理 。未经许可，禁止转载。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+登录 | 注册
+关闭
+
+JAVA飘香
+目录视图摘要视图订阅
+异步赠书：9月重磅新书升级，本本经典           程序员9月书讯      每周荐书：ES6、虚拟现实、物联网（评论送书）
+ 大型的支付系统如何对账、风控
+2012-12-17 22:10 5389人阅读 评论(0) 收藏 举报
+ 分类： 支付（3）  
+本文源自我在知乎上的一个回答，最近在微博上被分享了好多次，就贴在这儿分享给大家。
+
+为了可以更好地解释支付结算系统对账过程，我们先把业务从头到尾串起来描述一下场景，帮助大家理解：
+一个可能得不能再可能的场景，请大家深刻理解里面每个角色做了什么，获取了哪些信息：
+某日阳光灿烂，支付宝用户小明在淘宝上看中了暖脚器一只，价格100元。犹豫再三后小明使用支付宝网银完成了支付，支付宝显示支付成功，淘宝卖家通知他已发货，最近几日注意查收。
+
+我们来看看这个过程中有几个相关方，分别做了什么。我语文不好，写得饶口，如果看不懂请多看几次：
+小明：持卡人，消费者，淘宝和支付宝的注册会员，完成了支付动作，自己的银行账户资金减少，交易成功。
+银行：收单银行，接受来自支付宝的名为“支付宝BBB”的100元订单，并引导持卡人小明支付成功，扣除小明银行卡账户余额后返回给支付宝成功通知，并告诉支付宝这笔交易在银行流水号为“银行CCC”
+支付宝：支付公司，接收到淘宝发来的订单号为“淘宝AAA”的商户订单号，并形成支付系统唯一流水号：“支付宝BBB”发往银行系统。然后获得银行回复的支付成功信息，顺带银行流水号“银行CCC”
+淘宝：我们支付公司称淘宝这类电商为商户，是支付系统的客户。淘宝向支付系统发送了一笔交易收单请求，金额为100，订单号为:“淘宝AAA”，支付系统最后反馈给淘宝这笔支付流水号为“支付BBB”
+
+以上流程貌似大家都达到了预期效果，但实际上仍然还有一个问题：
+对支付公司（支付宝）而言，虽然银行通知了它支付成功，但资金实际还要T+1后结算到它银行账户，所以目前只是一个信息流，资金流还没过来。
+
+Tips:插一句话，对支付系统内部账务来说，由于资金没有能够实时到账，所以此时小明的这笔100元交易资金并没有直接记入到系统资产类科目下的“银行存款”科目中，而是挂在“应收账款”或者“待清算科目”中。大白话就是，这100元虽然答应给我了，我也记下来了，但还没收到，我挂在那里。
+
+对商户（淘宝）而言，虽然支付公司通知了它支付成功，他也发货了，但资金按照合同也是T+1到账。如果不对账确认一下，恐怕也会不安。
+
+倒是对消费者（小明）而言：反正钱付了，你们也显示成功了，等暖脚器呀等暖脚器~
+
+基于支付公司和商户的困惑，我们的支付结算系统需要进行两件事情：一是资金渠道对账，通称对银行帐；二是商户对账，俗称对客户帐。对客户帐又分为对公客户和对私客户，通常对公客户会对对账文件格式、对账周期、系统对接方案有特殊需求，而对私客户也就是我们一般的消费者只需要可以后台查询交易记录和支付历史流水就可以了。
+我们先聊银行资金渠道对账，由于支付公司的资金真正落地在商业银行，所以资金渠道的对账显得尤为重要。
+在一个银行会计日结束后，银行系统会先进行自己内部扎帐，完成无误后进行数据的清分和资金的结算，将支付公司当日应入账的资金结算到支付公司账户中。于此同时，目前多数银行已经支持直接系统对接的方式发送对账文件。
+于是，在某日临晨4点，支付宝系统收到来自银行发来的前一会计日对账文件。根据数据格式解析正确后和前日支付宝的所有交易数据进行匹配，理想情况是一一匹配成功无误，然后将这些交易的对账状态勾对为“已对账”。
+
+Tips:此时，对账完成的交易，会将该笔资金从“应收账款”或者“待清算账款”科目中移动到“银行存款”科目中，以示该交易真正资金到账。
+
+以上太理想了，都那么理想就不要对账了。所以通常都会出一些差错，那么我总结了一下常见的差错情况：
+1.支付时提交到银行后没有反馈，但对账时该交易状态为支付成功
+这种情况很正常，因为我们在信息传输过程中，难免会出现掉包和信息不通畅。消费者在银行端完成了支付行为，银行的通知信息却被堵塞了，如此支付公司也不知道结果，商户也不知道结果。如果信息一直没法通知到支付公司这边，那么这条支付结果就只能在日终对账文件中体现了。这时支付公司系统需要对这笔交易进行补单操作，将交易置为成功并完成记账规则，有必要还要通知到商户。
+
+此时的小明：估计急的跳起来了……付了钱怎么不给说支付成功呢！坑爹！
+
+TIPS：通常银行系统会开放一个支付结果查询接口。支付公司会对提交到银行但没有回复结果的交易进行间隔查询，以确保支付结果信息的实时传达。所以以上情况出现的概率已经很少了。
+
+2.我方支付系统记录银行反馈支付成功，金额为100，银行对账金额不为100
+这种情况已经不太常见了，差错不管是长款和短款都不是我们想要的结果。通常双方系统通讯都是可作为纠纷凭证的，如果银行在支付结果返回时确认是100元，对账时金额不一致，可以要求银行进行协调处理。而这笔账在支付系统中通常也会做对应的挂账处理，直到纠纷解决。
+
+3.我方支付系统记录银行反馈支付成功，但对账文件中压根不存在
+这种情况也经常见到，因为跨交易会计日的系统时间不同，所以会出现我们认为交易是23点59分完成的，银行认为是第二天凌晨0点1分完成。对于这种情况我们通常会继续挂账，直到再下一日的对账文件送达后进行对账匹配。
+如果这笔交易一直没有找到，那么就和第二种情况一样，是一种短款，需要和银行追究。
+
+以上情况针对的是一家银行资金渠道所作的流程，实际情况中，支付公司会在不同银行开立不同银行账户，用以收单结算（成本会降低），所以真实情况极有可能是：
+临晨1点，工行对账文件丢过来（支行A）
+临晨1点01分，工行又丢一个文件过来（支行B）
+临晨1点15分，农行对账文件丢过来
+。 。 。
+临晨5点，兴业银行文件丢过来
+。。。
+不管什么时候，中国银行都必须通过我方业务员下载对账文件再上传的方式进行对账，所以系统接收到中行文件一般都是早上9点05分……
+
+对系统来说，每天都要处理大量并发的对账数据，如果在交易高峰时段进行，会引起客户交互的延迟和交易的失败，这是万万行不得的
+
+所以通常支付公司不会用那么傻的方式处理数据，而是在一个会计日结束后，通常也是临晨时段，将前一日交易增量备份到专用对账服务器中，在物理隔绝环境下进行统一的对账行为，杜绝硬件资源的抢占。
+
+以上是银行资金渠道入款的对账，出款基本原理一致，不过出款渠道在实际业务过程中还有一些特别之处，由于大家不是要建设系统，我就不赘述了。
+
+谈完了资金渠道的对账，我们再来看看对客户帐。
+
+前面提到了，由于资金落在银行，所以对支付公司来说，对银行帐非常重要。那么同理，由于资金落在支付公司，所以对商户来说，对支付公司账也一样重要。能否提供高品质甚至定制化的服务，是目前支付公司走差异化路线的一个主要竞争点。
+就流程而言@詹世波已经说的差不多了，我就不赘述了……
+
+—————————————————没经过排版的小知识点——————————————–
+之前说过，银行与支付公司之间的通讯都是可以作为纠纷凭证的。原理是对支付报文的关键信息进行密钥加签+md5处理，以确保往来报文“不可篡改，不可抵赖”。
+同理，支付公司和商户之间也会有类似机制保证报文的可追溯性，由此我们可以知道，一旦我方支付系统通知商户支付结果，那么我们就要为此承担责任。由此我们再推断一个结论：
+即便某支付订单银行方面出错导致资金未能到账，一旦我们支付系统通知商户该笔交易成功，那么根据协议该结算的资金还是要结算给这个商户。自然，我们回去追究银行的问题，把账款追回。
+—————————————————没经过排版的小知识点——————————————–
+
+一、对支付系统而言，最基本的对账功能是供商户在其后台查询下载某一时间段内的支付数据文件，以供商户自己进行对账。
+这个功能应该是个支付公司就有，如果没有就别混了。
+二、对大多数支付系统而言，目前已经可以做到对账文件的主动投送功能。
+这个功能方便了商户系统和支付系统的对接，商户的结算人员无须登录支付平台后台下载文件进行对账，省去了人工操作的麻烦和风险。
+
+对大型支付系统而言，商户如果跨时间区域很大，反复查询该区域内的数据并下载，会对服务器造成比较大的压力。各位看官别笑，觉得查个数据怎么就有压力了。实际上为了这个查询，我最早就职的一家支付公司重新优化了所有SQL语句，并且因为查询压力过大服务器瘫痪过好几次。
+现在比较主流的做法是把商户短期内查询过、或者经常要查询的数据做缓存。实在不行就干脆实时备份，两分钟同步一次数据到专用数据库供商户查询，以避免硬件资源占用。甚至……大多数支付公司都会对查询范围跨度和历史事件进行限制，比如最多只能查一个月跨度内，不超过24个月前的数据……以避免服务嗝屁。
+
+对账这块大致就这样了，再往细的说就说不完了，大家有什么想问的可以单M我或者回复答案。
+稍后给大家讲一下风控。
+———————————————–风控的分割线——————————————-
+风险控制，在各行各业都尤其重要。
+金融即风险，控制好风险，才有利润。
+虽然第三方支付严格意义上说并非属于金融行业，但由于涉及资金的清分和结算，业务主体又是资金的收付，所以风险控制一样非常重要。
+
+对支付公司来说，风控主要分为合规政策风控以及交易风控两种。
+前者主要针对特定业务开展，特定产品形态进行法规层面的风险规避，通常由公司法务和风控部门一起合作进行。例如，一家公司要开展第三方支付业务，现在要获得由人民银行颁发的“支付业务许可证”。遵守中国对于金融管制的所有条规，帮助人行监控洗钱行为……这些法规合规风险，虽然条条框框，甚至显得文绉绉，但如果没人解读没人公关，业务都会无法开展。
+当然，这块也不是本题所关注的重点，提问者关注的，应当是业务进行过程中的交易风控环节。
+
+现在随着各支付公司风险控制意识的加强，风控系统渐渐被重视起来。除了上述提到的合规风控相关功能，风控系统最讲技术含量，最讲业务水平，最考究数据分析的业务就是交易风控环节。
+
+对一笔支付交易而言，在它发生之前、发生过程中及发生过程后，都会被风控系统严密监控，以确保支付及客户资产安全。而所有的所有秘密，都归结到一个词头上：规则。风控系统是一系列规则的集合，任何再智能的风控方案，都绕不开规则二字。
+
+我们先看看，哪些情况是交易风控需要监控处理的：
+1.钓鱼网站
+什么是钓鱼呢？
+用我的说法，就是利用技术手段蒙蔽消费者，当消费者想付款给A的时候，替换掉A的支付页面，将钱付给B，以达成非法占用资金的目的。
+还有更低级的，直接就是发小广告，里面带一个类似http://tiaobao.com的网址，打开后和淘宝页面一摸一样，上当客户直接付款给假冒网站主。
+
+第一种情况风控系统是可以通过规则进行简单判定的，虽然有误杀，但不会多。
+通常使用的规则是判断提交订单的IP地址和银行实际支付完成的IP地址是否一致，如果不一致，则判断为钓鱼网站风险交易，进入待确认订单。
+
+但第二种情况，亲爹亲娘了，支付公司真的没办法。当然遇到客户投诉后可能会事后补救，但交易是无法阻止了。
+
+2.盗卡组织利用盗卡进行交易
+大家都知道，信用卡信息是不能随便公布给别人的，国内大多信用卡虽然都设置了密码，但银行仍然会开放无磁无密支付接口给到商户进行快速支付之用。
+所谓无磁无密，就是不需要磁道信息，不需要密码就可以进行支付的通道。只需要获取到客户的CVV，有效期，卡号三个核心信息，而这三个信息是在卡上直接有的，所以大家不要随便把卡交给别人哦~
+
+碰到类似的这种交易，风控系统就不会像钓鱼网站这样简单判断了。
+过去我们所有的历史交易，都会存库，不仅会存支付相关信息，更会利用网页上的控件（对，恶心的activex或者目前用的比较多的flash控件）抓取支付者的硬件信息，存储在数据库中。
+当一笔交易信息带着能够搜集到的硬件信息一同提交给风控系统时，风控系统会进行多种规则判定。
+例如：当天该卡是否交易超过3次
+当天该IP是否交易超过3次
+该主机CPU的序列号是否在黑名单之列
+
+等等等等，一批规则跑完后，风控系统会给该交易进行加权评分，标示其风险系数，然后根据评分给出处理结果。
+
+通过硬件信息采集以及历史交易记录回溯，我们可以建立很多交易风控规则来进行监控。所以规则样式的好坏，规则系数的调整，就是非常重要的用以区别风控系统档次高低的标准。
+
+例如，我听说著名的风控厂商RED，有一个“神经网络”机制，灰常牛逼。
+其中有一个规则我到现在还记忆犹新：
+某人早上八点在加利福尼亚进行了信用卡支付，到了下午一点，他在东亚某小国家发起了信用卡支付申请。系统判断两者距离过长，不是短短5小时内能够到达的，故判定交易无效，支付请求拒绝。
+
+规则非常重要，当然，数据也一样重要。我们不仅需要从自己的历史记录中整合数据，同时还要联合卡组织、银行、风控机构，购买他们的数据和风控服务用来增加自己的风控实力。
+
+SO，风控是一个不断积累数据、分析数据、运营数据、积累数据的循环过程。
+
+好的风控规则和参数，需要经过无数次的规则修改和调整，是一个漫长的过程。
+不知道大家做互联网，有没有利用GA做过AB测试，同样的，风控系统也需要反复地做类似AB测试的实验，以保证理论和实际的匹配。
+
+最后给大家说一个小小的概念：
+所谓风控，是指风险控制，不是风险杜绝。
+风控的目标一定不是把所有风险全部杜绝。
+合理的风控，目标一定是：利润最大化，而不是风险最小化
+过于严格的风控规则，反而会伤害公司利益（看看销售和风控经常打架就知道了）
+
+不光是交易的风控，我们日常制定规则，法规，公司流程，也一定要秉着这个出发点进行规划。
+
+ 
+顶
+1
+踩
+0
+ 
+ 
+上一篇启动TOGAF9项目之前应遵循的10个步骤
+下一篇大型支付系统后台对账系统的控制和管理
+  相关文章推荐
+? 账户对账的程序开发
+? 自然语言处理在“天猫精灵”的实践应用--姜飞俊
+? 支付系统对账算法优化方案
+? 蚂蜂窝大数据平台架构及Druid引擎实践--汪木铃
+? 一个很好的2个银行进行对账单对账程序
+? Retrofit 从入门封装到源码解析
+? 微软新搜索计划暴光 首页较Google少54字节
+? 程序员如何转型AI工程师
+? 成本与总账对账工具
+? 深入探究Linux/VxWorks的设备树
+? 清结算系统对账文件的规范和目录(省平台)
+? 使用QEMU搭建u-boot+Linux+NFS嵌入式开发环境
+? 支付系统中的对账处理
+? 大型支付系统后台对账系统的控制和管理
+? 对账系统框架
+? 大型的支付系统如何对账、风控
+
+查看评论
+
+  暂无评论
+
+您还没有登录,请[登录]或[注册]
+* 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场
+个人资料
+ 访问我的空间 
+rainight
+ 
+访问：38953次
+积分：470
+等级： 
+排名：千里之外
+原创：7篇转载：13篇译文：0篇评论：16条
+文章搜索
+
+搜索
+文章分类
+JCA(0)
+Unix/Linux技巧(1)
+视频会议(1)
+云计算(1)
+支付(4)
+大规模系统(7)
+企业架构(1)
+EA(1)
+TOGAF(1)
+WEB(0)
+文章存档
+2013年11月(2)
+2013年05月(1)
+2013年03月(1)
+2012年12月(2)
+2012年03月(1)
+展开
+阅读排行
+代码动态生成利器ASM(8133)
+大型的支付系统如何对账、风控(5386)
+大型支付系统后台对账系统的控制和管理(3388)
+LVS NAT模式简介(2109)
+用JAVA访问共享文件系统(1986)
+通过xalan实现关系型数据库到XML的数据交换(1858)
+JDOM/XPATH编程指南(1801)
+Web Service深度编程——Axis序列化/反序列化器开发指南(1779)
+如何用xmanager连接redhat9(1321)
+支付宝大规模SOA系统(转载)(1164)
+评论排行
+JDOM/XPATH编程指南(7)
+通过xalan实现关系型数据库到XML的数据交换(5)
+用JAVA访问共享文件系统(3)
+代码动态生成利器ASM(1)
+LVS NAT模式简介(0)
+可伸缩性最佳实践：来自eBay的经验(0)
+支付宝大规模SOA系统(转载)(0)
+基于SIP的集中式视频会议模型介绍(0)
+如何用xmanager连接redhat9(0)
+高并发服务端分布式系统设计概要（下）(0)
+推荐文章
+* CSDN新版博客feed流内测用户征集令
+* Android检查更新下载安装
+* 动手打造史上最简单的 Recycleview 侧滑菜单
+* TCP网络通讯如何解决分包粘包问题
+* SDCC 2017之大数据技术实战线上峰会
+* 快速集成一个视频直播功能
+最新评论
+代码动态生成利器ASM
+liuyuanhui0301:
+通过xalan实现关系型数据库到XML的数据交换
+Element: ,正在研究中，资料真是少啊！
+用JAVA访问共享文件系统
+Kavon: java有没有什么工具包可以获得工作组名
+通过xalan实现关系型数据库到XML的数据交换
+jeson_jin: 关于sql条件问题没找到有关文档，请教sql条件怎么写进去？
+通过xalan实现关系型数据库到XML的数据交换
+jeson_jin: 我知道了用addParameterFromElement()
+JDOM/XPATH编程指南
+ldeng76: for (int i = 0; i &gt; list.size(); i++) { 这一句应该改为...
+通过xalan实现关系型数据库到XML的数据交换
+雨夜聆风: 没有错误，是你的jdk版本有问题，jdk1.3.1可以正常执行。如果你用的是jdk1.4请在运行时替...
+通过xalan实现关系型数据库到XML的数据交换
+Epkhq: 例子有错,报错&quot;未知的 SystemId; 行 #25; 列 #22; Error ...
+用JAVA访问共享文件系统
+Jeasonzhao: Thanks a lot,it's a good stuff for me
+用JAVA访问共享文件系统
+tinyjimmy: 不错, 学习
+JCA
+J2EE连接器开发实践之一: J2EE连接器的开发
+J2EE连接器开发实践之一: J2EE连接器的开发
+Report
+JFreeChart中文API
+Rule Engine
+Java规则引擎：开源Drools项目 (RSS)
+
+
+公司简介|招贤纳士|广告服务|联系方式|版权声明|法律顾问|问题报告|合作伙伴|论坛反馈
+网站客服杂志客服微博客服webmaster@csdn.net400-660-0108|北京创新乐知信息技术有限公司 版权所有|江苏知之为计算机有限公司|江苏乐知网络技术有限公司
+京 ICP 证 09002463 号|Copyright ? 1999-2017, CSDN.NET, All Rights Reserved GongshangLogo
+
+职位描述：
+
+工作职责：    
+
+                  
+
+1.深入理解商业模式、业务及产品的方向和需求，参与构建公司数据分析与风控模型体系，参与研究和应用互联网金融领域模型构建知识与技术；        
+
+2.对风控数据进行统计分析，发现数据中的相关关系，为风控模型创建并筛选变量，为风险管理提供决策支持；        
+
+3.对风控数据进行挖掘，利用统计分析、决策树、回归算法、机器学习或时间序列等技术建立信用风险预测模型，包括但不限于申请评分卡、行为评分卡、催收评分卡、反欺诈评分卡等；        
+
+4.参与各类模型及其评分卡报表的设计、开发、实施与跟踪，并结合效果不断改进评分卡，熟悉模型生命周期的全流程管理；    
+
+5.针对商业问题和实际业务，参与创新方法和应用的研发，充分挖掘数据的商业价值        
+
+                  
+
+任职要求：    
+
+                  
+
+1. 至少具备以下教育背景中的一种：信息管理与计算机科学类、数学类、统计类、计量经济学类、机器学习类等专业（硕士以上学历优先）；               
+
+2. 一到两年数据分析、数据挖掘及模型开发经验（有IT大数据分析经验，咨询公司数据分析经验、互联网金融数据建模分析经验者优先）；           
+
+3. 熟练使用SQL与EXCEL，熟悉主流数据库环境；                  
+
+4. 掌握至少一种主流数据挖掘或数据分析工具，如SAS、SPSS、R、Python等；                
+
+5. 对互联网金融行业有兴趣，对工作有热情；具备良好的学习能力、逻辑思维能力、沟通能力、团队协作能力和执行力；         
+
+6. 文本数据的分析与挖掘（文本分类，关键词提取，聚类，主题分析，情感分析等）有一定知识者加分
+
+
+
+
+
+
+
+
+
+
+
+
+余额支付风控
+整体篇
+by dylanfan at 2015-2-9
+一  概述
+什么是风控？在支付行业的的风控是通过一定手段来对平台的业务风险进行控制，偏业务安全领域。风控和技术安全还是不太一样，技术安全更多关注系统漏洞，是否被攻击，是否被拖库。 所以，风控更加注重对业务的理解，数据分析，模型，以及风险打击策略的制定。一句话：支付领域的风控就是来之别当前交易是否有风险，如果有，进行什么的动作。 在支付领域，支付产品出来前，都会和风控团队沟通，提前预知可能的风险点，并保证用户体验的情况下，制定风险策略。
+二 余额支付场景
+场景大体分为购买行为（包括余额支付，混合支付，合单支付，代付），C2C 转账，付款到银行卡，提现。所有风险控制策略基本都是围绕这几块场景的风险情况来制定的。
+
+各个场景具体情况如下：
+（1）购买行为： 买方是用户，卖方是商户，购买的是物品。物品有虚拟，自动发货，一般实物，高危实物等。根据物品属性不同，风险也不同。销赃快速和方便的物品的风险相对较高，比如虚拟和自动发货的物品。常见的虚拟物品：游戏道具，充手机话费等。所以，这块的风险一方面是是从买方账号侧来看，一方面从物品属性来看。
+（2）C2C转账：买方是用户，卖方也是用户。风险可以从买卖双方两侧账号情况来看。
+（3）付款到银行卡是主要指钱从余额转到一张银行卡（非账号绑定的卡）中，常见的如汇款转账，还信用卡。这块的风险可以买方账号侧和银行卡信息来看。
+（4）提现：指余额的钱提现到自己绑定的卡中。相对前面三种情况，对于账号被盗销赃场景的风险，提现相对最低。
+三 用户分类
+
+1： 按证书用户分：无证书用户和数字证书用户。无证书用户是余额被盗对抗中最为激烈的一块。
+2：按一般用户和C商户账号来分：普通用户和拍拍卖家账号。普通用户骗子常用的手法是批量处理销赃。拍拍卖家账号，金额很多，骗子经常一对一的钓鱼来处理。对拍拍卖家账号的交易处理尤为谨慎。
+3：按实名来分：非实名用户和实名用户；实名只需要账号姓名和身份证姓名一致就行。
+4：按实名认证来分：非实名认证用户和实名认证用户。实名认证是在实名的基础上需要有银行卡信息，这块的处理有两种方式：绑卡开通快捷和系统给你指定的银行卡打很小的钱，你回答打了多少钱来确定银行卡是你本人的。
+四 风险评估和惩罚手段
+   余额支付风险主要分两块：（1）盗号的风险 （2）盗卡的风险。盗号的风险：账号被盗，余额被转移的风险。盗卡的风险：骗子骗到银行卡后，注册个账号，用该银行卡开通快捷支付充值到余额，然后通过余额支付的风险。 两者情况不同，识别的方法也不同。
+
+4.1：业务限制
+支付反欺诈一直是个长期博弈的过程，此消彼长，不太可能我们能完全控制住对方，取得压倒性胜利，很多反欺诈策略是事后根据损失案例来制定的，所以，基本上一个新的支付产品（购买，转账，红包等都可以看成一种支付产品）出来，在风险异常识别策略之前，都应该有个基本的业务限制策略（这个需要和产品协商，在不影响用户的支付体验上做限制），比如限定一定额度或者实名认证等，这样可以把损失上限控制在一定的范围内。
+4.2：风险异常识别
+风险异常识别是从损失案例中的分析和对比正常样本来发现异常特征，然后制定风险策略，风险策略包括识别风险和如何打击。风险识别方法主要分为两块专家规则体系和风向模型体系。规则精准度高，覆盖率低，上线快速，但系统迁移和维护成本高。模型覆盖率高，精准度相对单一规则要低，需要足够多的样本，但具备学习能力，系统迁移和维护便利。对于反欺诈领域对规则和模型的效果对比可以参考如下：
+
+   无论专家规则还是模型，首先都是要挖掘足够多的有用的风险特征。风险评估基本可以总结为识别异常和过滤正常，所以风险特征集合基本就包含这两块的特征。在盗号风险异常中，基本面临的就是账号被盗在异地销赃和同城销赃，异地相对同城识别容易些。欺诈和反欺诈的对抗博弈会不断加剧，从简单的对抗向深层次的对抗延伸，坏人盗号后的支付行为也会越来越伪装的很像正常行为。所以，我们也需要挖掘更深次特征来区别异常支付行为和正常行为，否则，就会带来拦截量高涨。我相信，坏人伪装的再好，他和正常用户自己的行为总会有不一样的地方。具体的识别方法和不同用户在不同场景的风控策略这里不细说，后续具体探讨。
+4.3：惩罚手段
+限额，加验（根据用户的自己的定义来选择是加验数字证书，还是U顿，短信等），实名认证，拦截交易，关闭余额，冻结账号，加黑信息等。不同的行为评估，采用不同惩罚手段。对于惩罚手段需要注意的是，如果涉及到金额，对单笔金额限制意义是不大的，最好用累计金额来限制。同时，一旦识别有风险点，需要在各个场景进行布控，任何场景的布控缺失都是高危的。风控遵循木桶原理，风控的水平取决于你对最薄弱环节的控制。对于控制手段，我想提下黑产。在黑产市场上有个词是叫信封，信封就是装有账号和密码的文件。每个信封都有它价格。同样，黑产上每个银行卡号也有相应的价格，在我们把额度控制在一定范围内，也能起到不错的作用，比如黑产上一张卡的价格是500元，我们控制的额度在500元以下，骗子花大功夫去却收益很少，长期来看，对骗子也能起到驱赶的作用。  
+五 策略上线和运营
+5.1: 策略上线
+分析损失案例，对比正常交易，我们发现恶意手法，制定相应的风险策略。首先这个风险策略，是经过常规离线评估指标，准确率，覆盖率多少。离线评估指标达标后，我们就可以尝试放到线上了。但是在真实环境中真正应用风险策略前，我们需要把策略先放到测试环境上来观察一段时间，评估拦截量和准确度。相对广告一些领域，算法和模型测试都是做A/B Test不同，风控的测试环境和真实环境保持一致，只需在测试环境中给命中策略的交易打上相应的标记来记录就好，不做真实动作，就可以起到测试的作用。
+策略上线后，风控策略和欺诈者的博弈对抗就会开始。刚开始的时候，策略的准确度都会很高，但是随着时间推移，策略的准确性就会下降。因为，欺诈者之前的欺诈手法所做的交易行为为拦截，并多次碰壁后，他们就会意识到，他们的行为已经被监测了，之前发现的风控系统的漏洞已经被堵上，他们会随之消停直到发现新的风控系统漏洞再发起攻击。
+5.2：策略运营
+风险策略运营需要观察拦截曲线和损失曲线。时间周期可以以周为基本单位，观察一定时间内拦截曲线的变化和损失曲线的变化，详细记录拦截曲线大变化的事件或策略，尤其是是损失曲线上涨和下降原因。
+策略上线后，我们需要对策略拦截量，准确率等指标有个实时监控。通过监控，我们能发现拦截异常，策略当前有效性问题等。对策略有效性监控可以有如下几个方法：抽样调查，用户反馈，白名单机制（看白名单被你命中的比率）。在盗号领域，用户反馈可以分为：要求加验，看用户是否加验成功；或者冻结账户，用户来反馈当前交易是否是本人操作等。损失曲线变化一般相对策略上线时间有个几天的延时，主要是由于用户反馈有个延时期。
